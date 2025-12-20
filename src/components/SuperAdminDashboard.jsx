@@ -8,9 +8,9 @@ import {
   doc,
   setDoc,
 } from "firebase/firestore";
-import { db, auth } from "../firebase";
+import { db, auth } from "@/lib/firebase";
 import { httpsCallable } from "firebase/functions";
-import { functions } from "../firebase";
+import { functions } from "@/lib/firebase";
 
 const SuperAdminDashboard = ({ user, onLogout }) => {
   const [admins, setAdmins] = useState([]);

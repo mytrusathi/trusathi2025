@@ -2,7 +2,7 @@
 "use client";
 import React, { useState } from "react";
 import { Heart } from "lucide-react";
-import { auth, db } from "../firebase";
+import { auth, db } from "@/lib/firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,

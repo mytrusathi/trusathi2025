@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { Heart, MapPin, Briefcase, Phone, Share2 } from "lucide-react";
-import { BRAND } from "../config/brand";
+import { BRAND } from "@/config/brand";
 
 const APP_NAME = BRAND.NAME;
 const APP_TAGLINE = BRAND.TAGLINE;;

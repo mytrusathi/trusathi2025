@@ -20,8 +20,8 @@ import {
   updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../firebase";
-import { parseBiodataHybrid } from "../utils/parseBiodata";
+import { db } from "@/lib/firebase";
+import { parseBiodataHybrid } from "@/utils/parseBiodata";
 
 // Basic sanitization (same idea as in GroupAdminDashboard)
 const sanitizeProfile = (data) => {

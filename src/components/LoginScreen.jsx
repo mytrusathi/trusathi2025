@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Lock } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { db, auth } from "../firebase";
+import { db, auth } from "@/lib/firebase";
 
 const LoginScreen = ({ onLogin, onBack }) => {
   const [email, setEmail] = useState("");

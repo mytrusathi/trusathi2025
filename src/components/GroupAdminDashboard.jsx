@@ -30,9 +30,9 @@ import {
   orderBy,
 } from "firebase/firestore";
 
-import Input from "./Input";
+import Input from "@/components/Input";
 
-import parseBiodata from "../utils//parseBiodata";
+import parseBiodata from "@/utils//parseBiodata";
 
 function renderInitial(name) {
   if (!name) return "?";
