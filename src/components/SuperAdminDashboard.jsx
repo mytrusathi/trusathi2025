@@ -2,15 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { UserPlus } from "lucide-react";
-import {
-  collection,
-  getDocs,
-  doc,
-  setDoc,
-} from "firebase/firestore";
+import {collection, getDocs} from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
-import { httpsCallable } from "firebase/functions";
-import { functions } from "@/lib/firebase";
 
 const SuperAdminDashboard = ({ user, onLogout }) => {
   const [admins, setAdmins] = useState([]);
@@ -58,13 +51,6 @@ const SuperAdminDashboard = ({ user, onLogout }) => {
 
     try {
       setLoading(true);
-      const createGroupAdmin = httpsCallable(functions, "createGroupAdmin");
-      const result = await createGroupAdmin({ email, password, groupName });
-      if (result.data.success) {
-        alert("New Group Admin Created Successfully!");
-        setNewAdmin({ email: "", password: "", groupName: "" });
-        setShowAdd(false);
-      }
       
     }catch (e) {
       alert("Error: " + e.message);
