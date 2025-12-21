@@ -51,7 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(firebaseUser)
 
         // 🔑 Fetch role from Firestore
-        const userDocRef = doc(db, 'users', firebaseUser.uid)
+        try 
+        {
+          const userDocRef = doc(db, 'users', firebaseUser.uid)
         const userDocSnap = await getDoc(userDocRef)
 
         if (userDocSnap.exists()) {
@@ -59,7 +61,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setRole(null)
         }
-      } else {
+      }
+      catch (error) {
+    console.error('Failed to fetch user role:', error)
+    setRole(null) 
+      } 
+    }
+      else {
         setUser(null)
         setRole(null)
       }
