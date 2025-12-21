@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { Heart, Menu, X } from 'lucide-react'
 import { auth } from 'app/lib/firebase'
 
+import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, role, loading } = useAuth()
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
