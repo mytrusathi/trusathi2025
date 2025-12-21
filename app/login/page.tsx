@@ -14,9 +14,11 @@ export default function LoginPage() {
 
   // 🔁 AUTO REDIRECT AFTER LOGIN
   useEffect(() => {
+    
     if (loading) return
 
     if (user && role) {
+        console.log('REDIRECTING TO DASHBOARD:', role)
       if (role === 'super-admin') {
         router.replace('/dashboard/super-admin')
       } else if (role === 'group-admin') {
@@ -72,6 +74,7 @@ export default function LoginPage() {
         />
 
         <button
+         type="button"
           onClick={handleLogin}
           className="bg-indigo-600 text-white w-full py-2 rounded hover:bg-indigo-700"
         >

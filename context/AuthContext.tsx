@@ -46,37 +46,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+  let isMounted = true
+
+  const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    try {
+      if (!isMounted) return
+
       if (firebaseUser) {
         setUser(firebaseUser)
 
-        // 🔑 Fetch role from Firestore
-        try 
-        {
+        try {
           const userDocRef = doc(db, 'users', firebaseUser.uid)
-        const userDocSnap = await getDoc(userDocRef)
+          const userDocSnap = await getDoc(userDocRef)
 
-        if (userDocSnap.exists()) {
-          setRole(userDocSnap.data().role as UserRole)
-        } else {
+          if (userDocSnap.exists()) {
+            setRole(userDocSnap.data().role as UserRole)
+          } else {
+            setRole(null)
+          }
+        } catch (firestoreError) {
+          console.error('Firestore role fetch failed:', firestoreError)
           setRole(null)
         }
-      }
-      catch (error) {
-    console.error('Failed to fetch user role:', error)
-    setRole(null) 
-      } 
-    }
-      else {
+      } else {
         setUser(null)
         setRole(null)
       }
+    } catch (authError) {
+      console.error('Auth state error:', authError)
+      setUser(null)
+      setRole(null)
+    } finally {
+      if (isMounted) {
+        setLoading(false)
+      }
+    }
+  })
 
-      setLoading(false)
-    })
+  return () => {
+    isMounted = false
+    unsubscribe()
+  }
+}, [])
 
-    return () => unsubscribe()
-  }, [])
 
   /* -----------------------------
      Auth Functions
