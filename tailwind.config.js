@@ -1,9 +1,13 @@
+const path = require('path');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    // Use absolute paths to guarantee Tailwind finds the files
+    path.join(process.cwd(), "src/**/*.{js,ts,jsx,tsx,mdx}"),
+    path.join(process.cwd(), "app/**/*.{js,ts,jsx,tsx,mdx}"),
+    path.join(process.cwd(), "pages/**/*.{js,ts,jsx,tsx,mdx}"),
+    path.join(process.cwd(), "components/**/*.{js,ts,jsx,tsx,mdx}"),
   ],
   theme: {
     extend: {},
