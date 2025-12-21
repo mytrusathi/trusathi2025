@@ -11,10 +11,10 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  User,
 } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db } from '../app/lib/firebase'
+import { AppUser } from '@/types/appUser'
 
 /* -----------------------------
    Types
@@ -23,7 +23,7 @@ import { auth, db } from '../app/lib/firebase'
 type UserRole = 'super-admin' | 'group-admin' | 'member' | null
 
 interface AuthContextType {
-  user: User | null
+  user: AppUser | null
   role: UserRole
   loading: boolean
   loginWithEmail: (email: string, password: string) => Promise<void>
@@ -41,54 +41,55 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 ------------------------------*/
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<AppUser | null>(null)
   const [role, setRole] = useState<UserRole>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-  let isMounted = true
+    let isMounted = true
 
-  const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-    try {
-      if (!isMounted) return
-
-      if (firebaseUser) {
-        setUser(firebaseUser)
-
-        try {
-          const userDocRef = doc(db, 'users', firebaseUser.uid)
-          const userDocSnap = await getDoc(userDocRef)
-
-          if (userDocSnap.exists()) {
-            setRole(userDocSnap.data().role as UserRole)
-          } else {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      try {
+        if (!firebaseUser) {
+          if (isMounted) {
+            setUser(null)
             setRole(null)
+            setLoading(false)
           }
-        } catch (firestoreError) {
-          console.error('Firestore role fetch failed:', firestoreError)
-          setRole(null)
+          return
         }
-      } else {
-        setUser(null)
-        setRole(null)
+
+        // 🔥 Fetch Firestore user ONCE
+        const userRef = doc(db, 'users', firebaseUser.uid)
+        const userSnap = await getDoc(userRef)
+
+        const appUser: AppUser = {
+          ...(firebaseUser as AppUser),
+          role: userSnap.exists() ? userSnap.data().role : null,
+          groupName: userSnap.exists() ? userSnap.data().groupName : null,
+          groupId: userSnap.exists() ? userSnap.data().groupId : null,
+        }
+
+        if (isMounted) {
+          setUser(appUser)
+          setRole(appUser.role ?? null)
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Auth initialization failed:', error)
+        if (isMounted) {
+          setUser(null)
+          setRole(null)
+          setLoading(false)
+        }
       }
-    } catch (authError) {
-      console.error('Auth state error:', authError)
-      setUser(null)
-      setRole(null)
-    } finally {
-      if (isMounted) {
-        setLoading(false)
-      }
+    })
+
+    return () => {
+      isMounted = false
+      unsubscribe()
     }
-  })
-
-  return () => {
-    isMounted = false
-    unsubscribe()
-  }
-}, [])
-
+  }, [])
 
   /* -----------------------------
      Auth Functions
