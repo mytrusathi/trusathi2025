@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { Heart, Menu, X } from 'lucide-react'
+import { auth } from 'app/lib/firebase'
+
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
