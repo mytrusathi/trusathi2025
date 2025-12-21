@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { Heart, Search, Shield, Users, CheckCircle, Menu, X, ChevronRight, Facebook, Twitter, Instagram, UserPlus, Lock } from 'lucide-react';
 
@@ -13,43 +15,42 @@ export default function TrusathiUI() {
   ];
 
   const features = [
-    { icon: <Users className="w-8 h-8 text-rose-600" />, title: 'Community Verified', desc: 'Profiles are sourced and verified by trusted Group Admins from your own community WhatsApp groups.' },
-    { icon: <Shield className="w-8 h-8 text-rose-600" />, title: '100% Trust', desc: 'No fake profiles. Every member is vetted by a Group Admin before being listed on Trusathi.' },
-    { icon: <Lock className="w-8 h-8 text-rose-600" />, title: 'Privacy First', desc: 'Your contact details are secure. Only verified members can initiate connection requests.' },
+    { icon: <Users className="w-8 h-8 text-indigo-600" />, title: 'Community Verified', desc: 'Profiles are sourced and verified by trusted Group Admins from your own community WhatsApp groups.' },
+    { icon: <Shield className="w-8 h-8 text-indigo-600" />, title: '100% Trust', desc: 'No fake profiles. Every member is vetted by a Group Admin before being listed on Trusathi.' },
+    { icon: <Lock className="w-8 h-8 text-indigo-600" />, title: 'Privacy First', desc: 'Your contact details are secure. Only verified members can initiate connection requests.' },
   ];
 
   return (
-    <div className="min-h-screen bg-rose-50/30 font-sans text-gray-800">
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
       
       {/* --- Navbar --- */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
+          <div className="flex justify-between h-16 items-center">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-rose-600 rounded-full flex items-center justify-center text-white">
+              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
                 <Heart fill="currentColor" size={20} />
               </div>
               <div>
-                <span className="text-2xl font-bold text-gray-900 tracking-tight block leading-none">Trusathi</span>
-                <span className="text-xs text-rose-600 font-medium tracking-wide uppercase">Trusted Matrimony</span>
+                <span className="text-2xl font-bold text-indigo-900 tracking-tight block leading-none">Trusathi</span>
               </div>
             </div>
 
             {/* Desktop Links */}
             <div className="hidden md:flex space-x-8 items-center">
-              <a href="#" className="text-gray-600 hover:text-rose-600 font-medium transition">Browse Profiles</a>
-              <a href="#" className="text-gray-600 hover:text-rose-600 font-medium transition">Communities</a>
-              <a href="#" className="text-gray-600 hover:text-rose-600 font-medium transition">About Us</a>
-              <button className="text-rose-600 font-medium hover:bg-rose-50 px-4 py-2 rounded-full transition">Login</button>
-              <button className="bg-rose-600 text-white px-6 py-2.5 rounded-full font-medium hover:bg-rose-700 shadow-md transition transform hover:-translate-y-0.5">
+              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition">Browse Profiles</a>
+              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition">Communities</a>
+              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition">About Us</a>
+              <button className="text-indigo-600 font-medium hover:bg-indigo-50 px-4 py-2 rounded-full transition">Login</button>
+              <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-indigo-700 shadow-md transition transform hover:-translate-y-0.5">
                 Register Free
               </button>
             </div>
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600 hover:text-rose-600 p-2">
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600 hover:text-indigo-600 p-2">
                 {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
             </div>
@@ -59,126 +60,117 @@ export default function TrusathiUI() {
         {/* Mobile Menu Dropdown */}
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 py-4 px-4 space-y-3 shadow-lg">
-            <a href="#" className="block text-gray-700 hover:text-rose-600 font-medium py-2">Browse Profiles</a>
-            <a href="#" className="block text-gray-700 hover:text-rose-600 font-medium py-2">Communities</a>
-            <a href="#" className="block text-gray-700 hover:text-rose-600 font-medium py-2">About Us</a>
+            <a href="#" className="block text-gray-700 hover:text-indigo-600 font-medium py-2">Browse Profiles</a>
+            <a href="#" className="block text-gray-700 hover:text-indigo-600 font-medium py-2">Communities</a>
+            <a href="#" className="block text-gray-700 hover:text-indigo-600 font-medium py-2">About Us</a>
             <div className="border-t border-gray-100 pt-3 flex flex-col gap-3">
-              <button className="w-full text-center text-rose-600 font-medium py-2 border border-rose-100 rounded-lg">Login</button>
-              <button className="w-full bg-rose-600 text-white font-medium py-3 rounded-lg shadow">Register Free</button>
+              <button className="w-full text-center text-indigo-600 font-medium py-2 border border-indigo-100 rounded-lg">Login</button>
+              <button className="w-full bg-indigo-600 text-white font-medium py-3 rounded-lg shadow">Register Free</button>
             </div>
           </div>
         )}
       </nav>
 
       {/* --- Hero Section --- */}
-      <div className="relative bg-gradient-to-br from-rose-900 via-rose-800 to-rose-900 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-rose-500 rounded-full blur-3xl opacity-30"></div>
+      <div className="relative bg-indigo-900 overflow-hidden">
+        {/* Abstract Background Shapes (Restored from previous UI) */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full mix-blend-overlay blur-3xl"></div>
+          <div className="absolute top-1/2 right-0 w-64 h-64 bg-pink-500 rounded-full mix-blend-overlay blur-3xl"></div>
+        </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-32 relative z-10">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            
-            <div className="text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-800/50 border border-rose-700 text-rose-200 text-sm mb-6">
-                <CheckCircle size={14} /> Verified by Community Group Admins
-              </div>
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
-                Find Your Soulmate within your <span className="text-rose-300">Trusted Community.</span>
-              </h1>
-              <p className="text-lg text-rose-100 mb-8 leading-relaxed max-w-lg">
-                The only platform where profiles are curated by Group Admins from trusted WhatsApp groups. Authentic, Safe, and Reliable.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <button className="bg-white text-rose-900 px-6 py-3.5 rounded-full font-bold shadow-lg hover:bg-gray-50 transition">
-                  Join as Member
-                </button>
-                <button className="bg-transparent border-2 border-rose-300 text-white px-6 py-3.5 rounded-full font-bold hover:bg-rose-800 transition">
-                  Create Group Admin Account
-                </button>
-              </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 relative z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-800/50 border border-indigo-700 text-indigo-200 text-sm mb-6">
+              <CheckCircle size={14} /> Verified by Community Group Admins
             </div>
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+              Find Your Soulmate within your <span className="text-indigo-300">Trusted Community.</span>
+            </h1>
+            <p className="text-lg md:text-xl text-indigo-100 mb-10 leading-relaxed max-w-2xl mx-auto">
+              The only platform where profiles are curated by Group Admins from trusted WhatsApp groups. Authentic, Safe, and Reliable.
+            </p>
+          </div>
 
-            {/* Search Widget */}
-            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl border-4 border-rose-100/20">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <Search size={20} className="text-rose-600" /> Search for a Match
-              </h3>
+          {/* Search Widget (Restored Floating Style) */}
+          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-2xl max-w-5xl mx-auto transform translate-y-12 border border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
               
-              <div className="space-y-5">
-                {/* Looking For */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-600">I'm looking for a</label>
-                  <div className="flex gap-4">
-                    {['Bride', 'Groom'].map((type) => (
-                      <button 
-                        key={type}
-                        onClick={() => setSearchData({...searchData, lookingFor: type})}
-                        className={`flex-1 py-3 rounded-xl border font-medium transition ${
-                          searchData.lookingFor === type 
-                          ? 'bg-rose-600 text-white border-rose-600' 
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-rose-300'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
+              {/* Looking For */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Looking For</label>
+                <div className="relative">
+                  <select 
+                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium text-gray-700 appearance-none"
+                    value={searchData.lookingFor}
+                    onChange={(e) => setSearchData({...searchData, lookingFor: e.target.value})}
+                  >
+                    <option value="Bride">Bride</option>
+                    <option value="Groom">Groom</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                    <Users size={16} />
                   </div>
                 </div>
+              </div>
 
-                {/* Age Range */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-600">Age Min</label>
-                    <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
-                      {[21, 22, 23, 24, 25, 26, 27, 28, 29, 30].map(n => <option key={n}>{n} Yrs</option>)}
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-600">Age Max</label>
-                    <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none" defaultValue="28 Yrs">
-                      {[25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35].map(n => <option key={n}>{n} Yrs</option>)}
-                    </select>
-                  </div>
+              {/* Age Range */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Age Range</label>
+                <div className="flex gap-2">
+                  <select className="w-1/2 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium text-gray-700">
+                    {[21, 22, 23, 24, 25, 26, 27, 28, 29, 30].map(n => <option key={n}>{n}</option>)}
+                  </select>
+                  <select className="w-1/2 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium text-gray-700" defaultValue="28">
+                    {[25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35].map(n => <option key={n}>{n}</option>)}
+                  </select>
                 </div>
+              </div>
 
-                {/* Religion */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-600">Religion / Community</label>
-                  <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
-                    <option>Select Community</option>
+              {/* Religion */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Community</label>
+                <div className="relative">
+                  <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium text-gray-700 appearance-none">
+                    <option>All Communities</option>
                     <option>Hindu</option>
                     <option>Muslim</option>
                     <option>Christian</option>
                     <option>Sikh</option>
                     <option>Jain</option>
                   </select>
+                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                    <ChevronRight size={16} className="rotate-90" />
+                  </div>
                 </div>
+              </div>
 
-                <button className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg mt-2">
+              {/* Search Button */}
+              <div>
+                <button className="w-full h-12.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 text-lg">
+                  <Search size={20} />
                   Find Matches
                 </button>
               </div>
             </div>
-
           </div>
         </div>
       </div>
 
+      {/* --- Spacer for Search Widget --- */}
+      <div className="h-24 bg-gray-50"></div>
+
       {/* --- How it Works / Features --- */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <span className="text-rose-600 font-bold tracking-wider uppercase text-sm">How Trusathi Works</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-4">Trust through Community Leaders</h2>
-          <p className="text-gray-500 max-w-2xl mx-auto">
-            Unlike other open platforms, Trusathi relies on a network of Group Admins who verify members from their known social circles.
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Why choose Trusathi?</h2>
+          <p className="text-gray-500 max-w-2xl mx-auto">We're dedicated to making your search safe, reliable, and community-focused.</p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-10">
           {features.map((feature, idx) => (
-            <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition duration-300">
-              <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mb-6">
+            <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition duration-300">
+              <div className="w-14 h-14 bg-indigo-50 rounded-xl flex items-center justify-center mb-6">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
@@ -189,143 +181,144 @@ export default function TrusathiUI() {
       </section>
 
       {/* --- Featured Profiles --- */}
-      <section className="bg-white py-20 border-y border-gray-100">
+      <section className="bg-indigo-50 py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+          <div className="flex justify-between items-end mb-10">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">New Verified Members</h2>
               <p className="text-gray-500">Profiles recently added by Group Admins</p>
             </div>
-            <a href="#" className="flex items-center text-rose-600 font-bold hover:text-rose-700 transition">
-              View all profiles <ChevronRight size={20} />
+            <a href="#" className="hidden md:flex items-center text-indigo-600 font-bold hover:text-indigo-700 transition">
+              View all <ChevronRight size={20} />
             </a>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {featuredProfiles.map((profile, idx) => (
-              <div key={idx} className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition group">
-                {/* Profile Placeholder Image */}
+              <div key={idx} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition cursor-pointer group">
+                {/* Profile Image Placeholder */}
                 <div className="h-48 bg-gray-200 relative overflow-hidden">
                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
                      <Users size={48} className="opacity-20" />
                    </div>
                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-xs font-bold px-3 py-1 rounded-full shadow-sm text-gray-700">
-                     ID: {profile.id}
+                     {profile.id}
                    </div>
-                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                   <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/60 to-transparent p-4">
                      <span className="text-white font-bold text-lg">{profile.age} Yrs, {profile.height}</span>
                    </div>
                 </div>
-                
+
                 <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900">{profile.job}</h3>
-                      <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
-                         <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                         {profile.location}
-                      </p>
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-lg text-gray-900">{profile.job}</span>
+                      <span className="text-sm text-gray-500">{profile.location}</span>
                     </div>
                   </div>
                   
-                  {/* Verification Badge */}
-                  <div className="bg-rose-50 border border-rose-100 rounded-lg p-3 flex items-start gap-3 mb-6">
-                    <Shield className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+                  <div className="bg-indigo-50 rounded-lg p-3 flex items-start gap-3">
+                    <Shield className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-xs font-bold text-rose-800 uppercase tracking-wide">Verified by Admin</p>
-                      <p className="text-sm text-rose-900 font-medium">{profile.verifiedBy}</p>
+                      <p className="text-xs font-bold text-indigo-800 uppercase tracking-wide">Verified by</p>
+                      <p className="text-sm text-indigo-900 font-medium">{profile.verifiedBy}</p>
                     </div>
                   </div>
-
-                  <button className="w-full py-3 border-2 border-rose-600 text-rose-600 font-bold rounded-xl hover:bg-rose-600 hover:text-white transition">
-                    View Full Profile
-                  </button>
+                </div>
+                
+                <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center group-hover:bg-indigo-600 group-hover:text-white transition">
+                  <span className="text-sm font-medium">View Full Profile</span>
+                  <ChevronRight size={16} />
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 text-center md:hidden">
+            <a href="#" className="inline-flex items-center text-indigo-600 font-bold">
+              View all profiles <ChevronRight size={20} />
+            </a>
           </div>
         </div>
       </section>
 
       {/* --- CTA for Group Admins --- */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-900 rounded-3xl p-8 md:p-16 text-center md:text-left relative overflow-hidden">
+        <div className="bg-indigo-900 rounded-3xl p-8 md:p-16 text-center md:text-left relative overflow-hidden">
            <div className="absolute top-0 right-0 w-full h-full opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
 
            <div className="relative z-10 md:flex items-center justify-between gap-12">
              <div className="mb-8 md:mb-0 max-w-2xl">
-               <span className="text-rose-400 font-bold uppercase tracking-wider text-sm mb-2 block">For Community Leaders</span>
-               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Do you manage a Community WhatsApp Group?</h2>
-               <p className="text-gray-300 text-lg">
+               <span className="text-indigo-300 font-bold uppercase tracking-wider text-sm mb-2 block">For Community Leaders</span>
+               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Do you manage a WhatsApp Group?</h2>
+               <p className="text-indigo-100 text-lg">
                  Become a <strong>Group Admin</strong> on Trusathi. Create profiles for your community members, manage their visibility, and help them find trusted matches safely.
                </p>
              </div>
              <div className="flex flex-col gap-4 w-full md:w-auto">
-                <button className="bg-rose-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:bg-rose-700 transition flex items-center justify-center gap-2 whitespace-nowrap">
+                <button className="bg-white text-indigo-900 font-bold py-4 px-8 rounded-xl shadow-lg hover:bg-gray-50 transition flex items-center justify-center gap-2 whitespace-nowrap">
                    <UserPlus size={20} /> Create Admin Account
                 </button>
-                <p className="text-gray-400 text-xs text-center">Approved by Super Admin only</p>
              </div>
            </div>
         </div>
       </section>
 
       {/* --- Footer --- */}
-      <footer className="bg-white border-t border-gray-200 pt-16 pb-8">
+      <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-rose-600 rounded-full flex items-center justify-center text-white">
-                  <Heart fill="currentColor" size={16} />
+                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+                  <Heart fill="currentColor" size={20} />
                 </div>
                 <span className="text-xl font-bold text-gray-900">Trusathi</span>
               </div>
-              <p className="text-gray-500 text-sm leading-relaxed mb-6 pr-4">
-                Redefining matrimony with trust. A community-first platform where every profile is verified by a known group administrator.
+              <p className="text-gray-500 text-sm leading-relaxed mb-6">
+                Connecting people, places, and communities through shared journeys. Safe, affordable, and reliable travel for everyone.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="text-gray-400 hover:text-rose-600 transition"><Facebook size={20} /></a>
-                <a href="#" className="text-gray-400 hover:text-rose-600 transition"><Twitter size={20} /></a>
-                <a href="#" className="text-gray-400 hover:text-rose-600 transition"><Instagram size={20} /></a>
+                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Facebook size={20} /></a>
+                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Twitter size={20} /></a>
+                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Instagram size={20} /></a>
               </div>
             </div>
             
             <div>
               <h4 className="font-bold text-gray-900 mb-6">Explore</h4>
               <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-rose-600 transition">Browse Brides</a></li>
-                <li><a href="#" className="hover:text-rose-600 transition">Browse Grooms</a></li>
-                <li><a href="#" className="hover:text-rose-600 transition">Success Stories</a></li>
-                <li><a href="#" className="hover:text-rose-600 transition">Group List</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Browse Brides</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Browse Grooms</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Success Stories</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Group List</a></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold text-gray-900 mb-6">Support</h4>
               <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-rose-600 transition">For Group Admins</a></li>
-                <li><a href="#" className="hover:text-rose-600 transition">Verification Process</a></li>
-                <li><a href="#" className="hover:text-rose-600 transition">Help Center</a></li>
-                <li><a href="#" className="hover:text-rose-600 transition">Contact Us</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">For Group Admins</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Verification Process</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Help Center</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Press</a></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold text-gray-900 mb-6">Legal</h4>
               <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-rose-600 transition">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-rose-600 transition">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-rose-600 transition">Safety Tips</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Terms & Conditions</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Cookie Policy</a></li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-400">© 2024 Trusathi Matrimony. All rights reserved.</p>
+            <p className="text-sm text-gray-400">© 2024 Trusathi Technologies Inc. All rights reserved.</p>
             <div className="flex gap-6 text-sm text-gray-400">
-              <span className="flex items-center gap-1"><Lock size={14} /> SSL Secured</span>
-              <span className="flex items-center gap-1"><Shield size={14} /> Admin Verified</span>
+              <span className="flex items-center gap-1"><Shield size={14} /> 100% Secure</span>
             </div>
           </div>
         </div>

@@ -1,14 +1,8 @@
-import type { Config } from "tailwindcss";
+import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 
-const config: Config = {
-  content: [
-    "./src/app/**/*.{js,ts,jsx,tsx}",
-    "./src/components/**/*.{js,ts,jsx,tsx}",
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
   ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
-
-export default config;
+})
