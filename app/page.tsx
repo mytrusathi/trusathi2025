@@ -2,9 +2,13 @@
 
 import React, { useState } from 'react';
 import { Heart, Search, Shield, Users, CheckCircle, Menu, X, ChevronRight, Facebook, Twitter, Instagram, UserPlus, Lock } from 'lucide-react';
+import Navbar from "../components/Navbar";
+import Footer from '../components/Footer'
+import ProfileCard from '../components/ProfileCard'
+
+
 
 export default function TrusathiUI() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchData, setSearchData] = useState({ lookingFor: 'Bride', ageMin: '21', ageMax: '35', religion: '' });
 
   // Dummy data for featured profiles (Group Admin created)
@@ -22,56 +26,8 @@ export default function TrusathiUI() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
-      
-      {/* --- Navbar --- */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
-                <Heart fill="currentColor" size={20} />
-              </div>
-              <div>
-                <span className="text-2xl font-bold text-indigo-900 tracking-tight block leading-none">Trusathi</span>
-              </div>
-            </div>
-
-            {/* Desktop Links */}
-            <div className="hidden md:flex space-x-8 items-center">
-              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition">Browse Profiles</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition">Communities</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600 font-medium transition">About Us</a>
-              <button className="text-indigo-600 font-medium hover:bg-indigo-50 px-4 py-2 rounded-full transition">Login</button>
-              <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-indigo-700 shadow-md transition transform hover:-translate-y-0.5">
-                Register Free
-              </button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600 hover:text-indigo-600 p-2">
-                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu Dropdown */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 py-4 px-4 space-y-3 shadow-lg">
-            <a href="#" className="block text-gray-700 hover:text-indigo-600 font-medium py-2">Browse Profiles</a>
-            <a href="#" className="block text-gray-700 hover:text-indigo-600 font-medium py-2">Communities</a>
-            <a href="#" className="block text-gray-700 hover:text-indigo-600 font-medium py-2">About Us</a>
-            <div className="border-t border-gray-100 pt-3 flex flex-col gap-3">
-              <button className="w-full text-center text-indigo-600 font-medium py-2 border border-indigo-100 rounded-lg">Login</button>
-              <button className="w-full bg-indigo-600 text-white font-medium py-3 rounded-lg shadow">Register Free</button>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* --- Hero Section --- */}
+      <Navbar />
+           {/* --- Hero Section --- */}
       <div className="relative bg-indigo-900 overflow-hidden">
         {/* Abstract Background Shapes (Restored from previous UI) */}
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
@@ -180,9 +136,8 @@ export default function TrusathiUI() {
         </div>
       </section>
 
-      {/* --- Featured Profiles --- */}
-      <section className="bg-indigo-50 py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <section className="bg-indigo-50 py-16 md:py-24">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-10">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">New Verified Members</h2>
@@ -194,44 +149,9 @@ export default function TrusathiUI() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {featuredProfiles.map((profile, idx) => (
-              <div key={idx} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                {/* Profile Image Placeholder */}
-                <div className="h-48 bg-gray-200 relative overflow-hidden">
-                   <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                     <Users size={48} className="opacity-20" />
-                   </div>
-                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-xs font-bold px-3 py-1 rounded-full shadow-sm text-gray-700">
-                     {profile.id}
-                   </div>
-                   <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/60 to-transparent p-4">
-                     <span className="text-white font-bold text-lg">{profile.age} Yrs, {profile.height}</span>
-                   </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-lg text-gray-900">{profile.job}</span>
-                      <span className="text-sm text-gray-500">{profile.location}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-indigo-50 rounded-lg p-3 flex items-start gap-3">
-                    <Shield className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs font-bold text-indigo-800 uppercase tracking-wide">Verified by</p>
-                      <p className="text-sm text-indigo-900 font-medium">{profile.verifiedBy}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center group-hover:bg-indigo-600 group-hover:text-white transition">
-                  <span className="text-sm font-medium">View Full Profile</span>
-                  <ChevronRight size={16} />
-                </div>
-              </div>
-            ))}
+            {featuredProfiles.map((profile) => (
+              <ProfileCard key={profile.id} profile={profile} />
+            ))}    
           </div>
 
           <div className="mt-8 text-center md:hidden">
@@ -240,7 +160,7 @@ export default function TrusathiUI() {
             </a>
           </div>
         </div>
-      </section>
+    </section>
 
       {/* --- CTA for Group Admins --- */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -264,65 +184,8 @@ export default function TrusathiUI() {
         </div>
       </section>
 
-      {/* --- Footer --- */}
-      <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-            <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
-                  <Heart fill="currentColor" size={20} />
-                </div>
-                <span className="text-xl font-bold text-gray-900">Trusathi</span>
-              </div>
-              <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                Connecting people, places, and communities through shared journeys. Safe, affordable, and reliable travel for everyone.
-              </p>
-              <div className="flex gap-4">
-                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Facebook size={20} /></a>
-                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Twitter size={20} /></a>
-                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Instagram size={20} /></a>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-bold text-gray-900 mb-6">Explore</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-indigo-600 transition">Browse Brides</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Browse Grooms</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Success Stories</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Group List</a></li>
-              </ul>
-            </div>
+    <Footer />
 
-            <div>
-              <h4 className="font-bold text-gray-900 mb-6">Support</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-indigo-600 transition">For Group Admins</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Verification Process</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Help Center</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Press</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-gray-900 mb-6">Legal</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-indigo-600 transition">Terms & Conditions</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Cookie Policy</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-400">© 2024 Trusathi Technologies Inc. All rights reserved.</p>
-            <div className="flex gap-6 text-sm text-gray-400">
-              <span className="flex items-center gap-1"><Shield size={14} /> 100% Secure</span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
