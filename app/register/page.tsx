@@ -34,7 +34,7 @@ const RegisterPage = () => {
         uid: user.uid,
         email: user.email,
         displayName: name,
-        role: role, 
+        role: 'member', 
         createdAt: new Date().toISOString(),
       });
 
