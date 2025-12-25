@@ -37,7 +37,8 @@ export default function FeaturedProfiles() {
   }, [])
 
   return (
-    <section className="bg-indigo-50 py-16 md:py-24">
+    <section id="featured"
+    className="bg-indigo-50 py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -50,13 +51,14 @@ export default function FeaturedProfiles() {
               Profiles recently added by our trusted Group Admins
             </p>
           </div>
-
+        <div className="flex justify-between items-end mb-10">
           <Link
-            href="/login"
+            href="/search"
             className="hidden md:flex items-center text-indigo-600 font-bold hover:text-indigo-700 transition-colors"
           >
             View all <ChevronRight size={20} />
           </Link>
+          </div>
         </div>
 
         {/* Profile Grid */}

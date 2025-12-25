@@ -1,4 +1,5 @@
 import { UserPlus } from 'lucide-react'
+import Link from 'next/link'
 
 export default function GroupAdminCTA() {
   return (
@@ -28,10 +29,11 @@ export default function GroupAdminCTA() {
 
           {/* CTA Button */}
           <div className="flex flex-col gap-4 w-full md:w-auto">
-            <button className="bg-white text-indigo-900 font-bold py-4 px-8 rounded-xl shadow-lg hover:bg-gray-50 transition flex items-center justify-center gap-2 whitespace-nowrap">
+            <Link href="/register"
+             className="bg-white text-indigo-900 font-bold py-4 px-8 rounded-xl shadow-lg hover:bg-gray-50 transition flex items-center justify-center gap-2 whitespace-nowrap">
               <UserPlus size={20} />
               Create Admin Account
-            </button>
+            </Link>
           </div>
 
         </div>

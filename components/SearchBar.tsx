@@ -1,15 +1,29 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Users, Search, ChevronRight } from 'lucide-react'
 
 export default function SearchBar() {
+  const router = useRouter()
   const [searchData, setSearchData] = useState({
     lookingFor: 'Bride',
     ageMin: '21',
     ageMax: '35',
-    community: ''
+    community: 'All Communities'
   })
+ 
+  const handleSearch = () => {
+    // Construct query params
+    const params = new URLSearchParams({
+      role: searchData.lookingFor,
+      minAge: searchData.ageMin,
+      maxAge: searchData.ageMax,
+      community: searchData.community
+    })
+    // Redirect to a search page (you need to create app/search/page.tsx later)
+    router.push(`/search?${params.toString()}`)
+  }
 
   return (
     <div className="bg-white p-4 md:p-6 rounded-2xl shadow-2xl max-w-5xl mx-auto transform translate-y-12 border border-gray-100">
@@ -79,7 +93,9 @@ export default function SearchBar() {
         </div>
 
         {/* Button */}
-        <button className="h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl flex items-center justify-center gap-2">
+        <button 
+        onClick={handleSearch}
+        className="h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl flex items-center justify-center gap-2">
           <Search size={18} />
           Find Matches
         </button>

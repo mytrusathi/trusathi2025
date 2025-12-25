@@ -1,6 +1,7 @@
 
 import { Heart, Shield, Facebook, Twitter, Instagram, } from 'lucide-react';
- 
+import Link from 'next/link' 
+
 export default function Footer() {
   return (
       <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
@@ -54,7 +55,7 @@ export default function Footer() {
           </div>
 
           <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-400">© 2024 Trusathi Technologies Inc. All rights reserved.</p>
+            <p className="text-sm text-gray-400">© 2025 Trusathi. All rights reserved.</p>
             <div className="flex gap-6 text-sm text-gray-400">
               <span className="flex items-center gap-1"><Shield size={14} /> 100% Secure</span>
             </div>
