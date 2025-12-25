@@ -1,40 +1,64 @@
 'use client'
 
-import { Profile } from '@/types/profile'
 import { useState } from 'react'
-import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/context/AuthContext'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import GroupAdminLayout from '@/components/group-admin/GroupAdminLayout'
+import ProfileList from '@/components/group-admin/ProfileList'
+import ProfileForm from '@/components/group-admin/ProfileForm'
+import ProfileDetail from '@/components/group-admin/ProfileDetail'
+import { Profile } from '@/types/profile'
 
-import ProfileList from 'components/group-admin/ProfileList'
-import ProfileDetail from 'components/group-admin/ProfileDetail'
-import ProfileForm from 'components/group-admin/ProfileForm'
-import GroupAdminLayout from 'components/group-admin/GroupAdminLayout'
+type ViewType = 'list' | 'add' | 'edit' | 'detail'
 
-export default function GroupAdminDashboardPage() {
+export default function GroupAdminPage() {
   const { user } = useAuth()
 
-  const [view, setView] = useState<'list' | 'detail' | 'add' | 'edit'>('list')
-  const [selectedProfile, setSelectedProfile] = useState<any>(null)
-  const [editingProfile, setEditingProfile] = useState<any>(null)
+  const [view, setView] = useState<ViewType>('list')
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null)
 
   return (
     <ProtectedRoute allowedRoles={['group-admin']}>
       <GroupAdminLayout>
+
+        {/* LIST VIEW */}
         {view === 'list' && (
           <ProfileList
             user={user}
-            onAdd={() => setView('add')}
-            onView={(p:Profile) => {
+            onAdd={() => {
+              setSelectedProfile(null)
+              setView('add')
+            }}
+            onView={(p: Profile) => {
               setSelectedProfile(p)
               setView('detail')
             }}
-            onEdit={(p:Profile) => {
-              setEditingProfile(p)
+            onEdit={(p: Profile) => {
+              setSelectedProfile(p)
               setView('edit')
             }}
           />
         )}
 
+        {/* ADD PROFILE */}
+        {view === 'add' && (
+          <ProfileForm
+            initialData={null}
+            onCancel={() => setView('list')}
+            onSaved={() => setView('list')}
+          />
+        )}
+
+        {/* EDIT PROFILE */}
+        {view === 'edit' && selectedProfile && (
+          <ProfileForm
+            initialData={selectedProfile}
+            onCancel={() => setView('list')}
+            onSaved={() => setView('list')}
+          />
+        )}
+
+        {/* DETAIL VIEW */}
         {view === 'detail' && selectedProfile && (
           <ProfileDetail
             profile={selectedProfile}
@@ -42,30 +66,11 @@ export default function GroupAdminDashboardPage() {
               setSelectedProfile(null)
               setView('list')
             }}
-            onEdit={(p: Profile) => {
-              setEditingProfile(p)
-              setView('edit')
-            }}
-          />
-        )}
-
-        {(view === 'add' || view === 'edit') && (
-          <ProfileForm
-            user={user}
-            initialData={editingProfile}
-            onCancel={() => {
-              setEditingProfile(null)
-              setView('list')
-            }}
-            onSaved={() => {
-              setEditingProfile(null)
-              setView('list')
-            }}
+            onEdit={() => setView('edit')}
           />
         )}
 
       </GroupAdminLayout>
-
     </ProtectedRoute>
   )
 }
