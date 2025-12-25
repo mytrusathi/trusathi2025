@@ -15,7 +15,7 @@ export default function Footer() {
                 <span className="text-xl font-bold text-gray-900">Trusathi</span>
               </div>
               <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                Connecting people, places, and communities through shared journeys. Safe, affordable, and reliable travel for everyone.
+               Connecting hearts, families, and communities through lifelong bonds. Safe, authentic, and reliable matchmaking for everyone.
               </p>
               <div className="flex gap-4">
                 <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Facebook size={20} /></a>

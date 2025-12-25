@@ -42,7 +42,7 @@ export default function Navbar() {
 
             <a className="text-gray-600 hover:text-indigo-600 font-medium">Communities</a>
             
-            <Link href="/#about"
+            <Link href="/about"
             className="text-gray-600 hover:text-indigo-600 font-medium">
               About Us
               </Link>
@@ -101,12 +101,12 @@ export default function Navbar() {
             </Link>
 
           <Link
-          href="/#about" 
+          href="/about" 
           className="block text-gray-700 font-medium py-2"
           onClick={closeMenu}>
             About Us
             </Link>
-            
+
           {!user && (
             <Link
               href="/login"
