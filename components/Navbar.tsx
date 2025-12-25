@@ -42,9 +42,15 @@ export default function Navbar() {
                 Login
               </Link>
             )}
-            <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-full font-medium">
-              Register Free
-            </button>
+            {!user && (
+              <Link
+                href="/register"
+                className="bg-indigo-600 text-white px-5 py-2.5 rounded-full font-medium"
+              >
+                Register Free
+              </Link>
+            )}
+        
             {user && (
               <button
                 onClick={handleLogout}

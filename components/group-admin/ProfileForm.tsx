@@ -1,226 +1,206 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import {
-  addDoc,
-  collection,
-  doc,
-  updateDoc,
-  serverTimestamp,
-} from 'firebase/firestore'
-import { db } from 'app/lib/firebase'
-import parseBiodata from 'app/utils/parseBiodata'
-import { Profile } from '@/types/profile'
-import { useAuth } from '@/context/AuthContext'
+import React, { useState, useEffect } from 'react';
+import { db, storage } from '../../app/lib/firebase';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useAuth } from '../../context/AuthContext';
+import { Profile } from '../../types/profile';
+import { Loader2, Upload, X, Save, ArrowLeft } from 'lucide-react';
 
 interface Props {
-  initialData?: Profile | null
-  onCancel: () => void
-  onSaved: () => void
+  initialData?: Profile | null;
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export default function ProfileForm({
-  initialData,
-  onCancel,
-  onSaved,
-}: Props) {
-  const { user } = useAuth()
+const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<Partial<Profile>>({
+    name: '',
+    age: '',
+    gender: 'male',
+    height: '',
+    education: '',
+    profession: '',
+    income: '',
+    location: '',
+    religion: 'Hindu',
+    caste: '',
+    fatherName: '',
+    fatherOccupation: '',
+    contact: '',
+    about: '',
+    imageUrl: '',
+  });
 
-  const [rawText, setRawText] = useState('')
-  const [formData, setFormData] = useState<Partial<Profile>>({})
-  const [saving, setSaving] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData)
+      setFormData(initialData);
+      setPreviewUrl(initialData.imageUrl || null);
     }
-  }, [initialData])
+  }, [initialData]);
 
-  const handleChange = (field: keyof Profile, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-  const handleParse = () => {
-    if (!rawText.trim()) return
-    const parsed = parseBiodata(rawText)
-    setFormData((prev) => ({ ...prev, ...parsed }))
-  }
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!user?.uid) return
+    e.preventDefault();
+    if (!user) return;
 
+    setLoading(true);
     try {
-      setSaving(true)
+      let imageUrl = formData.imageUrl;
 
-      const payload = {
-        ...(formData as Profile),
-        groupAdminUid: user.uid,
-        groupName: user.groupName || '',
-        addedBy: user.email || '',
-        updatedAt: serverTimestamp(),
+      if (imageFile) {
+        const storageRef = ref(storage, `profiles/${user.uid}/${Date.now()}_${imageFile.name}`);
+        const snapshot = await uploadBytes(storageRef, imageFile);
+        imageUrl = await getDownloadURL(snapshot.ref);
       }
+
+      const profileData = {
+        ...formData,
+        imageUrl,
+        createdBy: user.uid,
+        updatedAt: new Date().toISOString(),
+      };
 
       if (initialData?.id) {
-        await updateDoc(doc(db, 'profiles', initialData.id), payload)
+        await updateDoc(doc(db, 'profiles', initialData.id), profileData);
       } else {
         await addDoc(collection(db, 'profiles'), {
-          ...payload,
-          createdAt: serverTimestamp(),
-        })
+          ...profileData,
+          createdAt: new Date().toISOString(),
+        });
       }
-
-      onSaved()
-    } catch (err) {
-      console.error('Save failed:', err)
-      alert('Failed to save profile')
+      onSuccess();
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile. Please try again.");
     } finally {
-      setSaving(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-5"
-    >
-      {/* HEADER */}
-      <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 shadow-2xl shadow-black/50 flex justify-between items-center">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold">
-            {initialData ? 'Edit Profile' : 'Add New Profile'}
-          </p>
-          <p className="text-xs text-slate-400 mt-1">
-            Paste WhatsApp biodata or fill manually
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={onCancel}
-          className="text-[11px] px-3 py-1.5 rounded-lg border border-slate-700 hover:border-slate-500 transition"
-        >
-          ← Back
+    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden max-w-4xl mx-auto my-8">
+      <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
+        <h2 className="text-xl font-bold text-slate-800">
+          {initialData ? 'Edit Profile' : 'Create New Profile'}
+        </h2>
+        <button onClick={onCancel} className="text-slate-500 hover:text-slate-700">
+          <X size={24} />
         </button>
       </div>
 
-      {/* BIODATA PARSER */}
-      <Section title="Quick Fill (WhatsApp Biodata)">
-        <textarea
-          placeholder="Paste full biodata text here…"
-          value={rawText}
-          onChange={(e) => setRawText(e.target.value)}
-          className="w-full min-h-25 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 outline-none"
-        />
+      <form onSubmit={handleSubmit} className="p-6 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          {/* Left Column - Image & Basic Info */}
+          <div className="space-y-6">
+            <div className="flex flex-col items-center">
+              <div className="w-32 h-32 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden relative mb-3 group cursor-pointer">
+                {previewUrl ? (
+                  <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <Upload className="text-slate-400" size={32} />
+                )}
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                   <span className="text-white text-xs font-bold">Change Photo</span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500">Tap to upload profile photo</p>
+            </div>
 
-        <div className="flex justify-between mt-2">
-          <button
-            type="button"
-            onClick={handleParse}
-            className="text-[11px] px-3 py-1.5 rounded-lg border border-slate-700 hover:border-indigo-500 hover:text-indigo-300 transition"
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b pb-2">Basic Details</h3>
+              <Input label="Full Name" name="name" value={formData.name} onChange={handleChange} required />
+              <div className="grid grid-cols-2 gap-4">
+                <Input label="Age" name="age" type="number" value={formData.age} onChange={handleChange} required />
+                <div>
+                   <label className="block text-sm font-medium text-slate-700 mb-1">Gender</label>
+                   <select name="gender" value={formData.gender} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none">
+                     <option value="male">Male</option>
+                     <option value="female">Female</option>
+                   </select>
+                </div>
+              </div>
+              <Input label="Height" name="height" value={formData.height} onChange={handleChange} placeholder="e.g. 5'10&quot;" />
+              <Input label="Location" name="location" value={formData.location} onChange={handleChange} placeholder="City, State" />
+            </div>
+          </div>
+
+          {/* Right Column - Professional & Family */}
+          <div className="space-y-6">
+             <div className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b pb-2">Professional & Social</h3>
+              <Input label="Education" name="education" value={formData.education} onChange={handleChange} placeholder="e.g. MBA, B.Tech" />
+              <Input label="Profession" name="profession" value={formData.profession} onChange={handleChange} placeholder="e.g. Software Engineer" />
+              <Input label="Annual Income" name="income" value={formData.income} onChange={handleChange} placeholder="e.g. 10-12 LPA" />
+              <div className="grid grid-cols-2 gap-4">
+                 <Input label="Religion" name="religion" value={formData.religion} onChange={handleChange} />
+                 <Input label="Caste" name="caste" value={formData.caste} onChange={handleChange} />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b pb-2">Family & Contact</h3>
+              <Input label="Father's Name" name="fatherName" value={formData.fatherName} onChange={handleChange} />
+              <Input label="Father's Occupation" name="fatherOccupation" value={formData.fatherOccupation} onChange={handleChange} />
+              <Input label="Contact Number" name="contact" value={formData.contact} onChange={handleChange} placeholder="+91 98765 43210" required />
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end gap-3">
+          <button 
+            type="button" 
+            onClick={onCancel}
+            className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors"
           >
-            Parse & Auto-Fill
+            Cancel
           </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setFormData({})
-              setRawText('')
-            }}
-            className="text-[11px] text-slate-500 hover:text-slate-300"
+          <button 
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-colors flex items-center gap-2 disabled:opacity-70"
           >
-            Clear
+            {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+            {initialData ? 'Update Profile' : 'Save Profile'}
           </button>
         </div>
-      </Section>
-
-      {/* PERSONAL DETAILS */}
-      <Section title="Personal Details">
-        <Grid>
-          <Input label="Name" value={formData.name || ''} onChange={(v) => handleChange('name', v)} />
-          <Input label="Gender" value={formData.gender || ''} onChange={(v) => handleChange('gender', v)} />
-          <Input label="Age" value={formData.age || ''} onChange={(v) => handleChange('age', v)} />
-          <Input label="Height" value={formData.height || ''} onChange={(v) => handleChange('height', v)} />
-          <Input label="City" value={formData.city || ''} onChange={(v) => handleChange('city', v)} />
-          <Input label="Diet" value={formData.diet || ''} onChange={(v) => handleChange('diet', v)} />
-        </Grid>
-      </Section>
-
-      {/* PROFESSIONAL DETAILS */}
-      <Section title="Professional Details">
-        <Grid>
-          <Input label="Education" value={formData.education || ''} onChange={(v) => handleChange('education', v)} />
-          <Input label="Profession" value={formData.profession || ''} onChange={(v) => handleChange('profession', v)} />
-          <Input label="Company" value={formData.company || ''} onChange={(v) => handleChange('company', v)} />
-          <Input label="Income" value={formData.income || ''} onChange={(v) => handleChange('income', v)} />
-        </Grid>
-      </Section>
-
-      {/* FAMILY DETAILS */}
-      <Section title="Family Details">
-        <Grid>
-          <Input label="Father" value={formData.father || ''} onChange={(v) => handleChange('father', v)} />
-          <Input label="Father Occupation" value={formData.fatherOcc || ''} onChange={(v) => handleChange('fatherOcc', v)} />
-          <Input label="Mother" value={formData.mother || ''} onChange={(v) => handleChange('mother', v)} />
-          <Input label="Mother Occupation" value={formData.motherOcc || ''} onChange={(v) => handleChange('motherOcc', v)} />
-          <Input label="Siblings" value={formData.siblings || ''} onChange={(v) => handleChange('siblings', v)} />
-          <Input label="Caste / Gotra" value={`${formData.caste || ''}${formData.gotra ? ' • ' + formData.gotra : ''}`} onChange={(v) => handleChange('caste', v)} />
-        </Grid>
-      </Section>
-
-      {/* ACTION */}
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={saving}
-          className="px-5 py-2 rounded-lg text-xs font-semibold bg-linear-to-r from-emerald-500 to-lime-500 text-slate-900 shadow hover:shadow-lg transition"
-        >
-          {saving ? 'Saving…' : initialData ? 'Update Profile' : 'Save Profile'}
-        </button>
-      </div>
-    </form>
-  )
-}
-
-/* -----------------------------
-   UI Helpers
-------------------------------*/
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 shadow-2xl shadow-black/50">
-      <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold mb-3">
-        {title}
-      </p>
-      {children}
+      </form>
     </div>
-  )
-}
+  );
+};
 
-function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-2 text-xs">{children}</div>
-}
+// Helper Input Component
+const Input = ({ label, ...props }: any) => (
+  <div>
+    <label className="block text-sm font-medium text-slate-700 mb-1">{label}</label>
+    <input 
+      className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"
+      {...props}
+    />
+  </div>
+);
 
-function Input({
-  label,
-  value,
-  onChange,
-}: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-}) {
-  return (
-    <div>
-      <label className="text-[10px] uppercase text-slate-500 font-semibold tracking-wide">
-        {label}
-      </label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 outline-none"
-      />
-    </div>
-  )
-}
+export default ProfileForm;
