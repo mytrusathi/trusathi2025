@@ -30,18 +30,12 @@ export default function ProfileForm({
   const [formData, setFormData] = useState<Partial<Profile>>({})
   const [saving, setSaving] = useState(false)
 
-  /* -----------------------------
-     Prefill on Edit
-  ------------------------------*/
   useEffect(() => {
     if (initialData) {
       setFormData(initialData)
     }
   }, [initialData])
 
-  /* -----------------------------
-     Handlers
-  ------------------------------*/
   const handleChange = (field: keyof Profile, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
@@ -68,10 +62,8 @@ export default function ProfileForm({
       }
 
       if (initialData?.id) {
-        // UPDATE
         await updateDoc(doc(db, 'profiles', initialData.id), payload)
       } else {
-        // CREATE
         await addDoc(collection(db, 'profiles'), {
           ...payload,
           createdAt: serverTimestamp(),
@@ -80,29 +72,25 @@ export default function ProfileForm({
 
       onSaved()
     } catch (err) {
-      console.error('Save profile failed:', err)
-      alert('Failed to save profile. Check console.')
+      console.error('Save failed:', err)
+      alert('Failed to save profile')
     } finally {
       setSaving(false)
     }
   }
 
-  /* -----------------------------
-     Render
-  ------------------------------*/
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-slate-950/70 border border-slate-800 rounded-2xl
-                 p-4 shadow-2xl shadow-black/50 space-y-4"
+      className="space-y-5"
     >
       {/* HEADER */}
-      <div className="flex justify-between items-center">
+      <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 shadow-2xl shadow-black/50 flex justify-between items-center">
         <div>
           <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold">
             {initialData ? 'Edit Profile' : 'Add New Profile'}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 mt-1">
             Paste WhatsApp biodata or fill manually
           </p>
         </div>
@@ -110,33 +98,28 @@ export default function ProfileForm({
         <button
           type="button"
           onClick={onCancel}
-          className="text-[11px] px-3 py-1.5 rounded-lg
-                     border border-slate-700 hover:border-slate-500 transition"
+          className="text-[11px] px-3 py-1.5 rounded-lg border border-slate-700 hover:border-slate-500 transition"
         >
           ← Back
         </button>
       </div>
 
       {/* BIODATA PARSER */}
-      <div>
+      <Section title="Quick Fill (WhatsApp Biodata)">
         <textarea
-          placeholder="Paste WhatsApp biodata text here…"
+          placeholder="Paste full biodata text here…"
           value={rawText}
           onChange={(e) => setRawText(e.target.value)}
-          className="w-full min-h-22.5 bg-slate-900 border border-slate-700
-                     rounded-xl px-3 py-2 text-xs text-slate-100
-                     placeholder:text-slate-500 outline-none"
+          className="w-full min-h-25 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 outline-none"
         />
 
-        <div className="flex justify-between mt-1">
+        <div className="flex justify-between mt-2">
           <button
             type="button"
             onClick={handleParse}
-            className="text-[11px] px-2 py-1 rounded-lg
-                       border border-slate-700
-                       hover:border-indigo-500 hover:text-indigo-300 transition"
+            className="text-[11px] px-3 py-1.5 rounded-lg border border-slate-700 hover:border-indigo-500 hover:text-indigo-300 transition"
           >
-            Parse & Fill
+            Parse & Auto-Fill
           </button>
 
           <button
@@ -150,32 +133,50 @@ export default function ProfileForm({
             Clear
           </button>
         </div>
-      </div>
+      </Section>
 
-      {/* FORM FIELDS */}
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        <Input label="Name" value={formData.name || ''} onChange={(v) => handleChange('name', v)} />
-        <Input label="Gender" value={formData.gender || ''} onChange={(v) => handleChange('gender', v)} />
-        <Input label="Age" value={formData.age || ''} onChange={(v) => handleChange('age', v)} />
-        <Input label="City" value={formData.city || ''} onChange={(v) => handleChange('city', v)} />
-        <Input label="Profession" value={formData.profession || ''} onChange={(v) => handleChange('profession', v)} />
-        <Input label="Education" value={formData.education || ''} onChange={(v) => handleChange('education', v)} />
-      </div>
+      {/* PERSONAL DETAILS */}
+      <Section title="Personal Details">
+        <Grid>
+          <Input label="Name" value={formData.name || ''} onChange={(v) => handleChange('name', v)} />
+          <Input label="Gender" value={formData.gender || ''} onChange={(v) => handleChange('gender', v)} />
+          <Input label="Age" value={formData.age || ''} onChange={(v) => handleChange('age', v)} />
+          <Input label="Height" value={formData.height || ''} onChange={(v) => handleChange('height', v)} />
+          <Input label="City" value={formData.city || ''} onChange={(v) => handleChange('city', v)} />
+          <Input label="Diet" value={formData.diet || ''} onChange={(v) => handleChange('diet', v)} />
+        </Grid>
+      </Section>
+
+      {/* PROFESSIONAL DETAILS */}
+      <Section title="Professional Details">
+        <Grid>
+          <Input label="Education" value={formData.education || ''} onChange={(v) => handleChange('education', v)} />
+          <Input label="Profession" value={formData.profession || ''} onChange={(v) => handleChange('profession', v)} />
+          <Input label="Company" value={formData.company || ''} onChange={(v) => handleChange('company', v)} />
+          <Input label="Income" value={formData.income || ''} onChange={(v) => handleChange('income', v)} />
+        </Grid>
+      </Section>
+
+      {/* FAMILY DETAILS */}
+      <Section title="Family Details">
+        <Grid>
+          <Input label="Father" value={formData.father || ''} onChange={(v) => handleChange('father', v)} />
+          <Input label="Father Occupation" value={formData.fatherOcc || ''} onChange={(v) => handleChange('fatherOcc', v)} />
+          <Input label="Mother" value={formData.mother || ''} onChange={(v) => handleChange('mother', v)} />
+          <Input label="Mother Occupation" value={formData.motherOcc || ''} onChange={(v) => handleChange('motherOcc', v)} />
+          <Input label="Siblings" value={formData.siblings || ''} onChange={(v) => handleChange('siblings', v)} />
+          <Input label="Caste / Gotra" value={`${formData.caste || ''}${formData.gotra ? ' • ' + formData.gotra : ''}`} onChange={(v) => handleChange('caste', v)} />
+        </Grid>
+      </Section>
 
       {/* ACTION */}
-      <div className="flex justify-end pt-2">
+      <div className="flex justify-end">
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-2 rounded-lg text-xs font-semibold
-                     bg-linear-to-r from-emerald-500 to-lime-500
-                     text-slate-900 shadow hover:shadow-lg transition"
+          className="px-5 py-2 rounded-lg text-xs font-semibold bg-linear-to-r from-emerald-500 to-lime-500 text-slate-900 shadow hover:shadow-lg transition"
         >
-          {saving
-            ? 'Saving…'
-            : initialData
-            ? 'Update Profile'
-            : 'Save Profile'}
+          {saving ? 'Saving…' : initialData ? 'Update Profile' : 'Save Profile'}
         </button>
       </div>
     </form>
@@ -183,8 +184,23 @@ export default function ProfileForm({
 }
 
 /* -----------------------------
-   Small Input Component
+   UI Helpers
 ------------------------------*/
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 shadow-2xl shadow-black/50">
+      <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold mb-3">
+        {title}
+      </p>
+      {children}
+    </div>
+  )
+}
+
+function Grid({ children }: { children: React.ReactNode }) {
+  return <div className="grid grid-cols-2 gap-2 text-xs">{children}</div>
+}
 
 function Input({
   label,
@@ -203,9 +219,7 @@ function Input({
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-slate-900 border border-slate-700
-                   rounded-lg px-2 py-1.5 text-xs text-slate-100
-                   outline-none"
+        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 outline-none"
       />
     </div>
   )
