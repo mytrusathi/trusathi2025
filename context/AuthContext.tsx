@@ -68,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: userSnap.exists() ? userSnap.data().role : null,
           groupName: userSnap.exists() ? userSnap.data().groupName : null,
           groupId: userSnap.exists() ? userSnap.data().groupId : null,
+          isApproved: userSnap.exists() ? userSnap.data().isApproved : undefined,
         }
 
         if (isMounted) {

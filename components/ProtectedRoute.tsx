@@ -59,6 +59,9 @@ const ProtectedRoute = ({ children, requireAdmin, requireSuperAdmin, allowedRole
   // Only render children if we are authorized
   if (!user) return null;
   
+  // Guard for render: Hide content if pending
+  if (user.role === 'group-admin' && user.isApproved === false) return null;
+  
   // Guard flags for render
   if (requireSuperAdmin && user.role !== 'super-admin') return null;
   if (requireAdmin && user.role !== 'group-admin' && user.role !== 'super-admin') return null;

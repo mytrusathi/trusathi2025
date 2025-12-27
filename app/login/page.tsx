@@ -23,8 +23,16 @@ export default function LoginPage() {
       if (role === 'super-admin') {
         router.replace('/dashboard/super-admin')
       } else if (role === 'group-admin') {
+        // NEW CHECK: If not approved, go to pending page
+        // (Assuming user object has isApproved from AuthContext)
+        // If your useAuth user object doesn't have isApproved, 
+        // you might need to check this differently, but usually it does.
+        if (user.isApproved === false) {
+           router.replace('/register/pending')
+        } else {
         router.replace('/dashboard/group-admin')
-      } else if (role === 'member') {
+      }
+     } else if (role === 'member') {
         router.replace('/dashboard/member')
       }
     }
