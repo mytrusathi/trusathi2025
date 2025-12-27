@@ -39,7 +39,7 @@ const RegisterPage = () => {
         uid: user.uid,
         email: user.email,
         displayName: name,
-        role: 'role',
+        role: role,
         isApproved: isApproved, 
         createdAt: new Date().toISOString(),
       });
