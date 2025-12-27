@@ -5,7 +5,7 @@ import { auth, db } from '../lib/firebase';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { User, Users, Check, Loader2 } from 'lucide-react';
+import { User, Users, Check, Loader2, TriangleAlert } from 'lucide-react';
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
@@ -29,18 +29,24 @@ const RegisterPage = () => {
         displayName: name,
       });
 
+      // SECURITY FIX: 
+      // Members are auto-approved. 
+      // Group Admins must be approved by Super Admin before accessing data.
+      const isApproved = role === 'member';
+
       // Create user document in Firestore with SELECTED ROLE
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
         email: user.email,
         displayName: name,
-        role: 'member', 
+        role: 'role',
+        isApproved: isApproved, 
         createdAt: new Date().toISOString(),
       });
 
       // Redirect based on role
       if (role === 'group-admin') {
-        router.push('/dashboard/group-admin');
+        router.push('/register/pending');
       } else {
         router.push('/dashboard/member');
       }
@@ -105,6 +111,14 @@ const RegisterPage = () => {
               {role === 'group-admin' && <div className="absolute top-2 right-2 text-rose-500"><Check size={16} /></div>}
             </button>
           </div>
+          
+          {/* Warning Message for Admins */}
+          {role === 'group-admin' && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-lg flex gap-2">
+              <TriangleAlert className="shrink-0" size={16} />
+              <p>Note: Group Admin accounts require manual verification by the Trusathi team before you can access the dashboard.</p>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
@@ -141,6 +155,19 @@ const RegisterPage = () => {
               required
               minLength={6}
             />
+          </div>
+
+          {/* Terms and Conditions Checkbox */}
+          <div className="flex items-start gap-2 pt-2">
+            <input 
+              type="checkbox" 
+              id="terms" 
+              required 
+              className="mt-1 w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500 cursor-pointer"
+            />
+            <label htmlFor="terms" className="text-sm text-slate-600 cursor-pointer">
+              I agree to the <Link href="/terms" target="_blank" className="text-rose-600 font-medium hover:underline">Terms and Conditions</Link> and Privacy Policy.
+            </label>
           </div>
 
           <button

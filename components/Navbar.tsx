@@ -40,7 +40,11 @@ export default function Navbar() {
               Browse Profiles
               </Link>
 
-            <a className="text-gray-600 hover:text-indigo-600 font-medium">Communities</a>
+            <Link
+            href="/search"
+             className="text-gray-600 hover:text-indigo-600 font-medium">
+              Communities
+              </Link>
             
             <Link href="/about"
             className="text-gray-600 hover:text-indigo-600 font-medium">
