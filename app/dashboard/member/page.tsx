@@ -1,114 +1,132 @@
-// app/dashboard/member/page.tsx
-'use client'
-
-import { useEffect, useState } from 'react'
-import { db } from '../../lib/firebase'
-import { collection, query, where, getDocs } from 'firebase/firestore'
-import { useAuth } from '../../../context/AuthContext'
-import { Profile } from '../../../types/profile'
-import { Loader2, UserPlus, Edit3 } from 'lucide-react'
-import ProfileForm from '../../../components/group-admin/ProfileForm' // Reusing your existing form!
-import { ProfileCard } from '../../../components/group-admin/ProfileCard' // Reusing your existing card!
+"use client";
+import React, { useEffect, useState } from 'react';
+import { db } from '../../lib/firebase';
+import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthContext';
+import { Profile } from '@/types/profile';
+import ProfileCard from '@/components/group-admin/ProfileCard'; // Named import not needed, it is default
+import ProfileForm from '@/components/group-admin/ProfileForm';
+import { Loader2, Plus, FileText } from 'lucide-react';
 
 export default function MemberDashboard() {
-  const { user } = useAuth()
+  const { user } = useAuth();
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  const [loading, setLoading] = useState(true)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
+  // Form State
+  const [showForm, setShowForm] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
 
-  // Fetch the SINGLE profile belonging to this member
-  const fetchMyProfile = async () => {
-    if (!user) return
-    setLoading(true)
+  // Fetch User's Profiles
+  const fetchProfiles = async () => {
+    if (!user) return;
+    setLoading(true);
     try {
-      // Find profile created by this user
-      const q = query(collection(db, 'profiles'), where('createdBy', '==', user.uid))
-      const snapshot = await getDocs(q)
-      
-      if (!snapshot.empty) {
-        const docData = snapshot.docs[0]
-        setProfile({ id: docData.id, ...docData.data() } as Profile)
-      } else {
-        setProfile(null)
-      }
+      const q = query(collection(db, 'profiles'), where('createdBy', '==', user.uid));
+      const querySnapshot = await getDocs(q);
+      const fetched: Profile[] = [];
+      querySnapshot.forEach((doc) => {
+        fetched.push({ ...doc.data(), id: doc.id } as Profile);
+      });
+      setProfiles(fetched);
     } catch (error) {
-      console.error("Error fetching profile:", error)
+      console.error("Error fetching profiles:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchMyProfile()
-  }, [user])
+    fetchProfiles();
+  }, [user]);
 
-  // --- RENDER STATES ---
+  // Handlers
+  const handleEdit = (profile: Profile) => {
+    setSelectedProfile(profile);
+    setShowForm(true);
+  };
 
-  if (loading) {
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this profile?")) return;
+    try {
+      await deleteDoc(doc(db, 'profiles', id));
+      setProfiles(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      console.error("Delete failed", error);
+    }
+  };
+
+  const handleSuccess = () => {
+    setShowForm(false);
+    setSelectedProfile(null);
+    fetchProfiles();
+  };
+
+  if (showForm) {
     return (
-      <div className="flex flex-col items-center justify-center h-96">
-        <Loader2 className="animate-spin text-rose-600 mb-4" size={40} />
-        <p className="text-slate-500 font-medium">Loading your profile...</p>
-      </div>
-    )
-  }
-
-  // 1. Show Form (Create or Edit)
-  if (isEditing || !profile) {
-    return (
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-           <h1 className="text-2xl font-bold text-slate-800">
-             {profile ? 'Edit Your Profile' : 'Create Your Profile'}
-           </h1>
-           <p className="text-slate-500">
-             {profile ? 'Update your details to find better matches.' : 'Complete your biodata to get started.'}
-           </p>
-        </div>
-
+      <div className="min-h-screen bg-slate-50 p-4">
         <ProfileForm 
-          initialData={profile}
-          onSuccess={() => {
-            setIsEditing(false)
-            fetchMyProfile()
-          }}
-          onCancel={() => {
-            // If they have a profile, go back to view. If not, stay here (or logout).
-            if (profile) setIsEditing(false)
-          }}
+          initialData={selectedProfile}
+          onSuccess={handleSuccess}
+          onCancel={() => { setShowForm(false); setSelectedProfile(null); }}
         />
       </div>
-    )
+    );
   }
 
-  // 2. Show Profile View (Default)
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">My Profile</h1>
-          <p className="text-slate-500">This is how your profile appears to others.</p>
+    <div className="min-h-screen bg-slate-50 font-sans">
+      {/* Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+             <div className="bg-rose-600 text-white p-2 rounded-lg">
+                <FileText size={20} />
+             </div>
+             <h1 className="text-xl font-bold text-slate-800">My Profiles</h1>
+          </div>
+          <button 
+            onClick={() => { setSelectedProfile(null); setShowForm(true); }}
+            className="bg-rose-600 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-rose-700 transition-colors"
+          >
+            <Plus size={18} /> Create New
+          </button>
         </div>
-        <button 
-          onClick={() => setIsEditing(true)}
-          className="bg-rose-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-rose-700 shadow-md transition-all font-semibold"
-        >
-          <Edit3 size={18} /> Edit Profile
-        </button>
-      </div>
+      </header>
 
-      <div className="max-w-md">
-         {/* Reuse the card we built earlier */}
-         <ProfileCard 
-            profile={profile}
-            isCopied={false}
-            onCopy={() => {}} // Member doesn't need to copy their own link usually
-            onView={() => {}} // Already viewing
-            onEdit={() => setIsEditing(true)}
-            onDelete={() => alert("Members cannot delete their profile. Contact admin.")}
-         />
-      </div>
+      {/* Main Content */}
+      <main className="max-w-5xl mx-auto px-4 py-8">
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="animate-spin text-rose-500" size={32} />
+          </div>
+        ) : profiles.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200 border-dashed">
+            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+               <FileText size={32} />
+            </div>
+            <h3 className="text-lg font-bold text-slate-700">No Profiles Yet</h3>
+            <p className="text-slate-500 mb-6">Create a biodata to start searching for matches.</p>
+            <button 
+               onClick={() => setShowForm(true)}
+               className="text-rose-600 font-bold hover:underline"
+            >
+               Create your first profile
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {profiles.map(profile => (
+              <ProfileCard 
+                key={profile.id}
+                profile={profile}
+                onEdit={handleEdit}     // ONLY passing valid props now
+                onDelete={handleDelete} // ONLY passing valid props now
+              />
+            ))}
+          </div>
+        )}
+      </main>
     </div>
-  )
+  );
 }

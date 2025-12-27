@@ -1,24 +1,35 @@
-// components/group-admin/ProfileList.tsx
 "use client";
 import React, { useEffect, useState } from 'react';
 import { db } from '../../app/lib/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
 import { Profile } from '../../types/profile';
-import { Loader2, Plus, Search } from 'lucide-react';
+import { Loader2, Plus, Search, FilterX } from 'lucide-react';
+import ProfileCard from './ProfileCard'; // Ensure no { } around this import
 import ProfileForm from './ProfileForm';
-import ProfileDetail from './ProfileDetail';
-import { ProfileCard } from './ProfileCard'; // Import the new component
 
 const ProfileList = () => {
   const { user } = useAuth();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
-  const [viewingProfile, setViewingProfile] = useState<Profile | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  
+  // UI States
+  const [showForm, setShowForm] = useState(false);
+  const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
+
+  // Helper: Calculate Age from DOB
+  const getAge = (dob?: string) => {
+    if (!dob) return 0;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   const fetchProfiles = async () => {
     if (!user) return;
@@ -28,7 +39,7 @@ const ProfileList = () => {
       const querySnapshot = await getDocs(q);
       const fetchedProfiles: Profile[] = [];
       querySnapshot.forEach((doc) => {
-        fetchedProfiles.push({ id: doc.id, ...doc.data() } as Profile);
+        fetchedProfiles.push({ ...doc.data(), id: doc.id } as Profile);
       });
       setProfiles(fetchedProfiles);
     } catch (error) {
@@ -43,104 +54,96 @@ const ProfileList = () => {
   }, [user]);
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this profile?')) {
-      await deleteDoc(doc(db, 'profiles', id));
-      fetchProfiles();
+    if (window.confirm('Are you sure you want to delete this profile?')) {
+      try {
+        await deleteDoc(doc(db, 'profiles', id));
+        setProfiles(prev => prev.filter(p => p.id !== id));
+      } catch (error) {
+        console.error("Delete error:", error);
+      }
     }
   };
 
-  const copyForWhatsApp = (profile: Profile) => {
-    const waText = `
-💍 *Matrimonial Profile* 💍
-Name: ${profile.name}
-Age: ${profile.age} | Height: ${profile.height}
-Job: ${profile.profession}
-Location: ${profile.location}
----------------------------------
-*Contact:* ${profile.contact || 'Ask Admin'}
-    `.trim();
-
-    navigator.clipboard.writeText(waText).then(() => {
-      setCopiedId(profile.id || 'temp');
-      setTimeout(() => setCopiedId(null), 2000);
-    });
+  const handleEdit = (profile: Profile) => {
+    setEditingProfile(profile);
+    setShowForm(true);
   };
 
-  const filteredProfiles = profiles.filter(p =>
-    (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (p.location || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleFormSuccess = () => {
+    setShowForm(false);
+    setEditingProfile(null);
+    fetchProfiles(); // Refresh list
+  };
 
-  if (isEditing) {
+  // Filter logic
+  const filteredProfiles = profiles.filter(p => {
+    const searchLower = searchTerm.toLowerCase();
+    // Search by Name, City, or Caste
     return (
-      <ProfileForm
-        initialData={selectedProfile}
-        onSuccess={() => { setIsEditing(false); fetchProfiles(); }}
-        onCancel={() => setIsEditing(false)}
-      />
+      (p.name?.toLowerCase() || '').includes(searchLower) ||
+      (p.city?.toLowerCase() || '').includes(searchLower) ||
+      (p.caste?.toLowerCase() || '').includes(searchLower)
     );
-  }
+  });
 
-  if (viewingProfile) {
+  if (showForm) {
     return (
-      <ProfileDetail
-        profile={viewingProfile}
-        onBack={() => setViewingProfile(null)}
-        onEdit={() => {
-            setSelectedProfile(viewingProfile);
-            setViewingProfile(null);
-            setIsEditing(true);
-        }}
+      <ProfileForm 
+        initialData={editingProfile}
+        onSuccess={handleFormSuccess}
+        onCancel={() => { setShowForm(false); setEditingProfile(null); }}
       />
     );
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-800">My Profiles</h1>
-          <p className="text-slate-500 mt-1">Manage and share your biodata collection</p>
+    <div className="space-y-6">
+      
+      {/* Header Actions */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <div className="relative w-full sm:w-72">
+           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+           <input 
+             type="text" 
+             placeholder="Search by name, city..." 
+             value={searchTerm}
+             onChange={(e) => setSearchTerm(e.target.value)}
+             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+           />
         </div>
-        <button
-          onClick={() => { setSelectedProfile(null); setIsEditing(true); }}
-          className="bg-rose-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-rose-700 shadow-md font-semibold"
+        
+        <button 
+          onClick={() => { setEditingProfile(null); setShowForm(true); }}
+          className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors"
         >
-          <Plus size={20} /> Add New Profile
+          <Plus size={20} /> Add Profile
         </button>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-8">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-        <input
-          type="text"
-          placeholder="Search profiles..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20"
-        />
-      </div>
-
-      {/* List */}
+      {/* List Grid */}
       {loading ? (
-        <div className="flex justify-center py-20"><Loader2 className="animate-spin text-rose-500" size={40} /></div>
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="animate-spin text-rose-500 mb-2" size={32} />
+          <p className="text-slate-400">Loading profiles...</p>
+        </div>
       ) : filteredProfiles.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
-           <p className="text-slate-500">No profiles found.</p>
+        <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
+           <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+              <FilterX className="text-slate-300" size={32} />
+           </div>
+           <h3 className="text-lg font-bold text-slate-700">No profiles found</h3>
+           <p className="text-slate-500">
+             {searchTerm ? `No matches for "${searchTerm}"` : "Get started by adding a new profile."}
+           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredProfiles.map((profile) => (
-            <ProfileCard
-              key={profile.id}
+            <ProfileCard 
+              key={profile.id} 
               profile={profile}
-              isCopied={copiedId === profile.id}
-              onCopy={copyForWhatsApp}
-              onView={setViewingProfile}
-              onEdit={(p) => { setSelectedProfile(p); setIsEditing(true); }}
-              onDelete={handleDelete}
+              onEdit={handleEdit}     // CORRECT: Only passing supported props
+              onDelete={handleDelete} // CORRECT: Only passing supported props
             />
           ))}
         </div>
