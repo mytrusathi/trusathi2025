@@ -108,9 +108,14 @@ const SuperAdminDashboard = () => {
   };
 
   const handleLogout = async () => {
-    await signOut(auth);
-    router.push('/login');
-  };
+    try {
+      await signOut(auth);
+      // Force a full page reload to clear browser memory/cache
+      window.location.href = '/login'; 
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+};
 
   const filteredUsers = users.filter(u => 
     (u.email?.toLowerCase() || '').includes(searchTerm.toLowerCase()) || 

@@ -16,11 +16,12 @@ const GroupAdminLayout = ({ children }: Props) => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push('/login');
+      // Force a full page reload to clear browser memory/cache
+      window.location.href = '/login'; 
     } catch (error) {
       console.error("Logout failed", error);
     }
-  };
+};
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row font-sans text-slate-900">

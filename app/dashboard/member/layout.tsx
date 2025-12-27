@@ -11,10 +11,15 @@ import { User, Heart, LogOut, Search } from 'lucide-react'
 export default function MemberLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
-  const handleLogout = async () => {
-    await signOut(auth)
-    router.replace('/login')
-  }
+ const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      // Force a full page reload to clear browser memory/cache
+      window.location.href = '/login'; 
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+};
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
