@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../context/AuthContext'
-import { Heart, Mail, Lock, Loader2, ArrowRight } from 'lucide-react'
+import { ArrowLeft, Heart, Mail, Lock, Loader2, ArrowRight } from 'lucide-react'
 
 export default function LoginPage() {
   const { loginWithEmail, user, role, loading } = useAuth()
@@ -23,16 +23,12 @@ export default function LoginPage() {
       if (role === 'super-admin') {
         router.replace('/dashboard/super-admin')
       } else if (role === 'group-admin') {
-        // NEW CHECK: If not approved, go to pending page
-        // (Assuming user object has isApproved from AuthContext)
-        // If your useAuth user object doesn't have isApproved, 
-        // you might need to check this differently, but usually it does.
         if (user.isApproved === false) {
            router.replace('/register/pending')
         } else {
-        router.replace('/dashboard/group-admin')
-      }
-     } else if (role === 'member') {
+           router.replace('/dashboard/group-admin')
+        }
+      } else if (role === 'member') {
         router.replace('/dashboard/member')
       }
     }
@@ -62,8 +58,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md transition-all">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 relative">
+      
+      {/* ✅ NEW: Back to Home Button */}
+      <div className="absolute top-6 left-6 z-10">
+        <Link 
+          href="/" 
+          className="flex items-center gap-2 text-slate-500 hover:text-rose-600 font-medium transition-colors p-2 rounded-lg hover:bg-slate-100"
+        >
+          <ArrowLeft size={20} /> <span className="hidden sm:inline">Back to Home</span>
+        </Link>
+      </div>
+
+      <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md transition-all relative z-0">
         
         {/* Header Section */}
         <div className="text-center mb-8">
