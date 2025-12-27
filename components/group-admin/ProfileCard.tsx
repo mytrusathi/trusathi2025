@@ -1,86 +1,95 @@
-// components/group-admin/ProfileCard.tsx
 import React from 'react';
-import { MapPin, GraduationCap, Briefcase, Share2, Check, Edit, Trash2 } from 'lucide-react';
 import { Profile } from '../../types/profile';
+import { Edit, Trash2, MapPin, Briefcase, Calendar } from 'lucide-react';
 
 interface Props {
   profile: Profile;
-  isCopied: boolean;
-  onCopy: (profile: Profile) => void;
-  onView: (profile: Profile) => void;
   onEdit: (profile: Profile) => void;
   onDelete: (id: string) => void;
 }
 
-export const ProfileCard = ({ profile, isCopied, onCopy, onView, onEdit, onDelete }: Props) => {
-  return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-slate-200 overflow-hidden flex flex-col">
-      {/* Card Header */}
-      <div className="p-5 border-b border-slate-50">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <h3 className="font-bold text-lg text-slate-800 line-clamp-1">{profile.name}</h3>
-            <p className="text-rose-600 font-medium text-sm">{profile.profession}</p>
-          </div>
-          <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded-md">
-            {profile.age} Yrs
-          </span>
-        </div>
+const ProfileCard = ({ profile, onEdit, onDelete }: Props) => {
+  
+  // Helper: Calculate Age
+  const getAge = (dob?: string) => {
+    if (!dob) return 'N/A';
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
-        <div className="space-y-2 mt-4">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <MapPin size={16} className="text-slate-400" />
-            <span className="truncate">{profile.location || 'Location N/A'}</span>
+  const age = getAge(profile.dob);
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full">
+      {/* Top Section: Image & Basic Info */}
+      <div className="p-4 flex gap-4 items-start">
+        <div className="w-16 h-16 rounded-full bg-slate-100 shrink-0 overflow-hidden border border-slate-100">
+          {profile.imageUrl ? (
+            <img src={profile.imageUrl} alt={profile.name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs">
+              No Pic
+            </div>
+          )}
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-start">
+             <h3 className="font-bold text-slate-800 truncate pr-2">{profile.name}</h3>
+             <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded-md whitespace-nowrap">
+               {age} Yrs
+             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <GraduationCap size={16} className="text-slate-400" />
-            <span className="truncate">{profile.education}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <Briefcase size={16} className="text-slate-400" />
-            <span className="truncate">{profile.income || 'Income N/A'}</span>
+          <p className="text-xs text-rose-600 font-medium truncate mb-1">
+            {profile.religion}, {profile.caste}
+          </p>
+          <div className="flex items-center gap-1 text-xs text-slate-500 truncate">
+             <MapPin size={12} />
+             {profile.city || 'Unknown City'}
           </div>
         </div>
       </div>
 
-      {/* Card Actions */}
-      <div className="p-4 bg-slate-50 mt-auto flex flex-col gap-3">
-        {/* WhatsApp Button */}
-        <button
-          onClick={() => onCopy(profile)}
-          className={`
-            w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200
-            ${isCopied
-              ? 'bg-green-600 text-white shadow-md'
-              : 'bg-green-500 hover:bg-green-600 text-white shadow-sm'
-            }
-          `}
-        >
-          {isCopied ? <Check size={18} /> : <Share2 size={18} />}
-          {isCopied ? 'Copied!' : 'Copy for WhatsApp'}
-        </button>
+      {/* Middle: Profession */}
+      <div className="px-4 pb-4 grow">
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+             <div className="flex items-center gap-2 text-xs text-slate-500 mb-1 uppercase font-bold tracking-wide">
+                <Briefcase size={12} /> Profession
+             </div>
+             <p className="text-sm font-medium text-slate-700 line-clamp-2">
+                {profile.profession || 'Not Specified'} 
+                {profile.company && <span className="text-slate-500"> at {profile.company}</span>}
+             </p>
+             <p className="text-xs text-slate-500 mt-1">{profile.income || 'Income hidden'}</p>
+          </div>
+      </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={() => onView(profile)}
-            className="flex-1 bg-white border border-slate-200 text-slate-700 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
-          >
-            View Full
-          </button>
-          <button
-            onClick={() => onEdit(profile)}
-            className="w-10 flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-lg hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-colors"
-          >
-            <Edit size={16} />
-          </button>
-          <button
-            onClick={() => onDelete(profile.id!)}
-            className="w-10 flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-lg hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+      {/* Bottom: Actions */}
+      <div className="border-t border-slate-100 p-3 flex gap-2 bg-slate-50/50">
+        <button 
+          onClick={() => onEdit(profile)}
+          className="flex-1 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors flex items-center justify-center gap-2"
+        >
+          <Edit size={14} /> Edit
+        </button>
+        <button 
+          onClick={() => {
+            if (profile.id) onDelete(profile.id);
+          }}
+          className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-400 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+          title="Delete Profile"
+        >
+          <Trash2 size={16} />
+        </button>
       </div>
     </div>
   );
 };
+
+export default ProfileCard;
