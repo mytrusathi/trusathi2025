@@ -1,5 +1,5 @@
 
-import { Heart, Shield, Facebook, Twitter, Instagram, } from 'lucide-react';
+import { Heart, Shield, Facebook, Twitter, Instagram, Mail} from 'lucide-react';
 import Link from 'next/link' 
 
 export default function Footer() {
@@ -37,10 +37,15 @@ export default function Footer() {
             <div>
               <h4 className="font-bold text-gray-900 mb-6">Support</h4>
               <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-indigo-600 transition">For Group Admins</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Verification Process</a></li>
+                {/* UPDATED: Support Email Link */}
+                <li className="flex items-center gap-2">
+                  <Mail size={14}/> 
+                  <a href="mailto:support@trusathi.com" className="hover:text-indigo-600 transition">
+                    support@trusathi.com
+                  </a>
+                </li>
                 <li><a href="#" className="hover:text-indigo-600 transition">Help Center</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Press</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition">Safety Tips</a></li>
               </ul>
             </div>
 
@@ -53,8 +58,16 @@ export default function Footer() {
                   className="hover:text-indigo-600 transition">
                     Terms & Conditions
                     </Link></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Cookie Policy</a></li>
+                <li>
+             <Link href="/privacy" className="hover:text-indigo-600 transition">
+               Privacy Policy
+             </Link>
+          </li>
+                <li>
+                  <Link
+                   href="/cookie-policy" className="hover:text-indigo-600 transition">
+                    Cookie Policy
+                    </Link></li>
               </ul>
             </div>
           </div>

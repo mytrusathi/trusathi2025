@@ -51,7 +51,14 @@ export default function PendingApprovalPage() {
           <div className="flex flex-col gap-4">
              <div className="text-sm text-slate-500 flex items-center justify-center gap-2">
                 <Mail size={16} />
-                <span>Please contact support if this takes longer than 24 hours.</span>
+                <span>
+                  Please 
+                  {/* UPDATED: Support Email Link */}
+                  <a href="mailto:support@trusathi.com" className="mx-1 text-indigo-600 font-medium hover:underline">
+                    contact support
+                  </a> 
+                  if this takes longer than 24 hours.
+                </span>
              </div>
              
              <Link 
