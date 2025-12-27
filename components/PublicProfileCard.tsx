@@ -1,42 +1,101 @@
 import React from 'react';
-import { MapPin, Briefcase } from 'lucide-react';
 import { Profile } from '../types/profile';
+import { MapPin, Briefcase, User, Calendar } from 'lucide-react';
 
-export default function PublicProfileCard({ profile }: { profile: Profile }) {
+interface Props {
+  profile: Profile;
+}
+
+const PublicProfileCard = ({ profile }: Props) => {
+  
+  // Helper: Calculate Age from DOB
+  const getAge = (dob?: string) => {
+    if (!dob) return 'N/A';
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const age = getAge(profile.dob);
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all border border-slate-100 overflow-hidden group">
-      <div className="p-6">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-2xl font-bold text-slate-400 group-hover:bg-rose-100 group-hover:text-rose-600 transition-colors">
-            {profile.imageUrl ? (
-              <img src={profile.imageUrl} alt={profile.name} className="w-full h-full object-cover rounded-full" />
-            ) : (
-              profile.name?.charAt(0) || 'U'
-            )}
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all group h-full flex flex-col">
+      {/* Image Section */}
+      <div className="h-64 bg-slate-100 relative overflow-hidden">
+        {profile.imageUrl ? (
+          <img 
+            src={profile.imageUrl} 
+            alt={profile.name} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
+            <User size={64} strokeWidth={1.5} />
+            <span className="text-sm mt-2 font-medium">No Photo Available</span>
           </div>
-          <div>
-            <h3 className="font-bold text-lg text-slate-900">{profile.name}</h3>
-            <span className="text-xs font-bold px-2 py-0.5 rounded bg-green-50 text-green-700 border border-green-100">
-              Community Verified
-            </span>
-          </div>
-        </div>
-
-        <div className="space-y-2 text-sm text-slate-600">
-          <div className="flex items-center gap-2">
-            <Briefcase size={16} className="text-rose-500" />
-            <span>{profile.profession || 'Not Specified'}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPin size={16} className="text-rose-500" />
-            <span>{profile.location || 'India'}</span>
+        )}
+        
+        {/* Overlay Gradient for Text Readability */}
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/80 to-transparent"></div>
+        
+        {/* Quick Stats Overlay */}
+        <div className="absolute bottom-4 left-4 right-4 text-white">
+          <h3 className="font-bold text-xl truncate mb-1">{profile.name}</h3>
+          <div className="flex items-center gap-3 text-sm text-white/90">
+             <span className="flex items-center gap-1 bg-white/20 px-2 py-0.5 rounded backdrop-blur-sm">
+                <Calendar size={12} /> {age} yrs
+             </span>
+             <span className="truncate">{profile.religion}, {profile.caste}</span>
           </div>
         </div>
       </div>
-      
-      <div className="bg-slate-50 p-3 text-center border-t border-slate-100">
-        <span className="text-rose-600 font-bold text-sm group-hover:underline">View Full Profile &rarr;</span>
+
+      {/* Details Section */}
+      <div className="p-5 flex flex-col grow space-y-4">
+        
+        {/* Profession */}
+        <div className="flex items-start gap-3">
+            <div className="p-2 bg-rose-50 text-rose-600 rounded-lg mt-0.5">
+                <Briefcase size={16} />
+            </div>
+            <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Profession</p>
+                <p className="text-slate-800 font-medium leading-tight">
+                    {profile.profession || 'Not Specified'}
+                    {profile.company && <span className="text-slate-500 text-sm block mt-0.5">at {profile.company}</span>}
+                </p>
+            </div>
+        </div>
+
+        {/* Location (Fixed Error Here) */}
+        <div className="flex items-start gap-3">
+            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg mt-0.5">
+                <MapPin size={16} />
+            </div>
+            <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Location</p>
+                <p className="text-slate-800 font-medium">
+                    {profile.city || 'Unknown City'}
+                    {profile.state && `, ${profile.state}`}
+                </p>
+            </div>
+        </div>
+
+      </div>
+
+      {/* Footer Action */}
+      <div className="p-4 border-t border-slate-100 bg-slate-50 mt-auto">
+         <button className="w-full py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors shadow-sm text-sm">
+            View Full Profile
+         </button>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default PublicProfileCard;
