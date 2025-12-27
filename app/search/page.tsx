@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore'; // Removed unused orderBy
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { Profile } from '@/types/profile';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -22,6 +22,19 @@ function SearchResults() {
   const maxAge = searchParams.get('maxAge') ? parseInt(searchParams.get('maxAge')!) : 60;
   const community = searchParams.get('community') || 'All Communities';
 
+  // --- NEW HELPER: Calculate Age from DOB ---
+  const calculateAge = (dobString: string | undefined): number => {
+    if (!dobString) return 0;
+    const birthDate = new Date(dobString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   useEffect(() => {
     const fetchProfiles = async () => {
       setLoading(true);
@@ -39,12 +52,11 @@ function SearchResults() {
         const fetchedProfiles: Profile[] = [];
         
         querySnapshot.forEach((doc) => {
-          // Cast as Profile but we know 'id' comes from doc.id, not data fields usually
           const data = doc.data() as Profile;
           
           // Client-Side Filtering
           
-          // Filter by Community
+          // 1. Filter by Community
           if (community !== 'All Communities') {
              const religion = data.religion || '';
              if (!religion.toLowerCase().includes(community.toLowerCase())) {
@@ -52,13 +64,13 @@ function SearchResults() {
              }
           }
 
-          // Filter by Age
-          const age = data.age ? parseInt(data.age) : 0;
+          // 2. Filter by Age (Calculated from DOB)
+          const age = calculateAge(data.dob); // <--- FIXED HERE
+          
           if (age < minAge || age > maxAge) {
             return; 
           }
 
-          // FIX: Spread data first, then overwrite/add id
           fetchedProfiles.push({ ...data, id: doc.id });
         });
 
@@ -96,6 +108,7 @@ function SearchResults() {
         <div className="grid md:grid-cols-3 gap-6">
           {profiles.map((profile) => (
              <a href="/login" key={profile.id}> 
+               {/* Note: PublicProfileCard might need an update to show Age correctly too */}
                <PublicProfileCard profile={profile} />
              </a>
           ))}
@@ -130,7 +143,6 @@ export default function SearchPage() {
          </div>
       </div>
       
-      {/* FIX: Changed flex-grow to grow */}
       <div className="grow bg-gray-50">
         <Suspense fallback={<div className="p-10 text-center">Loading search...</div>}>
           <SearchResults />
