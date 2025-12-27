@@ -1,32 +1,47 @@
 export interface Profile {
-  id: string
-  name?: string
-  age?: string
-  gender?: string
-  height?: string
-  dob?: string
-  tob?: string
-  pob?: string
-  city?: string
-  address?: string
-  caste?: string
-  gotra?: string
-  complexion?: string
-  diet?: string
-  education?: string
-  profession?: string
-  income?: string
-  company?: string
-  father?: string
-  fatherOcc?: string
-  mother?: string
-  motherOcc?: string
-  siblings?: string
-  contact?: string
-  manglik?: string
-  groupProfileNo?: string
-  globalProfileNo?: string
-  createdAt?: any
-  updatedAt?: any
-  [key: string]: any
+  id?: string;
+  // Basic Details
+  name: string;
+  gender: 'male' | 'female';
+  dob: string; // Date of Birth (Important for age calc)
+  tob?: string; // Time of Birth
+  pob?: string; // Place of Birth
+  height?: string;
+  maritalStatus?: string;
+  
+  // Location
+  city: string;
+  state?: string;
+  country?: string;
+
+  // Religion & Astro
+  religion: string;
+  caste: string;
+  subCaste?: string;
+  gotra?: string;
+  manglik?: 'Yes' | 'No' | 'Anshik' | 'Don\'t Know';
+
+  // Professional
+  education: string;
+  profession: string;
+  income: string; // e.g., "12 LPA"
+  company?: string;
+
+  // Family Details
+  fatherName?: string;
+  fatherOccupation?: string;
+  motherName?: string;
+  motherOccupation?: string;
+  siblings?: string; // e.g. "1 Brother, 2 Sisters"
+  familyType?: 'Nuclear' | 'Joint';
+
+  // Media & Contact
+  imageUrl?: string;
+  about?: string; // Biodata summary
+  contact: string; // Parent's or Candidate's number
+  
+  // Metadata
+  createdBy: string;
+  createdAt: string;
+  updatedAt?: string;
 }
