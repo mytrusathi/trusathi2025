@@ -20,6 +20,7 @@ export default function GroupAdminDashboard() {
   const [copied, setCopied] = useState(false);
   const [slug, setSlug] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const isSlugFixed = !!user?.slug;
 
   // Initialize slug from user data
   useEffect(() => {
@@ -105,24 +106,25 @@ Find your soulmate within our trusted group here: ${communityLink}`;
       <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
         <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
           <Settings size={20} className="text-rose-500" /> 
-          Customize Your Community Link
+          {isSlugFixed ? "Your Community Link" : "Customize Your Community Link"}
         </h2>
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 w-full">
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">
-              Personalized URL Slug
+              {isSlugFixed ? "Permanent URL" : "Personalized URL Slug"}
             </label>
             <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-rose-500/20 transition-all">
               <span className="text-slate-400 text-sm hidden sm:inline">trusathi.com/community/</span>
               <input 
                 value={slug} 
                 onChange={(e) => setSlug(e.target.value)}
-                readOnly={!!user?.slug}
+                readOnly={isSlugFixed}
                 placeholder="e.g., sharma-community"
                 className="bg-transparent outline-none text-slate-700 font-medium ml-1 flex-1 min-w-0"
               />
             </div>
           </div>
+          {!isSlugFixed && (
           <button 
             onClick={handleSaveSlug}
             disabled={isSaving || !slug || !!user?.slug}
@@ -130,11 +132,16 @@ Find your soulmate within our trusted group here: ${communityLink}`;
           >
             {user?.slug ? "URL Fixed" : isSaving ? "Saving..." : "Set Permanent Link"}
           </button>
+          )}
         </div>
         <p className="text-xs text-slate-400 mt-3 ml-1">
-          Tip: Use a simple name like 'punjab-group' to make it easy for members to remember.
+          {isSlugFixed
+          ? "This link is now permanent to ensure your shared WhatsApp links never break." 
+        : "Tip: Once set, this link cannot be changed."}
         </p>
       </div>
+      );
+          
 
       {/* 3. WhatsApp Sharing Card */}
       <div className="bg-linear-to-br from-rose-600 to-rose-700 rounded-3xl p-8 text-white shadow-xl shadow-rose-200">

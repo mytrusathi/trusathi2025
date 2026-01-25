@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: { adminId: string }
   let adminDisplayName = "our Group Admin";
 
   try {
-    // Check if adminId is a slug or UID
+    // Check if adminId is a slug or UID to provide accurate SEO titles
     const slugQuery = query(collection(db, 'users'), where('slug', '==', adminId), limit(1));
     const slugSnap = await getDocs(slugQuery);
     
@@ -34,67 +34,68 @@ export async function generateMetadata({ params }: { params: { adminId: string }
 
   return {
     title: `${groupName} Matrimony | TruSathi`,
-    description: `Verified matches for ${groupName}. Profiles personally vetted by ${adminDisplayName}. Safe, authentic, and community-focused matchmaking.`,
+    description: `Verified matches for ${groupName}. Profiles personally vetted by ${adminDisplayName}.`,
     openGraph: {
       title: `${groupName} Community Matrimony`,
       description: `Find your soulmate in the ${groupName} group. Verified by ${adminDisplayName}.`,
       url: `https://www.trusathi.com/community/${adminId}`,
       siteName: 'TruSathi',
-      images: [
-        {
-          url: 'https://www.trusathi.com/logo.png', // Ensure this exists in your /public folder
-          width: 1200,
-          height: 630,
-          alt: `${groupName} Matrimony on TruSathi`,
-        },
-      ],
+      images: [{ url: 'https://www.trusathi.com/logo.png', width: 1200, height: 630 }],
       locale: 'en_IN',
       type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${groupName} Matrimony | TruSathi`,
-      description: `Trusted matches for ${groupName} community.`,
-      images: ['https://www.trusathi.com/logo.png'],
     },
   };
 }
 
-// 2. Server Component: Initial Data Fetch
+// 2. Server Component: Data Fetching Logic
 export default async function CommunityPage({ params }: { params: { adminId: string } }) {
   const { adminId } = params;
   let adminData: AppUser | null = null;
   let profiles: Profile[] = [];
-  let adminUid = adminId;
+  let resolvedAdminUid: string | null = null;
 
   try {
-    // Fetch Admin Info
+    // Step A: Resolve the adminId (Slug or UID) to the actual Firestore UID
     const slugQuery = query(collection(db, 'users'), where('slug', '==', adminId), limit(1));
     const slugSnap = await getDocs(slugQuery);
 
     if (!slugSnap.empty) {
+      // If it's a slug, get the internal UID from the document ID
       const adminDoc = slugSnap.docs[0];
       adminData = { ...adminDoc.data(), uid: adminDoc.id } as AppUser;
-      adminUid = adminDoc.id;
+      resolvedAdminUid = adminDoc.id;
     } else {
+      // If no slug found, treat adminId as the UID directly
       const adminDoc = await getDoc(doc(db, 'users', adminId));
       if (adminDoc.exists()) {
         adminData = { ...adminDoc.data(), uid: adminDoc.id } as AppUser;
+        resolvedAdminUid = adminDoc.id;
       }
     }
 
-    // Fetch Initial Profiles
-    if (adminData) {
-      const q = query(collection(db, 'profiles'), where('createdBy', '==', adminUid));
+    // Step B: Fetch Profiles created by this specific Admin UID
+    if (resolvedAdminUid) {
+      const q = query(
+        collection(db, 'profiles'), 
+        where('createdBy', '==', resolvedAdminUid)
+      );
+      
       const querySnapshot = await getDocs(q);
+      const fetchedProfiles: Profile[] = [];
       querySnapshot.forEach((doc) => {
-        profiles.push({ ...doc.data(), id: doc.id } as Profile);
+        fetchedProfiles.push({ ...doc.data(), id: doc.id } as Profile);
       });
+      profiles = fetchedProfiles;
     }
   } catch (error) {
     console.error("Page data fetch error:", error);
   }
 
-  // Pass data to Client Component for search/interactivity
-  return <CommunityClientPage initialAdmin={adminData} initialProfiles={profiles} />;
+  // Pass the resolved admin info and their specific profiles to the client component
+  return (
+    <CommunityClientPage 
+      initialAdmin={adminData} 
+      initialProfiles={profiles} 
+    />
+  );
 }
