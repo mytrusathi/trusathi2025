@@ -29,13 +29,20 @@ export default function GroupAdminDashboard() {
   }, [user]);
 
   // Determine which identifier to use for the link (Slug preferred, UID fallback)
-  const displayIdentifier = user?.slug || user?.uid;
+  const displayIdentifier = slug || user?.slug || user?.uid;
   const communityLink = typeof window !== 'undefined' 
     ? `${window.location.origin}/community/${displayIdentifier}`
     : '';
 
   const handleSaveSlug = async () => {
     if (!user?.uid || !slug) return;
+
+// Check if the user already has a fixed slug
+  if (user?.slug) {
+    alert("The community link is permanent and cannot be changed once set to prevent breaking shared links.");
+    return;
+  }
+
     setIsSaving(true);
     try {
       // Clean slug: lowercase, replace spaces/special chars with hyphens
@@ -47,7 +54,7 @@ export default function GroupAdminDashboard() {
       await updateDoc(doc(db, 'users', user.uid), { 
         slug: cleanSlug 
       });
-      alert("Custom URL updated! Your link is now prettier.");
+      alert("Custom URL set! This is now your permanent community link.");
     } catch (error) {
       console.error("Error updating slug:", error);
       alert("Failed to update URL.");
@@ -110,6 +117,7 @@ Find your soulmate within our trusted group here: ${communityLink}`;
               <input 
                 value={slug} 
                 onChange={(e) => setSlug(e.target.value)}
+                readOnly={!!user?.slug}
                 placeholder="e.g., sharma-community"
                 className="bg-transparent outline-none text-slate-700 font-medium ml-1 flex-1 min-w-0"
               />
@@ -117,10 +125,10 @@ Find your soulmate within our trusted group here: ${communityLink}`;
           </div>
           <button 
             onClick={handleSaveSlug}
-            disabled={isSaving || !slug}
+            disabled={isSaving || !slug || !!user?.slug}
             className="w-full md:w-auto bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSaving ? "Saving..." : "Update Link"}
+            {user?.slug ? "URL Fixed" : isSaving ? "Saving..." : "Set Permanent Link"}
           </button>
         </div>
         <p className="text-xs text-slate-400 mt-3 ml-1">
