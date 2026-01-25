@@ -1,4 +1,3 @@
-// app/community/[adminId]/page.tsx
 import { Metadata } from 'next';
 import { db } from '@/app/lib/firebase';
 import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
@@ -11,15 +10,11 @@ export async function generateMetadata({ params }: { params: { adminId: string }
   let groupName = "Community";
   try {
     const slugQuery = query(collection(db, 'users'), where('slug', '==', adminId), limit(1));
-    const slugSnap = await getDocs(slugQuery);
-    const data = !slugSnap.empty ? slugSnap.docs[0].data() : (await getDoc(doc(db, 'users', adminId))).data();
+    const snap = await getDocs(slugQuery);
+    const data = !snap.empty ? snap.docs[0].data() : (await getDoc(doc(db, 'users', adminId))).data();
     groupName = data?.groupName || "Community";
   } catch (e) { console.error(e); }
-
-  return { 
-    title: `${groupName} Matrimony | TruSathi`,
-    description: `Find verified soulmate matches in the ${groupName} community.`
-  };
+  return { title: `${groupName} Matrimony | TruSathi` };
 }
 
 export default async function CommunityPage({ params }: { params: { adminId: string } }) {
@@ -29,15 +24,17 @@ export default async function CommunityPage({ params }: { params: { adminId: str
   let resolvedUid: string | null = null;
 
   try {
-    // 1. Resolve Admin Identity: Check if URL uses a Slug or direct UID
+    // 1. Resolve slug in URL to actual Firestore UID
     const slugQuery = query(collection(db, 'users'), where('slug', '==', adminId), limit(1));
     const slugSnap = await getDocs(slugQuery);
 
     if (!slugSnap.empty) {
+      // If found by slug, use the document ID as the UID
       const adminDoc = slugSnap.docs[0];
       adminData = { ...adminDoc.data(), uid: adminDoc.id } as AppUser;
-      resolvedUid = adminDoc.id; // Map slug back to internal UID
+      resolvedUid = adminDoc.id;
     } else {
+      // Fallback: check if the adminId is already a UID
       const adminDoc = await getDoc(doc(db, 'users', adminId));
       if (adminDoc.exists()) {
         adminData = { ...adminDoc.data(), uid: adminDoc.id } as AppUser;
@@ -45,14 +42,15 @@ export default async function CommunityPage({ params }: { params: { adminId: str
       }
     }
 
-    // 2. Fetch Profiles using the resolved internal UID
+    // 2. Fetch profiles using the internal UID (resolvedUid)
+    // Profiles are stored with 'createdBy' matching the admin's UID
     if (resolvedUid) {
       const q = query(collection(db, 'profiles'), where('createdBy', '==', resolvedUid));
-      const snap = await getDocs(q);
-      profiles = snap.docs.map(d => ({ ...d.data(), id: d.id } as Profile));
+      const profileSnap = await getDocs(q);
+      profiles = profileSnap.docs.map(d => ({ ...d.data(), id: d.id } as Profile));
     }
   } catch (error) {
-    console.error("Page data fetch error:", error);
+    console.error("Fetch error:", error);
   }
 
   return <CommunityClientPage initialAdmin={adminData} initialProfiles={profiles} />;
