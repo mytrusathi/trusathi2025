@@ -5,8 +5,11 @@ import { AppUser } from '@/types/appUser';
 import { Profile } from '@/types/profile';
 import CommunityClientPage from './CommunityClientPage';
 
-export async function generateMetadata({ params }: { params: { adminId: string } }): Promise<Metadata> {
-  const { adminId } = params;
+// 1. Update generateMetadata to await params
+export async function generateMetadata({ params }: { params: Promise<{ adminId: string }> }): Promise<Metadata> {
+  const resolvedParams = await params; // Unwrapping the promise
+  const { adminId } = resolvedParams;
+  
   let groupName = "Community";
   try {
     const slugQuery = query(collection(db, 'users'), where('slug', '==', adminId), limit(1));
@@ -17,8 +20,11 @@ export async function generateMetadata({ params }: { params: { adminId: string }
   return { title: `${groupName} Matrimony | TruSathi` };
 }
 
-export default async function CommunityPage({ params }: { params: { adminId: string } }) {
-  const { adminId } = params;
+// 2. Update the main component to await params
+export default async function CommunityPage({ params }: { params: Promise<{ adminId: string }> }) {
+  const resolvedParams = await params; // Unwrapping the promise
+  const { adminId } = resolvedParams;
+  
   let adminData: AppUser | null = null;
   let profiles: Profile[] = [];
   let resolvedUid: string | null = null;
@@ -29,12 +35,10 @@ export default async function CommunityPage({ params }: { params: { adminId: str
     const slugSnap = await getDocs(slugQuery);
 
     if (!slugSnap.empty) {
-      // If found by slug, use the document ID as the UID
       const adminDoc = slugSnap.docs[0];
       adminData = { ...adminDoc.data(), uid: adminDoc.id } as AppUser;
       resolvedUid = adminDoc.id;
     } else {
-      // Fallback: check if the adminId is already a UID
       const adminDoc = await getDoc(doc(db, 'users', adminId));
       if (adminDoc.exists()) {
         adminData = { ...adminDoc.data(), uid: adminDoc.id } as AppUser;
@@ -43,7 +47,6 @@ export default async function CommunityPage({ params }: { params: { adminId: str
     }
 
     // 2. Fetch profiles using the internal UID (resolvedUid)
-    // Profiles are stored with 'createdBy' matching the admin's UID
     if (resolvedUid) {
       const q = query(collection(db, 'profiles'), where('createdBy', '==', resolvedUid));
       const profileSnap = await getDocs(q);

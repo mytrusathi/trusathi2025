@@ -5,12 +5,13 @@ import { auth, db } from '../lib/firebase';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { User, Users, Check, Loader2, TriangleAlert } from 'lucide-react';
+import { User, Users, Check, Loader2, TriangleAlert, Building2 } from 'lucide-react';
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [groupName, setGroupName] = useState('');
   const [role, setRole] = useState<'member' | 'group-admin'>('member');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,13 @@ const RegisterPage = () => {
     setError('');
     setLoading(true);
 
+
     try {
+      // Validate Group Name for admins
+      if (role === 'group-admin' && !groupName.trim()) {
+        throw new Error("Please provide your Community/Group Name.");
+      }
+
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
@@ -34,6 +41,16 @@ const RegisterPage = () => {
       // Group Admins must be approved by Super Admin before accessing data.
       const isApproved = role === 'member';
 
+      // NEW: Auto-generate the slug from the group name
+      let generatedSlug = '';
+      if (role === 'group-admin') {
+        generatedSlug = groupName
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')           // Replace spaces with hyphens
+          .replace(/[^a-z0-9-]/g, '');     // Remove special characters
+      }
+
       // Create user document in Firestore with SELECTED ROLE
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
@@ -41,6 +58,7 @@ const RegisterPage = () => {
         displayName: name,
         role: role,
         isApproved: isApproved, 
+        slug: role === 'group-admin' ? generatedSlug : null,
         createdAt: new Date().toISOString(),
       });
 
@@ -112,7 +130,7 @@ const RegisterPage = () => {
             </button>
           </div>
           
-          {/* Warning Message for Admins */}
+  {/* Warning Message for Admins */}
           {role === 'group-admin' && (
             <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-lg flex gap-2">
               <TriangleAlert className="shrink-0" size={16} />
@@ -120,8 +138,31 @@ const RegisterPage = () => {
             </div>
           )}
 
+              {/* NEW: Conditional Input for Group Name */}
+          {role === 'group-admin' && (
+            <div className="animate-in slide-in-from-top-2 duration-300">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Community / Group Name</label>
+              <div className="relative">
+                <Building2 className="absolute left-3 top-3 text-slate-400" size={18} />
+                <input
+                  type="text"
+                  className="w-full border border-slate-300 pl-10 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
+                  placeholder="e.g. Agarwal Community"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  required
+                />
+              </div>
+              <p className="text-[10px] text-slate-500 mt-1 ml-1 italic">
+                This name will be used to create your shareable URL.
+              </p>
+            </div>
+          )}
+
+     
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Group Admin Name</label>
             <input
               type="text"
               className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"

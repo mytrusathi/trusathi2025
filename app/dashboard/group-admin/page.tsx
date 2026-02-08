@@ -5,17 +5,15 @@ import { db } from '@/app/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import ProfileList from '@/components/group-admin/ProfileList';
 import { 
-  Share2, ExternalLink, Copy, CheckCircle2, Settings, LayoutDashboard, Users, ShieldCheck 
+  Share2, ExternalLink, Copy, CheckCircle2, Settings, LayoutDashboard, Users, ShieldCheck, Check, Globe 
 } from 'lucide-react';
 
 export default function GroupAdminDashboard() {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
   const [slug, setSlug] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
-  // Use a constant to track if the slug is already saved in the database
-  const isSlugFixed = !!user?.slug;
 
   useEffect(() => {
     if (user?.slug) {
@@ -25,18 +23,19 @@ export default function GroupAdminDashboard() {
 
   // Priority: Use the saved slug for the link, fallback to UID only if no slug exists
   const displayIdentifier = user?.slug || user?.uid;
-  
   const communityLink = typeof window !== 'undefined' 
     ? `${window.location.origin}/community/${displayIdentifier}` 
     : '';
 
-  const handleSaveSlug = async () => {
-    if (!user?.uid || !slug || isSlugFixed) return;
+  const handleUpdateSlug = async () => {
+    if (!user?.uid || !slug) return;
     setIsSaving(true);
     try {
       const cleanSlug = slug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       await updateDoc(doc(db, 'users', user.uid), { slug: cleanSlug });
-      alert("URL set permanently!");
+      setSlug(cleanSlug);
+      setIsEditing(false);
+      alert("Community URL updated successfully!");
     } catch (error) {
       alert("Failed to update URL.");
     } finally {
@@ -57,77 +56,110 @@ export default function GroupAdminDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <LayoutDashboard className="text-rose-600" /> Admin Center
-        </h1>
-        <div className="px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-bold border border-green-100 flex items-center gap-2">
-          <ShieldCheck size={18} /> Verified Admin
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+            <LayoutDashboard className="text-rose-500" /> Admin Center
+          </h1>
+          <p className="text-slate-500">Manage your community and member profiles</p>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-bold border border-green-100">
+          <Check size={16} /> Verified Admin
         </div>
       </div>
 
-      {/* URL Management: Hides the input field if a slug already exists */}
+      {/* NEW: URL Management Section */}
       <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-        <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
-          <Settings size={20} className="text-rose-500" /> 
-          {isSlugFixed ? "Your Permanent Community Link" : "Customize Your Community Link"}
+        <h2 className="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
+          <Globe size={20} className="text-rose-500" /> Community Link
         </h2>
         
-        {!isSlugFixed ? (
-          <div className="flex flex-col md:flex-row gap-4 items-end">
+        {isEditing ? (
+          <div className="flex flex-col md:flex-row gap-4 items-end animate-in fade-in slide-in-from-top-1 duration-300">
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL Slug (Cannot be changed later)</label>
-              <div className="flex items-center bg-slate-50 border rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-rose-500/20">
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Customize your handle</label>
+              <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-rose-500 transition-all">
                 <span className="text-slate-400 text-sm hidden sm:inline">trusathi.com/community/</span>
                 <input 
                   value={slug} 
                   onChange={(e) => setSlug(e.target.value)} 
-                  placeholder="e.g., sharma-group" 
-                  className="bg-transparent outline-none ml-1 flex-1" 
+                  className="bg-transparent outline-none ml-1 flex-1 font-semibold text-slate-700"
+                  placeholder="your-group-name"
                 />
               </div>
             </div>
-            <button onClick={handleSaveSlug} disabled={isSaving || !slug} className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-800 disabled:opacity-50">
-              {isSaving ? "Saving..." : "Set Link"}
-            </button>
+            <div className="flex gap-2 w-full md:w-auto">
+              <button 
+                onClick={() => { setIsEditing(false); setSlug(user?.slug || ''); }} 
+                className="px-6 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleUpdateSlug} 
+                disabled={isSaving || !slug}
+                className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-800 disabled:opacity-50 transition-all"
+              >
+                {isSaving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between bg-slate-50 rounded-xl px-6 py-4 border border-slate-200">
-             <div>
-                <p className="text-xs font-bold text-slate-400 uppercase">Active URL</p>
-                <p className="text-lg font-bold text-rose-600">trusathi.com/community/{user?.slug}</p>
+          <div className="flex flex-col sm:flex-row items-center justify-between bg-slate-50 rounded-xl px-6 py-5 border border-slate-200 gap-4">
+             <div className="text-center sm:text-left">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Your Public Address</p>
+                <p className="text-lg font-bold text-rose-600 break-all">
+                  trusathi.com/community/{user?.slug || 'loading...'}
+                </p>
              </div>
-             <div className="flex items-center gap-2 text-green-600 font-bold text-sm">
-                <CheckCircle2 size={20} /> Link Verified & Active
-             </div>
+             <button 
+               onClick={() => setIsEditing(true)} 
+               className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 hover:text-rose-600 border border-slate-300 hover:border-rose-200 bg-white rounded-lg transition-all shadow-sm"
+             >
+               <Settings size={16} /> Edit URL
+             </button>
           </div>
         )}
       </div>
 
-      {/* Sharing Card */}
-      <div className="bg-linear-to-br from-rose-600 to-rose-700 rounded-3xl p-8 text-white shadow-xl flex flex-col lg:flex-row justify-between items-center gap-8">
-        <div className="text-center lg:text-left">
-          <h2 className="text-3xl font-extrabold">Ready to share?</h2>
-          <p className="text-rose-100">Copy your link or share it on WhatsApp.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-          <button onClick={copyToClipboard} className={`flex-1 px-8 py-4 rounded-2xl font-bold text-lg transition-all ${copied ? 'bg-green-500 text-white' : 'bg-white text-rose-600'}`}>
-            {copied ? 'Copied!' : 'Copy Link'}
-          </button>
-          <button onClick={shareToWhatsApp} className="flex-1 px-8 py-4 bg-[#25D366] text-white rounded-2xl font-bold text-lg">
-             Share on WhatsApp
-          </button>
-          <a href={`/community/${displayIdentifier}`} target="_blank" className="flex-1 px-8 py-4 bg-rose-800/50 text-white rounded-2xl font-bold text-lg border border-white/30 flex items-center justify-center gap-2">
-            <ExternalLink size={22} /> Preview
-          </a>
-        </div>
+      {/* Quick Sharing Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button 
+          onClick={copyToClipboard}
+          className="flex items-center justify-center gap-3 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-rose-200 hover:bg-rose-50 transition-all group"
+        >
+          {copied ? <Check className="text-green-500" /> : <Copy className="text-slate-400 group-hover:text-rose-500" />}
+          <span className="font-bold text-slate-700">{copied ? "Link Copied!" : "Copy Link"}</span>
+        </button>
+
+        <button 
+          onClick={shareToWhatsApp}
+          className="flex items-center justify-center gap-3 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-green-200 hover:bg-green-50 transition-all group"
+        >
+          <Share2 className="text-slate-400 group-hover:text-green-500" />
+          <span className="font-bold text-slate-700">WhatsApp Share</span>
+        </button>
+
+        <a 
+          href={communityLink} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-3 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-blue-200 hover:bg-blue-50 transition-all group"
+        >
+          <ExternalLink className="text-slate-400 group-hover:text-blue-500" />
+          <span className="font-bold text-slate-700">Preview Page</span>
+        </a>
       </div>
 
-      {/* Profiles Section */}
-      <div className="bg-white rounded-3xl border shadow-sm p-6">
-        <h3 className="text-xl font-bold flex items-center gap-2 mb-4">
-          <Users className="text-rose-500" /> Manage Community Profiles
-        </h3>
+      <hr className="border-slate-100" />
+
+      {/* Members Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Users className="text-rose-500" size={24} />
+          <h2 className="text-xl font-bold text-slate-800">Community Members</h2>
+        </div>
         <ProfileList />
       </div>
     </div>
