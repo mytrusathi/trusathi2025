@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from '../context/AuthContext'
+import { Analytics } from "@vercel/analytics/react"
 
 
 const geistSans = Geist({
@@ -35,7 +36,7 @@ export default function RootLayout({
         <AuthProvider>
       {children}
        </AuthProvider>
-
+      <Analytics />
       </body>
     </html>
   );
