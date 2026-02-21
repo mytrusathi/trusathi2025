@@ -1,6 +1,7 @@
 
 import { Heart, Shield, Facebook, Twitter, Instagram, Mail} from 'lucide-react';
 import Link from 'next/link' 
+import VisitorCounter from './VisitorCounter';
 
 export default function Footer() {
   return (
@@ -74,11 +75,17 @@ export default function Footer() {
 
           <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-400">© 2025 Trusathi. All rights reserved.</p>
+            <div className="mt-4">
+            <VisitorCounter />
+           </div>
             <div className="flex gap-6 text-sm text-gray-400">
               <span className="flex items-center gap-1"><Shield size={14} /> 100% Secure</span>
             </div>
           </div>
         </div>
+
+        
+
       </footer>
 
     )
