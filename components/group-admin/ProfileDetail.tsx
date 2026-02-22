@@ -1,7 +1,8 @@
 import React from 'react';
+import Image from 'next/image';
 import { Profile } from '../../types/profile';
 import { 
-  X, MapPin, Briefcase, Calendar, User, Phone, 
+  X, MapPin, Calendar, User, Phone, 
   Heart, Star, GraduationCap, Users 
 } from 'lucide-react';
 
@@ -43,10 +44,12 @@ const ProfileDetail = ({ profile, onClose }: Props) => {
         {/* Header Section with Image */}
         <div className="relative h-64 bg-slate-800 shrink-0">
           {profile.imageUrl ? (
-            <img 
-               src={profile.imageUrl} 
-               alt={profile.name} 
-               className="w-full h-full object-cover opacity-90"
+            <Image
+               src={profile.imageUrl}
+               alt={profile.name}
+               fill
+               sizes="(max-width: 768px) 100vw, 896px"
+               className="object-cover opacity-90"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-slate-500 bg-slate-200">

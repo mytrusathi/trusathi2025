@@ -1,6 +1,5 @@
 "use client";
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { auth } from 'app/lib/firebase';
 import { LogOut, LayoutDashboard, Users, Settings } from 'lucide-react';
@@ -11,8 +10,6 @@ interface Props {
 }
 
 const GroupAdminLayout = ({ children }: Props) => {
-  const router = useRouter();
-
   const handleLogout = async () => {
     try {
       await signOut(auth);

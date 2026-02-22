@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
@@ -18,7 +18,7 @@ export default function MemberDashboard() {
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
 
   // Fetch User's Profiles
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
@@ -34,11 +34,11 @@ export default function MemberDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchProfiles();
-  }, [user]);
+  }, [fetchProfiles]);
 
   // Handlers
   const handleEdit = (profile: Profile) => {

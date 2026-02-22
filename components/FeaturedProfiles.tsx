@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { db } from '../app/lib/firebase'
-import { collection, query, limit, getDocs, orderBy } from 'firebase/firestore'
+import { collection, query, limit, getDocs } from 'firebase/firestore'
 import { Profile } from '../types/profile'
 import PublicProfileCard from './PublicProfileCard' // Import the new card
 import { ChevronRight, Loader2 } from 'lucide-react'

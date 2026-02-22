@@ -41,7 +41,7 @@ export default function LoginPage() {
     try {
       await loginWithEmail(email, password)
       // 🚫 DO NOT redirect here; AuthContext + useEffect handles it
-    } catch (err) {
+    } catch {
       setError('Invalid email or password. Please try again.')
       setIsSubmitting(false)
     }
@@ -148,7 +148,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="mt-8 text-center text-slate-600 text-sm">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/register" className="text-rose-600 font-semibold hover:underline hover:text-rose-700 transition-colors">
             Create Account
           </Link>

@@ -65,7 +65,7 @@ export const parseBiodataHybrid = (text: string) => {
   }
 
   // normalize text
-  let cleanText = text
+  const cleanText = text
     .replace(/([a-z])(Name[:\-])/gi, '$1\n$2')
     .replace(/([a-z])(DOB[:\-])/gi, '$1\n$2')
     .replace(/([a-z])(Contact[:\-])/gi, '$1\n$2')
@@ -77,11 +77,11 @@ export const parseBiodataHybrid = (text: string) => {
 
   // helper matcher
   const getValue = (patterns: string[], exclude: string[] = []) => {
-    for (let line of lines) {
+    for (const line of lines) {
       const lower = line.toLowerCase()
       if (exclude.some((k) => lower.includes(k.toLowerCase()))) continue
 
-      for (let pattern of patterns) {
+      for (const pattern of patterns) {
         const regex = new RegExp(`${pattern}[^a-z0-9\\n]*\\s*(.+)`, 'i')
         const match = line.match(regex)
         if (match && match[1]) return match[1].trim()

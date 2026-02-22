@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Profile } from '../types/profile';
 import { MapPin, Briefcase, User, Calendar } from 'lucide-react';
 
@@ -28,10 +29,12 @@ const PublicProfileCard = ({ profile }: Props) => {
       {/* Image Section */}
       <div className="h-64 bg-slate-100 relative overflow-hidden">
         {profile.imageUrl ? (
-          <img 
-            src={profile.imageUrl} 
-            alt={profile.name} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          <Image
+            src={profile.imageUrl}
+            alt={profile.name}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">

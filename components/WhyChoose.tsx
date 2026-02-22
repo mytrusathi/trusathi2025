@@ -27,7 +27,7 @@ export default function WhyChoose() {
           Why choose Trusathi?
         </h2>
         <p className="text-gray-500 max-w-2xl mx-auto">
-          We're dedicated to making your search safe, reliable, and community-focused.
+          We&apos;re dedicated to making your search safe, reliable, and community-focused.
         </p>
       </div>
 

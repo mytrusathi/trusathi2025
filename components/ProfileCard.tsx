@@ -1,6 +1,12 @@
 import { Shield, ChevronRight, Users } from 'lucide-react'
 
-export default function ProfileCard({ profile }: any) {
+type HomeProfile = {
+  job?: string
+  location?: string
+  verifiedBy?: string
+}
+
+export default function ProfileCard({ profile }: { profile: HomeProfile }) {
   return (
     <div className="bg-white rounded-2xl shadow border overflow-hidden">
       <div className="h-48 bg-gray-200 flex items-center justify-center">

@@ -2,15 +2,12 @@
 'use client'
 
 import React from 'react'
-import { useRouter } from 'next/navigation'
 import { signOut } from 'firebase/auth'
 import { auth } from '../../lib/firebase'
 import Link from 'next/link'
-import { User, Heart, LogOut, Search } from 'lucide-react'
+import { User, LogOut, Search } from 'lucide-react'
 
 export default function MemberLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
-
  const handleLogout = async () => {
     try {
       await signOut(auth);

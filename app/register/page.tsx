@@ -69,14 +69,15 @@ const RegisterPage = () => {
         router.push('/dashboard/member');
       }
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      if (err.code === 'auth/email-already-in-use') {
+      const firebaseError = err as { code?: string; message?: string };
+      if (firebaseError.code === 'auth/email-already-in-use') {
         setError('This email is already registered. Please login.');
-      } else if (err.code === 'auth/weak-password') {
+      } else if (firebaseError.code === 'auth/weak-password') {
         setError('Password should be at least 6 characters.');
       } else {
-        setError(err.message || 'Failed to register. Please try again.');
+        setError(firebaseError.message || 'Failed to register. Please try again.');
       }
       setLoading(false);
     }

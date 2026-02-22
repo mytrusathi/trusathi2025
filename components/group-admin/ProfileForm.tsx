@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { db, storage } from '../../app/lib/firebase';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -144,9 +145,9 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
           <div className="lg:col-span-3 space-y-6">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
               <div className="relative group cursor-pointer mb-4">
-                <div className="w-48 h-48 rounded-full bg-slate-100 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                <div className="relative w-48 h-48 rounded-full bg-slate-100 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
                     {previewUrl ? (
-                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <Image src={previewUrl} alt="Preview" fill sizes="192px" className="object-cover" unoptimized />
                     ) : (
                     <User className="text-slate-300" size={80} />
                     )}
@@ -316,7 +317,16 @@ const Section = ({ title, icon, children }: { title: string, icon: React.ReactNo
     </div>
 );
 
-const Input = ({ label, className, icon, ...props }: any) => (
+const Input = ({
+  label,
+  className,
+  icon,
+  ...props
+}: {
+  label: string
+  className?: string
+  icon?: React.ReactNode
+} & React.InputHTMLAttributes<HTMLInputElement>) => (
   <div className={className}>
     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 ml-1">{label}</label>
     <div className="relative">
@@ -330,7 +340,20 @@ const Input = ({ label, className, icon, ...props }: any) => (
 );
 
 // NEW: Beautiful Custom Select Component
-const Select = ({ label, options, displayFormat, icon, placeholder, ...props }: any) => (
+const Select = ({
+  label,
+  options,
+  displayFormat,
+  icon,
+  placeholder,
+  ...props
+}: {
+  label: string
+  options: string[]
+  displayFormat?: (value: string) => string
+  icon?: React.ReactNode
+  placeholder?: string
+} & React.SelectHTMLAttributes<HTMLSelectElement>) => (
   <div className="w-full">
     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 ml-1">{label}</label>
     <div className="relative">
@@ -346,6 +369,7 @@ const Select = ({ label, options, displayFormat, icon, placeholder, ...props }: 
         ))}
       </select>
       {/* Custom Chevron Icon */}
+      {icon && <div className="absolute right-10 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">{icon}</div>}
       <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
         <ChevronDown size={18} strokeWidth={2.5} />
       </div>
