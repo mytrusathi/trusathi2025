@@ -1,7 +1,7 @@
 import React from 'react';
 import { Profile } from '../../types/profile';
 import { 
-  X, MapPin, Briefcase, Calendar, User, Phone, 
+  X, MapPin, Calendar, User, Phone, 
   Heart, Star, GraduationCap, Users 
 } from 'lucide-react';
 

@@ -1,15 +1,14 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../../lib/firebase';
-import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
-import { sendPasswordResetEmail, signOut } from 'firebase/auth';
+import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import { useAuth } from '../../../context/AuthContext';
 import { 
-  Users, Shield, Search, Loader2, LogOut, KeyRound, 
+  Users, Shield, Search, LogOut, 
   LayoutDashboard, FileText, CheckCircle, AlertTriangle, XCircle, ShieldAlert 
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/ProtectedRoute';
-import { useRouter } from 'next/navigation';
 
 interface DashboardUser {
   uid: string;
@@ -23,11 +22,9 @@ interface DashboardUser {
 
 const SuperAdminDashboard = () => {
   const { user: currentUser } = useAuth();
-  const router = useRouter();
   
   // Data State
   const [users, setUsers] = useState<DashboardUser[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
@@ -41,7 +38,6 @@ const SuperAdminDashboard = () => {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       
       // 1. Fetch Users
       const usersRef = collection(db, 'users');
@@ -80,7 +76,6 @@ const SuperAdminDashboard = () => {
       console.error("Error fetching data:", error);
       setMessage({ type: 'error', text: "Failed to load dashboard data." });
     } finally {
-      setLoading(false);
     }
   };
 
@@ -97,11 +92,12 @@ const SuperAdminDashboard = () => {
       setMessage({ type: 'success', text: "User approved successfully" });
       fetchData(); // Refresh list
     } catch (error) {
+      console.error("Approve failed", error);
       setMessage({ type: 'error', text: "Failed to approve user" });
     }
   };
 
-  const handleReject = async (uid: string) => {
+  const handleReject = async () => {
     if(!confirm("Reject this user? They will remain in pending state.")) return;
     // For now, we just leave them as isApproved: false, or you could add a 'banned' field.
     setMessage({ type: 'success', text: "Action recorded." });
@@ -205,7 +201,7 @@ const SuperAdminDashboard = () => {
                                     {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                                 </td>
                                 <td className="px-6 py-4 text-right flex justify-end gap-3">
-                                    <button onClick={() => handleReject(user.uid)} className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-1">
+                                    <button onClick={handleReject} className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-1">
                                         <XCircle size={16}/> Reject
                                     </button>
                                     <button onClick={() => handleApprove(user.uid)} className="px-3 py-1.5 text-sm bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg flex items-center gap-1 shadow-sm">

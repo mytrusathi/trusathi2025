@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { db } from '../../app/lib/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
@@ -18,20 +18,7 @@ const ProfileList = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
 
-  // Helper: Calculate Age from DOB
-  const getAge = (dob?: string) => {
-    if (!dob) return 0;
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
@@ -47,11 +34,11 @@ const ProfileList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchProfiles();
-  }, [user]);
+  }, [fetchProfiles]);
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this profile?')) {

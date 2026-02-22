@@ -5,7 +5,7 @@ import { db } from '@/app/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import ProfileList from '@/components/group-admin/ProfileList';
 import { 
-  Share2, ExternalLink, Copy, CheckCircle2, Settings, LayoutDashboard, Users, ShieldCheck, Check, Globe 
+  Share2, ExternalLink, Copy, Settings, LayoutDashboard, Users, Check, Globe 
 } from 'lucide-react';
 
 export default function GroupAdminDashboard() {
@@ -37,6 +37,7 @@ export default function GroupAdminDashboard() {
       setIsEditing(false);
       alert("Community URL updated successfully!");
     } catch (error) {
+      console.error("Failed to update URL", error);
       alert("Failed to update URL.");
     } finally {
       setIsSaving(false);

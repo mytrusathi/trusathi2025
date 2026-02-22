@@ -1,6 +1,6 @@
 import React from 'react';
 import { Profile } from '../../types/profile';
-import { Edit, Trash2, MapPin, Briefcase, Calendar } from 'lucide-react';
+import { Edit, Trash2, MapPin, Briefcase } from 'lucide-react';
 
 interface Props {
   profile: Profile;

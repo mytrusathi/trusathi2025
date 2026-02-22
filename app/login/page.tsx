@@ -41,7 +41,7 @@ export default function LoginPage() {
     try {
       await loginWithEmail(email, password)
       // 🚫 DO NOT redirect here; AuthContext + useEffect handles it
-    } catch (err) {
+    } catch {
       setError('Invalid email or password. Please try again.')
       setIsSubmitting(false)
     }
