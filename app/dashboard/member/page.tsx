@@ -7,6 +7,7 @@ import { Profile } from '@/types/profile';
 import ProfileCard from '@/components/group-admin/ProfileCard'; // Named import not needed, it is default
 import ProfileForm from '@/components/group-admin/ProfileForm';
 import { Loader2, Plus, FileText } from 'lucide-react';
+import ChangePasswordCard from '@/components/ChangePasswordCard';
 
 export default function MemberDashboard() {
   const { user } = useAuth();
@@ -95,7 +96,8 @@ export default function MemberDashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        <ChangePasswordCard />
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="animate-spin text-rose-500" size={32} />
