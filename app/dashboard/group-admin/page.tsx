@@ -7,6 +7,7 @@ import ProfileList from '@/components/group-admin/ProfileList';
 import { 
   Share2, ExternalLink, Copy, Settings, LayoutDashboard, Users, Check, Globe 
 } from 'lucide-react';
+import ChangePasswordCard from '@/components/ChangePasswordCard';
 
 export default function GroupAdminDashboard() {
   const { user } = useAuth();
@@ -152,6 +153,8 @@ export default function GroupAdminDashboard() {
           <span className="font-bold text-slate-700">Preview Page</span>
         </a>
       </div>
+
+      <ChangePasswordCard />
 
       <hr className="border-slate-100" />
 
