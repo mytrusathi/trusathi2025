@@ -165,6 +165,8 @@ export default function GroupAdminDashboard() {
         </a>
       </div>
 
+      <ChangePasswordCard />
+
       <hr className="border-slate-100" />
 
       {/* Members Section */}
