@@ -168,7 +168,6 @@ function SearchPageContent() {
   );
 }
 
-
 export default function SearchPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-white p-10 text-center">Loading search...</div>}>
