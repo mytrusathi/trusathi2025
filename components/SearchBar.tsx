@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Users, Search, ChevronDown } from 'lucide-react'
 
@@ -40,6 +40,10 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
   )
 
   const [searchData, setSearchData] = useState<SearchFilters>(defaults)
+
+  useEffect(() => {
+    setSearchData(defaults)
+  }, [defaults])
 
   const handleSearch = () => {
     const min = Number(searchData.ageMin)
