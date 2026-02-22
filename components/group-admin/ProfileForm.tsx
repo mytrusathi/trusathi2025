@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { db, storage } from '../../app/lib/firebase';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -144,9 +145,9 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
           <div className="lg:col-span-3 space-y-6">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
               <div className="relative group cursor-pointer mb-4">
-                <div className="w-48 h-48 rounded-full bg-slate-100 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                <div className="relative w-48 h-48 rounded-full bg-slate-100 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
                     {previewUrl ? (
-                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <Image src={previewUrl} alt="Preview" fill sizes="192px" className="object-cover" unoptimized />
                     ) : (
                     <User className="text-slate-300" size={80} />
                     )}
