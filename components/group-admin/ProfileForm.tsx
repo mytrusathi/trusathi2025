@@ -343,12 +343,14 @@ const Select = ({
   label,
   options,
   displayFormat,
+  icon,
   placeholder,
   ...props
 }: {
   label: string
   options: string[]
   displayFormat?: (value: string) => string
+  icon?: React.ReactNode
   placeholder?: string
 } & React.SelectHTMLAttributes<HTMLSelectElement>) => (
   <div className="w-full">
@@ -366,6 +368,7 @@ const Select = ({
         ))}
       </select>
       {/* Custom Chevron Icon */}
+      {icon && <div className="absolute right-10 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">{icon}</div>}
       <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
         <ChevronDown size={18} strokeWidth={2.5} />
       </div>
