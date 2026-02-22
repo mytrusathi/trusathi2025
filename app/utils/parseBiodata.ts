@@ -1,5 +1,33 @@
 // src/utils/parseBiodata.ts
 
+export interface ParsedBiodata {
+  name: string
+  gender: string
+  age: string
+  height: string
+  dob: string
+  tob: string
+  pob: string
+  city: string
+  address: string
+  caste: string
+  gotra: string
+  complexion: string
+  diet: string
+  education: string
+  profession: string
+  income: string
+  company: string
+  father: string
+  fatherOcc: string
+  mother: string
+  motherOcc: string
+  siblings: string
+  contact: string
+  manglik: string
+  groupName: string
+}
+
 // --- AGE CALCULATOR ---
 const calculateAge = (dobString: string): string => {
   if (!dobString) return ''
@@ -35,8 +63,19 @@ const calculateAge = (dobString: string): string => {
 }
 
 // --- MAIN PARSER ---
-export const parseBiodataHybrid = (text: string) => {
-  const data: Record<string, string> = {
+const normalizePhoneNumber = (value: string): string => {
+  const normalized = value.replace(/[^\d+]/g, '')
+
+  if (normalized.startsWith('+91') && normalized.length >= 13) {
+    return normalized.slice(0, 13)
+  }
+
+  const lastTenDigits = normalized.replace(/\D/g, '').slice(-10)
+  return lastTenDigits.length === 10 ? lastTenDigits : value.trim()
+}
+
+export const parseBiodataHybrid = (text: string): ParsedBiodata => {
+  const data: ParsedBiodata = {
     name: '',
     gender: '',
     age: '',
@@ -171,6 +210,8 @@ export const parseBiodataHybrid = (text: string) => {
     if (phone) data.contact = phone[0]
   }
 
+  if (data.contact) data.contact = normalizePhoneNumber(data.contact)
+
   // clean name
   if (data.name) {
     data.name = data.name
@@ -184,8 +225,6 @@ export const parseBiodataHybrid = (text: string) => {
     const age = calculateAge(data.dob)
     if (age) data.age = age
   }
-
-  console.log('Parsed biodata:', data)
 
   return data
 }

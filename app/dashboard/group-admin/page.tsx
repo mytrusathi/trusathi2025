@@ -5,8 +5,9 @@ import { db } from '@/app/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import ProfileList from '@/components/group-admin/ProfileList';
 import { 
-  Share2, ExternalLink, Copy, Settings, LayoutDashboard, Users, Check, Globe 
+  Share2, ExternalLink, Copy, Settings, LayoutDashboard, Users, Check, Globe, ShieldCheck 
 } from 'lucide-react';
+import ChangePasswordCard from '@/components/ChangePasswordCard';
 
 export default function GroupAdminDashboard() {
   const { user } = useAuth();
@@ -69,6 +70,17 @@ export default function GroupAdminDashboard() {
           <Check size={16} /> Verified Admin
         </div>
       </div>
+
+      <section className="bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
+        <h2 className="text-base font-bold text-indigo-900 flex items-center gap-2">
+          <ShieldCheck size={18} /> Account Security
+        </h2>
+        <p className="text-sm text-indigo-700 mt-1">
+          Change your dashboard login password here.
+        </p>
+      </section>
+
+      <ChangePasswordCard />
 
       {/* NEW: URL Management Section */}
       <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">

@@ -6,7 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Profile } from '@/types/profile';
 import ProfileCard from '@/components/group-admin/ProfileCard'; // Named import not needed, it is default
 import ProfileForm from '@/components/group-admin/ProfileForm';
-import { Loader2, Plus, FileText } from 'lucide-react';
+import { Loader2, Plus, FileText, ShieldCheck } from 'lucide-react';
+import ChangePasswordCard from '@/components/ChangePasswordCard';
 
 export default function MemberDashboard() {
   const { user } = useAuth();
@@ -95,7 +96,17 @@ export default function MemberDashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        <section className="bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
+          <h2 className="text-base font-bold text-indigo-900 flex items-center gap-2">
+            <ShieldCheck size={18} /> Account Security
+          </h2>
+          <p className="text-sm text-indigo-700 mt-1">
+            Use this section to change your login password anytime.
+          </p>
+        </section>
+
+        <ChangePasswordCard />
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="animate-spin text-rose-500" size={32} />
