@@ -129,7 +129,7 @@ function SearchResults() {
   );
 }
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const role = (searchParams.get('role') === 'Groom' ? 'Groom' : 'Bride') as 'Bride' | 'Groom';
   const minAge = searchParams.get('minAge') ? parseInt(searchParams.get('minAge')!, 10) : 18;
@@ -163,5 +163,13 @@ export default function SearchPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white p-10 text-center">Loading search...</div>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }
