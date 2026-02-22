@@ -130,17 +130,29 @@ function SearchResults() {
 }
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const role = (searchParams.get('role') === 'Groom' ? 'Groom' : 'Bride') as 'Bride' | 'Groom';
+  const minAge = searchParams.get('minAge') ? parseInt(searchParams.get('minAge')!, 10) : 18;
+  const maxAge = searchParams.get('maxAge') ? parseInt(searchParams.get('maxAge')!, 10) : 60;
+  const community = searchParams.get('community') || 'All Communities';
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       
       <div className="bg-indigo-900 pt-8 pb-20 px-4">
-         <div className="max-w-7xl mx-auto">
-             <h2 className="text-white text-xl font-bold mb-4 text-center md:text-left opacity-90">Modify Search</h2>
-             <div className="transform translate-y-0">
-                <SearchBar />
-             </div>
-         </div>
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-white text-xl font-bold mb-4 text-center md:text-left opacity-90">Modify Search</h2>
+          <SearchBar
+            variant="embedded"
+            initialFilters={{
+              lookingFor: role,
+              ageMin: String(minAge),
+              ageMax: String(maxAge),
+              community,
+            }}
+          />
+        </div>
       </div>
       
       <div className="grow bg-gray-50">
