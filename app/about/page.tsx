@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { Shield, Users, Heart, CheckCircle } from 'lucide-react'
@@ -24,7 +23,7 @@ export default function AboutPage() {
             Restoring <span className="text-rose-400">Trust</span> in Matrimony
           </h1>
           <p className="text-xl text-indigo-100 leading-relaxed max-w-2xl mx-auto">
-            We are building India's first decentralized, community-verified matchmaking platform. 
+            We are building India&apos;s first decentralized, community-verified matchmaking platform. 
             No algorithms, just real people helping their communities find love.
           </p>
         </div>
@@ -43,11 +42,11 @@ export default function AboutPage() {
             <div className="space-y-4 text-gray-600 text-lg">
               <p>
                 Modern matrimony apps are broken. They are flooded with fake profiles, 
-                marketing calls, and impersonal algorithms that don't understand culture or family values.
+                marketing calls, and impersonal algorithms that don&apos;t understand culture or family values.
               </p>
               <p>
                 We realized the safest way to find a partner has always been through 
-                <strong> "Word of Mouth"</strong> and trusted community elders.
+                <strong> &quot;Word of Mouth&quot;</strong> and trusted community elders.
               </p>
               <p>
                 Trusathi digitizes this trust. We empower <strong>Community Group Admins</strong>—the people who actually know you—to curate and verify profiles.
@@ -90,8 +89,8 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Community First</h3>
               <p className="text-gray-600">
-                We don't mix everyone together. We respect the nuances of different communities, 
-                castes, and regions, giving you matches that align with your family's values.
+                We don&apos;t mix everyone together. We respect the nuances of different communities, 
+                castes, and regions, giving you matches that align with your family&apos;s values.
               </p>
             </div>
 
@@ -112,7 +111,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Privacy Centric</h3>
               <p className="text-gray-600">
-                Your phone number and photos aren't public property. Only verified members 
+                Your phone number and photos aren&apos;t public property. Only verified members 
                 approved by your Group Admin can initiate contact.
               </p>
             </div>

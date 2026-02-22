@@ -316,7 +316,16 @@ const Section = ({ title, icon, children }: { title: string, icon: React.ReactNo
     </div>
 );
 
-const Input = ({ label, className, icon, ...props }: any) => (
+const Input = ({
+  label,
+  className,
+  icon,
+  ...props
+}: {
+  label: string
+  className?: string
+  icon?: React.ReactNode
+} & React.InputHTMLAttributes<HTMLInputElement>) => (
   <div className={className}>
     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 ml-1">{label}</label>
     <div className="relative">
@@ -330,7 +339,18 @@ const Input = ({ label, className, icon, ...props }: any) => (
 );
 
 // NEW: Beautiful Custom Select Component
-const Select = ({ label, options, displayFormat, icon, placeholder, ...props }: any) => (
+const Select = ({
+  label,
+  options,
+  displayFormat,
+  placeholder,
+  ...props
+}: {
+  label: string
+  options: string[]
+  displayFormat?: (value: string) => string
+  placeholder?: string
+} & React.SelectHTMLAttributes<HTMLSelectElement>) => (
   <div className="w-full">
     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 ml-1">{label}</label>
     <div className="relative">

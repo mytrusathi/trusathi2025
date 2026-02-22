@@ -33,7 +33,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
             <p className="mb-4">
-              Welcome to <strong>Trusathi</strong> ("we," "our," or "us"). By accessing or using our website, mobile application, and services (collectively, the "Platform"), you agree to be bound by these Terms and Conditions ("Terms"). If you do not agree to these Terms, please do not use our Platform.
+              Welcome to <strong>Trusathi</strong> (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). By accessing or using our website, mobile application, and services (collectively, the &quot;Platform&quot;), you agree to be bound by these Terms and Conditions (&quot;Terms&quot;). If you do not agree to these Terms, please do not use our Platform.
             </p>
             <p>
               Trusathi is a community-verified matrimony platform designed to connect individuals for the purpose of marriage through trusted Community Group Admins.
@@ -93,7 +93,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Disclaimer of Warranties</h2>
             <p className="mb-4">
-              The Platform is provided on an "AS IS" and "AS AVAILABLE" basis. Trusathi does not guarantee that the platform will function without interruption or errors. We do not guarantee a successful match or marriage. Background checks are the responsibility of the users and their families.
+              The Platform is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis. Trusathi does not guarantee that the platform will function without interruption or errors. We do not guarantee a successful match or marriage. Background checks are the responsibility of the users and their families.
             </p>
           </section>
 

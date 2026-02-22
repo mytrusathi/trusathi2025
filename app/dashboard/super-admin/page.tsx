@@ -279,7 +279,17 @@ const SuperAdminDashboard = () => {
   );
 };
 
-const StatCard = ({ label, value, icon, bg }: any) => (
+const StatCard = ({
+  label,
+  value,
+  icon,
+  bg,
+}: {
+  label: string
+  value: number
+  icon: React.ReactNode
+  bg: string
+}) => (
     <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
         <div className={`p-3 rounded-xl ${bg}`}>{icon}</div>
         <div>

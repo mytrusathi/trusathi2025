@@ -105,7 +105,7 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-5 space-y-2">
               <li>Access the personal data we hold about you.</li>
               <li>Request correction of inaccurate data.</li>
-              <li>Request deletion of your account and data ("Right to be Forgotten").</li>
+              <li>Request deletion of your account and data (&quot;Right to be Forgotten&quot;).</li>
             </ul>
             <p className="mt-4">
               To exercise these rights, please contact our support team.
