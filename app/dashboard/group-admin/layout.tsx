@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { Suspense } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from 'app/lib/firebase';
 import { LogOut, LayoutDashboard, Users, Settings, KeyRound, Globe } from 'lucide-react';
@@ -11,7 +11,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const GroupAdminLayout = ({ children }: Props) => {
+const GroupAdminLayoutContent = ({ children }: Props) => {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const activeView = searchParams.get('view');
@@ -126,6 +126,14 @@ const GroupAdminLayout = ({ children }: Props) => {
         {children}
       </main>
     </div>
+  );
+};
+
+const GroupAdminLayout = ({ children }: Props) => {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <GroupAdminLayoutContent>{children}</GroupAdminLayoutContent>
+    </Suspense>
   );
 };
 

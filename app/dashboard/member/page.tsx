@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
@@ -10,7 +10,7 @@ import { Loader2, Plus, FileText, Search, SlidersHorizontal, UserCircle2 } from 
 import { useSearchParams } from 'next/navigation';
 import PasswordChangeModal from '@/components/PasswordChangeModal';
 
-export default function MemberDashboard() {
+function MemberDashboardContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const showPasswordModal = searchParams.get('view') === 'change-password';
@@ -196,5 +196,13 @@ export default function MemberDashboard() {
 
       {showPasswordModal && <PasswordChangeModal closeHref="/dashboard/member" />}
     </div>
+  );
+}
+
+export default function MemberDashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <MemberDashboardContent />
+    </Suspense>
   );
 }

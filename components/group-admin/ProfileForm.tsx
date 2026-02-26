@@ -6,9 +6,10 @@ import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../../context/AuthContext';
 import { Profile } from '../../types/profile';
+import { parseWhatsAppBiodataToProfile } from '../../app/utils/profileParser';
 import { 
   Loader2, Upload, X, Save, User, MapPin, Briefcase, 
-  Users, Star, ChevronDown, Ruler, Heart, Calendar 
+  Users, Star, ChevronDown, Ruler, Heart, Calendar, Wand2
 } from 'lucide-react';
 
 interface Props {
@@ -22,6 +23,9 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [rawBiodata, setRawBiodata] = useState('');
+  const [parserMessage, setParserMessage] = useState('');
+  const [matchedFields, setMatchedFields] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<Partial<Profile>>({
     name: '',
@@ -124,6 +128,34 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     }
   };
 
+  const handleParseBiodata = () => {
+    if (!rawBiodata.trim()) {
+      setParserMessage('Paste biodata text first.');
+      setMatchedFields([]);
+      return;
+    }
+
+    const { parsed, matchedFields: detectedFields } = parseWhatsAppBiodataToProfile(rawBiodata);
+    const entries = Object.entries(parsed).filter(([, value]) => typeof value === 'string' && value.trim()) as Array<[keyof Profile, string]>;
+
+    if (entries.length === 0) {
+      setParserMessage('No usable fields were detected. Try pasting a longer biodata message.');
+      setMatchedFields([]);
+      return;
+    }
+
+    setFormData((prev) => {
+      const next = { ...prev };
+      for (const [key, value] of entries) {
+        (next as Record<string, unknown>)[String(key)] = value;
+      }
+      return next;
+    });
+
+    setMatchedFields(detectedFields.map((field) => String(field)));
+    setParserMessage(`Parsed and filled ${entries.length} field${entries.length > 1 ? 's' : ''}.`);
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-w-5xl mx-auto my-4 md:my-8 flex flex-col h-[90vh] md:h-auto">
       
@@ -180,6 +212,55 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
 
           {/* RIGHT COLUMN: Form Data */}
           <div className="lg:col-span-9 space-y-6">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <div>
+                  <h3 className="text-slate-800 font-bold text-lg flex items-center gap-2">
+                    <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
+                      <Wand2 size={18} />
+                    </div>
+                    WhatsApp Biodata Parser
+                  </h3>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Paste raw biodata text and auto-fill this form.
+                  </p>
+                </div>
+              </div>
+
+              <textarea
+                value={rawBiodata}
+                onChange={(e) => setRawBiodata(e.target.value)}
+                rows={6}
+                placeholder="Paste WhatsApp biodata message here..."
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all placeholder:text-slate-400 text-slate-700"
+              />
+
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleParseBiodata}
+                  className="px-5 py-2.5 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors"
+                >
+                  Parse & Fill
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setRawBiodata(''); setParserMessage(''); setMatchedFields([]); }}
+                  className="px-5 py-2.5 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
+                >
+                  Clear Text
+                </button>
+                {parserMessage && (
+                  <p className="text-sm text-slate-600">{parserMessage}</p>
+                )}
+              </div>
+
+              {matchedFields.length > 0 && (
+                <p className="text-xs text-slate-500 mt-3">
+                  Detected fields: {matchedFields.join(', ')}
+                </p>
+              )}
+            </div>
             
             {/* 1. Basic Details */}
             <Section title="Basic Details" icon={<User size={18} />}>

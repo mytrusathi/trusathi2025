@@ -2,6 +2,7 @@
 'use client'
 
 import React from 'react'
+import { Suspense } from 'react'
 import { signOut } from 'firebase/auth'
 import { auth } from '../../lib/firebase'
 import Link from 'next/link'
@@ -9,7 +10,7 @@ import { User, LogOut, Search, KeyRound } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 
-export default function MemberLayout({ children }: { children: React.ReactNode }) {
+function MemberLayoutContent({ children }: { children: React.ReactNode }) {
  const { user } = useAuth()
  const searchParams = useSearchParams()
  const activeView = searchParams.get('view')
@@ -82,5 +83,13 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
         {children}
       </main>
     </div>
+  )
+}
+
+export default function MemberLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <MemberLayoutContent>{children}</MemberLayoutContent>
+    </Suspense>
   )
 }

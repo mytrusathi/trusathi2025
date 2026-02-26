@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import ProfileList from '@/components/group-admin/ProfileList';
 import { useSearchParams } from 'next/navigation';
@@ -9,7 +9,7 @@ import {
 import PasswordChangeModal from '@/components/PasswordChangeModal';
 import CommunityLinkModal from '@/components/CommunityLinkModal';
 
-export default function GroupAdminDashboard() {
+function GroupAdminDashboardContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const showPasswordModal = searchParams.get('view') === 'change-password';
@@ -93,5 +93,13 @@ export default function GroupAdminDashboard() {
       {showPasswordModal && <PasswordChangeModal closeHref="/dashboard/group-admin" />}
       {showCommunityLinkModal && <CommunityLinkModal closeHref="/dashboard/group-admin" />}
     </div>
+  );
+}
+
+export default function GroupAdminDashboard() {
+  return (
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8" />}>
+      <GroupAdminDashboardContent />
+    </Suspense>
   );
 }
