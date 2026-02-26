@@ -15,6 +15,8 @@ function SearchResults() {
   const searchParams = useSearchParams();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [keyword, setKeyword] = useState('');
+  const [cityFilter, setCityFilter] = useState('all');
 
   const role = searchParams.get('role') || 'Bride';
   const minAge = searchParams.get('minAge') ? parseInt(searchParams.get('minAge')!, 10) : 18;
@@ -59,6 +61,9 @@ function SearchResults() {
 
         querySnapshot.forEach((doc) => {
           const data = doc.data() as Profile;
+          if (data.isPublic === false) {
+            return;
+          }
 
           if (!matchesRole(data.gender, role)) {
             return;
@@ -90,6 +95,19 @@ function SearchResults() {
     fetchProfiles();
   }, [role, minAge, maxAge, community]);
 
+  const cities = Array.from(new Set(profiles.map((p) => p.city).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+
+  const filteredProfiles = profiles.filter((p) => {
+    const q = keyword.toLowerCase();
+    const matchesKeyword =
+      (p.name?.toLowerCase() || '').includes(q) ||
+      (p.city?.toLowerCase() || '').includes(q) ||
+      (p.caste?.toLowerCase() || '').includes(q) ||
+      (p.profession?.toLowerCase() || '').includes(q);
+    const matchesCity = cityFilter === 'all' || p.city === cityFilter;
+    return matchesKeyword && matchesCity;
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
@@ -102,14 +120,35 @@ function SearchResults() {
         </p>
       </div>
 
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <input
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="Search by name, city, caste, profession..."
+          className="md:col-span-2 px-4 py-2.5 border border-gray-200 rounded-lg"
+        />
+        <select
+          value={cityFilter}
+          onChange={(e) => setCityFilter(e.target.value)}
+          className="px-4 py-2.5 border border-gray-200 rounded-lg"
+        >
+          <option value="all">All Cities</option>
+          {cities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20">
           <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
           <p className="text-gray-500">Finding best matches...</p>
         </div>
-      ) : profiles.length > 0 ? (
+      ) : filteredProfiles.length > 0 ? (
         <div className="grid md:grid-cols-3 gap-6">
-          {profiles.map((profile) => (
+          {filteredProfiles.map((profile) => (
             <a href="/login" key={profile.id}>
               <PublicProfileCard profile={profile} />
             </a>

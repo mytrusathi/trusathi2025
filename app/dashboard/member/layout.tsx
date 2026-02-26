@@ -5,9 +5,16 @@ import React from 'react'
 import { signOut } from 'firebase/auth'
 import { auth } from '../../lib/firebase'
 import Link from 'next/link'
-import { User, LogOut, Search } from 'lucide-react'
+import { User, LogOut, Search, KeyRound } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 
 export default function MemberLayout({ children }: { children: React.ReactNode }) {
+ const { user } = useAuth()
+ const searchParams = useSearchParams()
+ const activeView = searchParams.get('view')
+ const isPasswordView = activeView === 'change-password'
+
  const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -27,11 +34,30 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
           <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">t</div>
           <span className="font-bold text-xl text-slate-800">tru<span className="text-rose-600">Sathi</span></span>
         </div>
+        <div className="px-4 py-3 border-b border-slate-100">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Logged In As</p>
+          <p className="text-sm font-semibold text-slate-800 truncate">{user?.displayName || user?.email || 'Member'}</p>
+        </div>
 
         <nav className="p-4 space-y-2">
-          <Link href="/dashboard/member" className="flex items-center gap-3 px-4 py-3 bg-rose-50 text-rose-700 rounded-xl font-medium transition-colors">
+          <Link
+            href="/dashboard/member"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+              !isPasswordView ? 'bg-rose-50 text-rose-700' : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
             <User size={20} />
             My Profile
+          </Link>
+
+          <Link
+            href="/dashboard/member?view=change-password"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+              isPasswordView ? 'bg-rose-50 text-rose-700' : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <KeyRound size={20} />
+            Change Your Password
           </Link>
           
           <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl font-medium transition-colors cursor-not-allowed">

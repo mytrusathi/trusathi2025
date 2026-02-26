@@ -1,15 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
 import { Profile } from '../../types/profile';
-import { Edit, Trash2, MapPin, Briefcase } from 'lucide-react';
+import { Edit, Trash2, MapPin, Briefcase, Eye, EyeOff } from 'lucide-react';
 
 interface Props {
   profile: Profile;
   onEdit: (profile: Profile) => void;
   onDelete: (id: string) => void;
+  onToggleVisibility?: (id: string, isPublic: boolean) => void;
 }
 
-const ProfileCard = ({ profile, onEdit, onDelete }: Props) => {
+const ProfileCard = ({ profile, onEdit, onDelete, onToggleVisibility }: Props) => {
   
   // Helper: Calculate Age
   const getAge = (dob?: string) => {
@@ -25,6 +26,7 @@ const ProfileCard = ({ profile, onEdit, onDelete }: Props) => {
   };
 
   const age = getAge(profile.dob);
+  const isPublic = profile.isPublic !== false;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full">
@@ -50,10 +52,15 @@ const ProfileCard = ({ profile, onEdit, onDelete }: Props) => {
           <p className="text-xs text-rose-600 font-medium truncate mb-1">
             {profile.religion}, {profile.caste}
           </p>
-          <div className="flex items-center gap-1 text-xs text-slate-500 truncate">
+          <div className="flex items-center gap-1 text-xs text-slate-500 truncate mb-2">
              <MapPin size={12} />
              {profile.city || 'Unknown City'}
           </div>
+          {onToggleVisibility && (
+            <span className={`inline-flex text-[11px] font-semibold px-2 py-1 rounded-md ${isPublic ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+              {isPublic ? 'Visible to public' : 'Hidden from public'}
+            </span>
+          )}
         </div>
       </div>
 
@@ -73,6 +80,22 @@ const ProfileCard = ({ profile, onEdit, onDelete }: Props) => {
 
       {/* Bottom: Actions */}
       <div className="border-t border-slate-100 p-3 flex gap-2 bg-slate-50/50">
+        {onToggleVisibility && (
+          <button
+            onClick={() => {
+              if (profile.id) onToggleVisibility(profile.id, !isPublic);
+            }}
+            className={`px-3 py-2 rounded-lg border text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${
+              isPublic
+                ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                : 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100'
+            }`}
+            title={isPublic ? 'Hide from public community pages' : 'Show on public community pages'}
+          >
+            {isPublic ? <EyeOff size={14} /> : <Eye size={14} />}
+            {isPublic ? 'Hide' : 'Show'}
+          </button>
+        )}
         <button 
           onClick={() => onEdit(profile)}
           className="flex-1 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors flex items-center justify-center gap-2"

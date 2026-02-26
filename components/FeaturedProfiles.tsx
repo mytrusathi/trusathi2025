@@ -23,7 +23,7 @@ export default function FeaturedProfiles() {
         const fetched = snap.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        } as Profile))
+        } as Profile)).filter((profile) => profile.isPublic !== false)
         
         setProfiles(fetched)
       } catch (error) {

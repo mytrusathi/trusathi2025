@@ -51,6 +51,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     contact: '',
     about: '',
     imageUrl: '',
+    isPublic: true,
   });
 
   // --- HEIGHT GENERATOR ---
@@ -103,6 +104,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
         createdBy: user.uid,
         updatedAt: new Date().toISOString(),
         nameLowerCase: formData.name?.toLowerCase(), 
+        isPublic: formData.isPublic ?? true,
       };
 
       if (initialData?.id) {

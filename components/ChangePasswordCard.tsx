@@ -6,7 +6,9 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from 'firebase/auth'
+import { FirebaseError } from 'firebase/app'
 import { useAuth } from '@/context/AuthContext'
+import { auth } from '@/app/lib/firebase'
 import { KeyRound, Loader2, ShieldCheck } from 'lucide-react'
 
 export default function ChangePasswordCard() {
@@ -28,8 +30,15 @@ export default function ChangePasswordCard() {
     e.preventDefault()
     setMessage(null)
 
-    if (!user || !user.email) {
+    const authUser = auth.currentUser
+
+    if (!authUser || !authUser.email) {
       setMessage({ type: 'error', text: 'No authenticated user email found. Please log in again.' })
+      return
+    }
+
+    if (user?.uid && authUser.uid !== user.uid) {
+      setMessage({ type: 'error', text: 'Session mismatch detected. Please log out and log in again.' })
       return
     }
 
@@ -51,21 +60,30 @@ export default function ChangePasswordCard() {
     setSaving(true)
 
     try {
-      const credential = EmailAuthProvider.credential(user.email, currentPassword)
-      await reauthenticateWithCredential(user, credential)
-      await updatePassword(user, newPassword)
+      const credential = EmailAuthProvider.credential(authUser.email, currentPassword)
+      await reauthenticateWithCredential(authUser, credential)
+      await updatePassword(authUser, newPassword)
 
       setMessage({ type: 'success', text: 'Password updated successfully.' })
       resetForm()
     } catch (error: unknown) {
-      const firebaseError = error as { code?: string }
+      const firebaseError = error as FirebaseError
 
       if (firebaseError.code === 'auth/wrong-password' || firebaseError.code === 'auth/invalid-credential') {
         setMessage({ type: 'error', text: 'Current password is incorrect.' })
+      } else if (firebaseError.code === 'auth/requires-recent-login') {
+        setMessage({ type: 'error', text: 'For security, please log in again and retry changing your password.' })
+      } else if (firebaseError.code === 'auth/weak-password') {
+        setMessage({ type: 'error', text: 'New password is too weak. Please choose a stronger password.' })
+      } else if (firebaseError.code === 'auth/network-request-failed') {
+        setMessage({ type: 'error', text: 'Network error. Check your internet connection and try again.' })
       } else if (firebaseError.code === 'auth/too-many-requests') {
         setMessage({ type: 'error', text: 'Too many attempts. Please try again in a few minutes.' })
       } else {
-        setMessage({ type: 'error', text: 'Failed to update password. Please try again.' })
+        setMessage({
+          type: 'error',
+          text: `Failed to update password. ${firebaseError.code ? `(${firebaseError.code})` : 'Please try again.'}`,
+        })
       }
     } finally {
       setSaving(false)

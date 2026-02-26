@@ -44,4 +44,5 @@ export interface Profile {
   createdBy: string;
   createdAt: string;
   updatedAt?: string;
+  isPublic?: boolean;
 }

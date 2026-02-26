@@ -50,7 +50,9 @@ export default async function CommunityPage({ params }: { params: Promise<{ admi
     if (resolvedUid) {
       const q = query(collection(db, 'profiles'), where('createdBy', '==', resolvedUid));
       const profileSnap = await getDocs(q);
-      profiles = profileSnap.docs.map(d => ({ ...d.data(), id: d.id } as Profile));
+      profiles = profileSnap.docs
+        .map(d => ({ ...d.data(), id: d.id } as Profile))
+        .filter((profile) => profile.isPublic !== false);
     }
   } catch (error) {
     console.error("Fetch error:", error);
