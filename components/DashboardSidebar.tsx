@@ -57,9 +57,15 @@ export default function DashboardSidebar() {
     links.push(
       { 
         href: '/dashboard/member', 
+        icon: LayoutDashboard, 
+        label: 'Overview', 
+        active: pathname === '/dashboard/member' && !activeView 
+      },
+      { 
+        href: '/dashboard/member?view=my-profiles', 
         icon: User, 
         label: 'My Profiles', 
-        active: pathname === '/dashboard/member' && !activeView 
+        active: activeView === 'my-profiles' 
       },
       { 
         href: '/dashboard/member?view=favorites', 

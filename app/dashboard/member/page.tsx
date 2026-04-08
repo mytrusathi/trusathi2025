@@ -19,6 +19,7 @@ import InterestsView from '@/components/dashboard/InterestsView';
 import ChatView from '@/components/dashboard/ChatView';
 import PartnerPreferences from '@/components/dashboard/PartnerPreferences';
 import CompletenessMeter from '@/components/dashboard/CompletenessMeter';
+import OverviewView from '@/components/dashboard/OverviewView';
 
 function MemberDashboardContent() {
   const { user } = useAuth();
@@ -86,7 +87,7 @@ function MemberDashboardContent() {
         return <ChatView />;
       case 'partner-preferences':
         return <PartnerPreferences />;
-      default:
+      case 'my-profiles':
         // Main profiles view
         if (loading) return (
           <div className="flex flex-col items-center justify-center py-24 space-y-4">
@@ -120,6 +121,8 @@ function MemberDashboardContent() {
              </div>
           </div>
         );
+      default:
+        return <OverviewView />;
     }
   };
 
@@ -130,7 +133,8 @@ function MemberDashboardContent() {
       case 'received-interests': return { title: 'Received Interests', desc: 'Inquiry and interest requests from others.' };
       case 'chats': return { title: 'Messaging Center', desc: 'Real-time conversations with your connections.' };
       case 'partner-preferences': return { title: 'Match Criteria', desc: 'Define who you are looking for.' };
-      default: return { title: 'My Managed Profiles', desc: 'Create and manage biodatas for yourself or family members.' };
+      case 'my-profiles': return { title: 'My Managed Profiles', desc: 'Create and manage biodatas for yourself or family members.' };
+      default: return { title: 'Member Overview', desc: 'Track your activity and manage your matchmaking journey.' };
     }
   };
 
