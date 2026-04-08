@@ -113,16 +113,23 @@ export default async function CommunityPage({ params }: { params: Promise<{ admi
         const perfBody = {
           structuredQuery: {
             from: [{ collectionId: "profiles" }],
-            where: { fieldFilter: { field: { fieldPath: "createdBy" }, op: "EQUAL", value: { stringValue: resolvedUid }}}
+            where: { fieldFilter: { field: { fieldPath: "createdBy" }, op: "EQUAL", value: { stringValue: resolvedUid }}},
+            limit: 500
           }
         };
         const pRes = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents:runQuery`, {
           method: 'POST', body: JSON.stringify(perfBody), headers: { 'Content-Type': 'application/json' }, cache: 'no-store'
         });
         const pData = await pRes.json();
-        if (!pData[0]?.readTime) { // Empty queries return [{readTime}]
-            profiles = pData.filter((d: any) => d.document).map((d: any) => parseFirestoreDoc(d.document) as Profile)
-                            .filter((p: Profile) => p.isPublic !== false);
+        
+        // Firestore runQuery returns [{readTime: ...}] for empty results. 
+        // Valid docs have {document: ...}
+        if (Array.isArray(pData)) {
+            profiles = pData
+              .filter((item: any) => item.document)
+              .map((item: any) => parseFirestoreDoc(item.document) as Profile)
+              // Ensure we show public profiles (default to public if isPublic is not explicitly false)
+              .filter((p: Profile) => p.isPublic !== false);
         }
       }
     }

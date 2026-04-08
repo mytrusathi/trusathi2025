@@ -18,20 +18,25 @@ interface Props {
 
 // 1. Dynamic SEO Metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const docRef = doc(db, 'profiles', id);
-  const snap = await getDoc(docRef);
-  
-  if (!snap.exists()) {
-    return { title: 'Profile Not Found | TruSathi' };
+  try {
+    const { id } = await params;
+    const docRef = doc(db, 'profiles', id);
+    const snap = await getDoc(docRef);
+    
+    if (!snap.exists()) {
+      return { title: 'Profile Not Found | TruSathi' };
+    }
+    
+    const profile = snap.data() as Profile;
+    const age = getAge(profile.dob);
+    return {
+      title: `View ${profile.name}'s Profile | TruSathi Matrimony`,
+      description: `Check out ${profile.name}'s biodata on TruSathi. ${age} years old, ${profile.religion}, ${profile.caste}. Community verified matches.`,
+    };
+  } catch (error) {
+    console.error('Metadata generation error:', error);
+    return { title: 'Biodata | TruSathi' };
   }
-  
-  const profile = snap.data() as Profile;
-  const age = getAge(profile.dob);
-  return {
-    title: `View ${profile.name}'s Profile | TruSathi Matrimony`,
-    description: `Check out ${profile.name}'s biodata on TruSathi. ${age} years old, ${profile.religion}, ${profile.caste}. Community verified matches.`,
-  };
 }
 
 // Helper: Calculate Age from DOB
@@ -48,19 +53,28 @@ const getAge = (dob?: string) => {
 };
 
 export default async function ProfilePage({ params }: Props) {
-  const { id } = await params;
-  
-  // Fetch profile data
-  const docRef = doc(db, 'profiles', id);
-  const snap = await getDoc(docRef);
-  
-  if (!snap.exists()) {
-    notFound();
+  try {
+    const { id } = await params;
+    
+    // Fetch profile data
+    const docRef = doc(db, 'profiles', id);
+    const snap = await getDoc(docRef);
+    
+    if (!snap.exists()) {
+      notFound();
+    }
+    
+    const profile = { ...snap.data(), id: snap.id } as Profile;
+    const age = getAge(profile.dob);
+    
+    return ProfileView({ profile, age });
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    notFound(); 
   }
-  
-  const profile = { ...snap.data(), id: snap.id } as Profile;
-  const age = getAge(profile.dob);
+}
 
+function ProfileView({ profile, age }: { profile: Profile; age: string | number }) {
   return (
     <div className="min-h-screen bg-slate-50">
       <style dangerouslySetInnerHTML={{ __html: `
