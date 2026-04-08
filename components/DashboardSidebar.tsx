@@ -5,7 +5,7 @@ import { auth } from '@/app/lib/firebase';
 import { 
   LogOut, LayoutDashboard, Users, Settings, 
   KeyRound, Globe, User, Search, Home,
-  Heart, Send, Inbox, MessageCircle
+  Heart, Send, Inbox, MessageCircle, SlidersHorizontal
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
