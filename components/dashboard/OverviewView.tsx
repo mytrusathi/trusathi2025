@@ -23,13 +23,19 @@ export default function OverviewView() {
   });
   const [mainProfile, setMainProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userDocMissing, setUserDocMissing] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
-    // 1. Fetch Stats
-    const fetchStats = async () => {
+    // 1. Fetch Stats & Check User Doc
+    const fetchData = async () => {
       try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!userDoc.exists()) {
+          setUserDocMissing(true);
+        }
+
         const [sentSnap, receivedSnap, favSnap, profileSnap] = await Promise.all([
           getDocs(query(collection(db, 'interests'), where('senderId', '==', user.uid))),
           getDocs(query(collection(db, 'interests'), where('receiverId', '==', user.uid))),
@@ -85,6 +91,16 @@ export default function OverviewView() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
+      {userDocMissing && (
+        <div className="bg-rose-50 border border-rose-100 p-6 rounded-[2rem] flex items-center gap-4 text-rose-700 animate-pulse">
+          <AlertCircle size={24} />
+          <div>
+            <p className="font-black uppercase text-xs tracking-widest">Registration Incomplete</p>
+            <p className="text-sm font-medium">Your account data is missing. Please try logging out and logging in again, or contact support if the issue persists.</p>
+          </div>
+        </div>
+      )}
+
       {/* Welcome Banner */}
       <div className="relative overflow-hidden bg-white p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-2xl shadow-indigo-100/20">
          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>

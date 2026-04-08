@@ -85,9 +85,13 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
       });
 
       setInterestSent(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Interest failed", error);
-      alert("Registration Error: Please ensure your profile is fully set up. If the error persists, contact support.");
+      if (error.code === 'permission-denied') {
+        alert("Permission Denied: Please ensure your account has been approved and you have filled in your name in settings.");
+      } else {
+        alert("Connection Error: Could not send interest. Our team has been notified. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
@@ -236,29 +240,36 @@ export function FavoriteButton({ profileId }: { profileId?: string }) {
             createdAt: new Date().toISOString()
           });
 
-          // Notify the profile owner (if it's not the user themselves)
-          // We need to fetch the profile to get the createdBy
-          const profSnap = await getDoc(doc(db, 'profiles', profileId));
-          if (profSnap.exists()) {
-            const profData = profSnap.data();
-            if (profData.createdBy !== user.uid) {
-              await sendNotification({
-                recipientId: profData.createdBy,
-                senderId: user.uid,
-                senderName: user.displayName || 'A Member',
-                type: 'favorite',
-                title: 'Profile Favorited',
-                message: `Someone has added profile ${profData.profileNo || 'your profile'} to their favorites.`,
-                link: user.role === 'member' ? '/dashboard/member?view=favorites' : '/dashboard/group-admin'
-              });
-            }
-          }
-
           setIsFav(true);
+
+          // Notify owner (Background - don't block UI if it fails)
+          try {
+             const profSnap = await getDoc(doc(db, 'profiles', profileId));
+             if (profSnap.exists()) {
+                const profData = profSnap.data();
+                if (profData.createdBy && profData.createdBy !== user.uid) {
+                   await sendNotification({
+                      recipientId: profData.createdBy,
+                      senderId: user.uid,
+                      senderName: user.displayName || 'A Member',
+                      type: 'favorite',
+                      title: 'Profile Favorited',
+                      message: `Someone has added profile ${profData.profileNo || 'your profile'} to their favorites.`,
+                      link: user.role === 'member' ? '/dashboard/member?view=favorites' : '/dashboard/group-admin'
+                   });
+                }
+             }
+          } catch (notifErr) {
+             console.warn("Notification for favorite failed:", notifErr);
+          }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Favorite toggle failed", error);
-        alert("Error updating favorites. Please try again.");
+        if (error.code === 'permission-denied') {
+           alert("Permission denied. Check your dashboard to ensure your member registration is complete.");
+        } else {
+           alert("Error updating favorites. Please try again.");
+        }
       } finally {
         setLoading(false);
       }

@@ -1,11 +1,39 @@
 "use client";
 
 import { CheckCircle, Shield, Users, Sparkles, Heart, Search, Star, MousePointer2 } from 'lucide-react'
+import { CheckCircle, Shield, Users, Sparkles, Heart, Search, Star, MousePointer2 } from 'lucide-react'
 import SearchBar from './SearchBar'
-import Image from 'next/image'
-import Link from 'next/link'
+import { db } from '@/app/lib/firebase'
+import { collection, query, where, getCountFromServer } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
 
 export default function Hero() {
+  const [stats, setStats] = useState({
+    profiles: '...',
+    communities: '...',
+    matches: '10+'
+  });
+
+  useEffect(() => {
+    async function fetchActualStats() {
+      try {
+        const [profileCount, communityCount] = await Promise.all([
+          getCountFromServer(collection(db, 'profiles')),
+          getCountFromServer(query(collection(db, 'users'), where('role', '==', 'group-admin')))
+        ]);
+        
+        setStats({
+          profiles: profileCount.data().count.toString(),
+          communities: communityCount.data().count.toString(),
+          matches: '10+' // Keep as small realistic baseline for startup phase
+        });
+      } catch (err) {
+        console.error("Stats fetch failed", err);
+      }
+    }
+    fetchActualStats();
+  }, []);
+
   return (
     <section className="relative bg-[#0F172A] pt-12 pb-24 md:pt-32 md:pb-48 overflow-hidden">
       
@@ -74,11 +102,11 @@ export default function Hero() {
           {/* Social Proof / Trust Indicators */}
           <div className="mt-32 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 items-center opacity-60 hover:opacity-100 transition-opacity duration-500">
              <div className="flex flex-col items-center">
-                <span className="text-3xl font-black text-white mb-1">5k+</span>
+                <span className="text-3xl font-black text-white mb-1">{stats.profiles}</span>
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active Members</span>
              </div>
              <div className="flex flex-col items-center border-l border-white/10">
-                <span className="text-3xl font-black text-white mb-1">50+</span>
+                <span className="text-3xl font-black text-white mb-1">{stats.communities}</span>
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Communities</span>
              </div>
              <div className="flex flex-col items-center border-l border-white/10">
