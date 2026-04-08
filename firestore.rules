@@ -2,25 +2,47 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // Help identify admin status
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['group-admin', 'super-admin'];
+    }
+    
+    function isSuperAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super-admin';
+    }
+
     // Secure Users Collection
     match /users/{userId} {
       // Anyone can read (needed for public Community pages & metadata)
       allow read: if true; 
       
-      // Users can only update their own documents. Admins handle approval via Firebase limits.
-      allow write: if request.auth != null && request.auth.uid == userId;
+      // Users can only update their own documents. 
+      // Protect critical fields like role and isApproved from being self-escalated.
+      allow update: if request.auth != null && request.auth.uid == userId
+                    && (isSuperAdmin() || (
+                      request.resource.data.role == resource.data.role &&
+                      request.resource.data.isApproved == resource.data.isApproved
+                    ));
+                    
+      // Only system/super-admin can create or delete user docs (typically via auth trigger or admin dash)
+      allow create, delete: if isSuperAdmin();
     }
 
     // Secure Matrimony Profiles Collection
     match /profiles/{profileId} {
-      // Public profiles are visible to all. Creators can read their own even if private.
-      allow read: if resource.data.isPublic == true || (request.auth != null && resource.data.createdBy == request.auth.uid);
+      // Allow public READ for search (isPublic) and individual GET for profile/[id]
+      allow read: if resource.data.isPublic == true 
+                  || (request.auth != null && resource.data.createdBy == request.auth.uid)
+                  || isAdmin();
       
-      // Any authenticated admin/member can create a profile under their account.
+      // Allow fetching single doc without list filtering constraints for public profile view
+      allow get: if true;
+
+      // Any authenticated user can create a profile under their account.
       allow create: if request.auth != null && request.resource.data.createdBy == request.auth.uid;
       
-      // Only the creator can modify or delete their owned profiles.
-      allow update, delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
+      // Only the creator or an admin can modify/delete profiles.
+      allow update, delete: if request.auth != null && (resource.data.createdBy == request.auth.uid || isAdmin());
     }
   }
 }

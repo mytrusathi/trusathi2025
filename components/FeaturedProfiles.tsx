@@ -73,7 +73,7 @@ export default function FeaturedProfiles() {
         ) : (
           <div className="grid md:grid-cols-3 gap-6">
             {profiles.map((profile) => (
-              <Link key={profile.id} href="/login">
+              <Link key={profile.id} href={`/profile/${profile.id}`}>
                  <PublicProfileCard profile={profile} />
               </Link>
             ))}
@@ -82,7 +82,7 @@ export default function FeaturedProfiles() {
 
         {/* Mobile CTA */}
         <div className="mt-8 text-center md:hidden">
-          <Link href="/login" className="inline-flex items-center text-indigo-600 font-bold">
+          <Link href="/search" className="inline-flex items-center text-indigo-600 font-bold">
             View all profiles <ChevronRight size={20} />
           </Link>
         </div>

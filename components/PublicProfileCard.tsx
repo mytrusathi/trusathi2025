@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Profile } from '../types/profile';
 import { MapPin, Briefcase, User, Calendar } from 'lucide-react';
+import Link from 'next/link';
 
 interface Props {
   profile: Profile;
@@ -93,9 +94,12 @@ const PublicProfileCard = ({ profile }: Props) => {
 
       {/* Footer Action */}
       <div className="p-4 border-t border-slate-100 bg-slate-50 mt-auto">
-         <button className="w-full py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors shadow-sm text-sm">
+         <Link 
+            href={`/profile/${profile.id}`}
+            className="w-full py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors shadow-sm text-sm block text-center"
+         >
             View Full Profile
-         </button>
+         </Link>
       </div>
     </div>
   );
