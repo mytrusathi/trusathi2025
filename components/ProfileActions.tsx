@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Check, Phone, Mail, MessageSquare } from 'lucide-react';
+import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Check, Phone, Mail, MessageSquare, AlertCircle, Info } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { db } from '@/app/lib/firebase';
@@ -10,9 +10,10 @@ import { Profile } from '@/types/profile';
 
 interface ProfileActionsProps {
   profile: Profile;
+  managerName?: string;
 }
 
-export default function ProfileActions({ profile }: ProfileActionsProps) {
+export default function ProfileActions({ profile, managerName }: ProfileActionsProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -79,6 +80,9 @@ export default function ProfileActions({ profile }: ProfileActionsProps) {
     }
   };
 
+  // Logic: Reveal contact only if interestSent AND (AutoReveal ON or it's a self-managed profile)
+  const canSeeContact = interestSent && profile.revealContactOnInterest;
+
   return (
     <div className="space-y-6">
       {/* Print Button Wrapper */}
@@ -94,19 +98,23 @@ export default function ProfileActions({ profile }: ProfileActionsProps) {
 
       {/* Main Connect Action Card */}
       <div className={`rounded-3xl p-8 no-print shadow-xl transition-all relative overflow-hidden group ${
-        interestSent ? 'bg-emerald-600 shadow-emerald-100' : 'bg-indigo-600 shadow-indigo-100'
+        interestSent ? (canSeeContact ? 'bg-emerald-600 shadow-emerald-100' : 'bg-slate-800 shadow-slate-100') : 'bg-indigo-600 shadow-indigo-100'
       }`}>
           <ShieldCheck size={120} className="absolute -bottom-6 -right-6 text-white/10 -rotate-12 transition-transform group-hover:rotate-0 duration-700" />
           
           <div className="relative z-10 space-y-6">
             <div className="space-y-2">
               <h4 className="text-white font-black text-xl leading-tight">
-                {interestSent ? "Interest Expressed!" : "Interest in this Profile?"}
+                {interestSent ? (canSeeContact ? "Interest Expressed!" : "Request Pending") : "Interest in this Profile?"}
               </h4>
               <p className="text-white/80 text-sm font-medium leading-relaxed">
                  {interestSent 
-                   ? "As a verified member, you can now see the contact details below." 
-                   : "Sending an interest reveals the contact information immediately."}
+                   ? (canSeeContact 
+                      ? "As a verified member, you can now see the contact details below." 
+                      : `Your interest has been sent to ${managerName || 'the Group Admin'} for review.`) 
+                   : (profile.revealContactOnInterest 
+                      ? `Interest will reveal contact details immediately as authorized by ${managerName || 'Admin'}.` 
+                      : `Sending interest will notify ${managerName || 'the Group Admin'} to share details with you.`)}
               </p>
             </div>
 
@@ -124,38 +132,51 @@ export default function ProfileActions({ profile }: ProfileActionsProps) {
                   )}
               </button>
             ) : (
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 space-y-4 animate-in zoom-in-95 duration-500">
-                 <div className="flex items-center gap-3 text-white">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                       <Phone size={18} />
+              <>
+                {canSeeContact ? (
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 space-y-4 animate-in zoom-in-95 duration-500">
+                    <div className="flex items-center gap-3 text-white">
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                          <Phone size={18} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Contact Number</p>
+                          <p className="font-bold text-lg">{profile.contact || 'Contact Admin'}</p>
+                        </div>
                     </div>
-                    <div>
-                       <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Contact Number</p>
-                       <p className="font-bold text-lg">{profile.contact || 'Contact Admin'}</p>
+                    
+                    <div className="pt-4 flex gap-2">
+                        <a 
+                          href={`https://wa.me/${profile.contact?.replace(/\D/g, '')}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all"
+                        >
+                          <MessageSquare size={14} /> WhatsApp
+                        </a>
+                        <button 
+                          onClick={() => router.push('/dashboard/member?view=chats')}
+                          className="flex-1 bg-white/20 hover:bg-white/30 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all"
+                        >
+                          <Check size={14} /> View Chats
+                        </button>
                     </div>
-                 </div>
-                 
-                 <div className="pt-4 flex gap-2">
-                    <a 
-                      href={`https://wa.me/${profile.contact?.replace(/\D/g, '')}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all"
-                    >
-                       <MessageSquare size={14} /> WhatsApp
-                    </a>
-                    <button 
-                      onClick={() => router.push('/dashboard/member?view=chats')}
-                      className="flex-1 bg-white/20 hover:bg-white/30 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all"
-                    >
-                       <Check size={14} /> Logged
-                    </button>
-                 </div>
-              </div>
+                  </div>
+                ) : (
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 flex items-center gap-4 text-white animate-in slide-in-from-bottom-2 duration-500">
+                     <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center shrink-0">
+                        <AlertCircle size={20} className="text-amber-300" />
+                     </div>
+                     <p className="text-[11px] font-bold leading-tight opacity-90">
+                        Waiting for {managerName || 'Admin'} to approve your request. You will be notified in your <b>Messages</b> tab.
+                     </p>
+                  </div>
+                )}
+              </>
             )}
             
             <p className="text-center text-[10px] text-white/40 font-bold uppercase tracking-widest leading-none">
-                {interestSent ? "Direct Connection Active" : (user ? "Verified Member" : "Auth Required")}
+                {interestSent ? (canSeeContact ? "Direct Connection Active" : "Waiting for Admin Approval") : (user ? "Verified Member" : "Auth Required")}
             </p>
           </div>
       </div>

@@ -67,15 +67,42 @@ export default async function ProfilePage({ params }: Props) {
     
     const profile = { ...snap.data(), id: snap.id } as Profile;
     const age = getAge(profile.dob);
+
+    // Fetch creator details
+    let creatorName = 'Self';
+    let managedByGroup = '';
     
-    return ProfileView({ profile, age });
+    if (profile.createdBy) {
+      const userRef = doc(db, 'users', profile.createdBy);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        creatorName = userData.displayName || 'Community Member';
+        managedByGroup = userData.groupName || '';
+      }
+    }
+    
+    return ProfileView({ profile, age, creatorName, managedByGroup });
   } catch (error) {
     console.error('Profile fetch error:', error);
     notFound(); 
   }
 }
 
-function ProfileView({ profile, age }: { profile: Profile; age: string | number }) {
+function ProfileView({ 
+  profile, 
+  age, 
+  creatorName, 
+  managedByGroup 
+}: { 
+  profile: Profile; 
+  age: string | number;
+  creatorName: string;
+  managedByGroup: string;
+}) {
+  const isSelfManaged = profile.createdBy === creatorName; // This is a bit weak, but better than nothing
+  const managerLabel = managedByGroup ? `${managedByGroup} (${creatorName})` : creatorName;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <style dangerouslySetInnerHTML={{ __html: `
@@ -130,6 +157,16 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
                       )}
                    </div>
                    <div className="text-white">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${managedByGroup ? 'bg-amber-500 text-white' : 'bg-indigo-500 text-white'}`}>
+                          {managedByGroup ? 'Admin Managed' : 'Self Managed'}
+                        </span>
+                        {profile.revealContactOnInterest && (
+                          <span className="px-2 py-0.5 rounded-lg bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
+                            <Shield size={10} /> Auto Reveal
+                          </span>
+                        )}
+                      </div>
                       <h1 className="text-3xl md:text-4xl font-black tracking-tight">{profile.name}</h1>
                       <div className="flex flex-wrap items-center gap-4 mt-2 text-white/80 font-medium">
                          <span className="flex items-center gap-1.5"><Calendar size={18} /> {age} years</span>
@@ -157,9 +194,15 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
                 
                 {/* About Section */}
                 <section>
-                   <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
-                      <div className="w-1.5 h-6 bg-rose-500 rounded-full"></div> About Me
-                   </h2>
+                   <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-bold text-slate-800 flex items-center gap-3">
+                         <div className="w-1.5 h-6 bg-rose-500 rounded-full"></div> About Me
+                      </h2>
+                      <div className="text-right">
+                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Profile Managed By</p>
+                         <p className="text-xs font-bold text-slate-500">{managerLabel}</p>
+                      </div>
+                   </div>
                    <p className="text-slate-600 leading-relaxed text-lg whitespace-pre-line">
                       {profile.about || `Hello, this is ${profile.name}. I am looking for a life partner who is compatible and shares similar values. Please explore my biodata for more details.`}
                    </p>
@@ -220,7 +263,7 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
                    </div>
                 </div>
 
-                <ProfileActions profile={profile} />
+                <ProfileActions profile={profile} managerName={managerLabel} />
              </div>
           </div>
         </div>

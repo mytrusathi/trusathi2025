@@ -46,4 +46,5 @@ export interface Profile {
   updatedAt?: string;
   isPublic?: boolean;
   profileNo?: string; // Human readable ID like TS-1001
+  revealContactOnInterest?: boolean;
 }

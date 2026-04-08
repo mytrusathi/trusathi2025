@@ -10,7 +10,7 @@ import { Profile } from '../../types/profile';
 import { parseWhatsAppBiodataToProfile } from '../../app/utils/profileParser';
 import { 
   Loader2, Upload, X, Save, User, MapPin, Briefcase, 
-  Users, Star, ChevronDown, Ruler, Heart, Calendar, Wand2
+  Users, Star, ChevronDown, Ruler, Heart, Calendar, Wand2, Shield
 } from 'lucide-react';
 import { Section, Input, Select } from '../ui/FormElements';
 
@@ -389,6 +389,41 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                   className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all placeholder:text-slate-400 text-slate-700"
                   placeholder="Describe personality, hobbies, and partner expectations..."
                />
+            </div>
+
+            {/* Visibility & Connect Settings */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+               <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <Shield size={16} className="text-indigo-500" /> Visibility & Connect Settings
+               </h3>
+               
+               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="space-y-0.5">
+                     <p className="text-sm font-bold text-slate-800">Auto-reveal Contact Details</p>
+                     <p className="text-xs text-slate-500">When enabled, verified members will see phone/WhatsApp immediately after sending interest.</p>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, revealContactOnInterest: !prev.revealContactOnInterest }))}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.revealContactOnInterest ? 'bg-rose-500' : 'bg-slate-300'}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.revealContactOnInterest ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+               </div>
+               
+               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="space-y-0.5">
+                     <p className="text-sm font-bold text-slate-800">Public Visibility</p>
+                     <p className="text-xs text-slate-500">Show this profile in browse & search results.</p>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, isPublic: !prev.isPublic }))}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.isPublic !== false ? 'bg-rose-500' : 'bg-slate-300'}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.isPublic !== false ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+               </div>
             </div>
 
           </div>
