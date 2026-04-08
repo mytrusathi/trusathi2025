@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/app/lib/firebase';
-import { collection, query, where, getDocs, onSnapshot, limit, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDoc, getDocs, onSnapshot, limit, orderBy, doc } from 'firebase/firestore';
 import Link from 'next/link';
 import CompletenessMeter from './CompletenessMeter';
 import { Profile } from '@/types/profile';
