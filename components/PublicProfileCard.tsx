@@ -28,14 +28,24 @@ const PublicProfileCard = ({ profile }: Props) => {
   return (
     <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500 group h-full flex flex-col relative">
       
-      {/* Premium Badge */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm">
-         <ShieldCheck size={14} className="text-indigo-600" />
-         <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Verified</span>
+      {/* Premium Badge & Profile No */}
+      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm">
+            <ShieldCheck size={14} className="text-indigo-600" />
+            <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Verified</span>
+         </div>
+         {profile.profileNo && (
+            <div className="px-3 py-1 bg-slate-900/40 backdrop-blur-md text-white rounded-full text-[9px] font-black tracking-widest uppercase border border-white/10 w-fit">
+               {profile.profileNo}
+            </div>
+         )}
       </div>
 
-      <button className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-rose-500 hover:text-white transition-all">
-         <Heart size={16} />
+      <button 
+        onClick={(e) => { e.preventDefault(); alert('Please visit the full profile to mark as favorite!'); }}
+        className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-rose-500 hover:text-white transition-all shadow-lg"
+      >
+         <Heart size={18} />
       </button>
 
       {/* Image Section */}

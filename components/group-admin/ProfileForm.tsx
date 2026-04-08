@@ -127,17 +127,25 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
         ...formData,
         imageUrl,
         createdBy: user.uid,
-        updatedAt: new Date().toISOString(),
         nameLowerCase: formData.name?.toLowerCase(), 
         isPublic: formData.isPublic ?? true,
       };
 
       if (initialData?.id) {
-        await updateDoc(doc(db, 'profiles', initialData.id), profileData);
+        await updateDoc(doc(db, 'profiles', initialData.id), {
+          ...profileData,
+          updatedAt: new Date().toISOString(),
+        });
       } else {
+        // Generate a random Profile Number (e.g., TS-A712B)
+        const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const profileNo = `TS-${randomStr}`;
+
         await addDoc(collection(db, 'profiles'), {
           ...profileData,
+          profileNo,
           createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         });
       }
       onSuccess();

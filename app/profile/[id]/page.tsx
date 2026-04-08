@@ -116,7 +116,7 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
              )}
              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
              
-             <FavoriteButton />
+             <FavoriteButton profileId={profile.id} />
              
              <div className="absolute bottom-8 left-8 right-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="flex items-center gap-6">
@@ -137,11 +137,16 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
                       </div>
                    </div>
                 </div>
-                <div className="flex items-center gap-3">
-                   <div className="px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white font-bold flex items-center gap-2">
-                       <Heart size={18} className="text-rose-400 fill-rose-400" /> Matches Found
-                   </div>
-                </div>
+                 <div className="flex items-center gap-3">
+                    <div className="px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white font-bold flex items-center gap-2">
+                        <Heart size={18} className="text-rose-400 fill-rose-400" /> Matches Found
+                    </div>
+                    {profile.profileNo && (
+                      <div className="px-5 py-2.5 bg-slate-900 border border-white/10 rounded-xl text-white font-black text-xs uppercase tracking-widest shadow-xl">
+                         ID: {profile.profileNo}
+                      </div>
+                    )}
+                 </div>
              </div>
           </div>
 
@@ -215,7 +220,7 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
                    </div>
                 </div>
 
-                <ProfileActions />
+                <ProfileActions profile={profile} />
              </div>
           </div>
         </div>

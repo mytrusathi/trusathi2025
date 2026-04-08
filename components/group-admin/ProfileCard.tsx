@@ -49,9 +49,14 @@ const ProfileCard = ({ profile, onEdit, onDelete, onToggleVisibility }: Props) =
                {age} Yrs
              </span>
           </div>
-          <p className="text-xs text-rose-600 font-medium truncate mb-1">
-            {profile.religion}, {profile.caste}
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-xs text-rose-600 font-medium truncate">
+                {profile.religion}, {profile.caste}
+            </p>
+            {profile.profileNo && (
+              <span className="text-[9px] font-black bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded tracking-widest">{profile.profileNo}</span>
+            )}
+          </div>
           <div className="flex items-center gap-1 text-xs text-slate-500 truncate mb-2">
              <MapPin size={12} />
              {profile.city || 'Unknown City'}

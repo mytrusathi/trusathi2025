@@ -45,4 +45,5 @@ export interface Profile {
   createdAt: string;
   updatedAt?: string;
   isPublic?: boolean;
+  profileNo?: string; // Human readable ID like TS-1001
 }
