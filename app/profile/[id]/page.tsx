@@ -11,6 +11,7 @@ import {
   Baby, Home, User, Download, Printer
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import ProfileActions, { FavoriteButton } from '@/components/ProfileActions';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -94,15 +95,7 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
       </div>
       
       <main className="max-w-5xl mx-auto px-4 py-12 md:py-20 profile-container">
-        {/* Quick Actions (Floating on mobile, sidebar on desktop) */}
-        <div className="flex justify-end mb-4 no-print gap-3">
-           <button 
-             onClick={() => window.print()}
-             className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center gap-2"
-           >
-              <Printer size={18} /> Print / Save as PDF
-           </button>
-        </div>
+        <ProfileActions />
 
         <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 overflow-hidden border border-slate-100">
           
@@ -122,6 +115,8 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
                 </div>
              )}
              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+             
+             <FavoriteButton />
              
              <div className="absolute bottom-8 left-8 right-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="flex items-center gap-6">
@@ -220,14 +215,7 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
                    </div>
                 </div>
 
-                <div className="pt-4 no-print">
-                    <button className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-rose-200 transition-all transform hover:-translate-y-1">
-                        Connect Now
-                    </button>
-                    <p className="text-center text-xs text-slate-400 mt-4">
-                        Login required to view contact details
-                    </p>
-                </div>
+                <ProfileActions />
              </div>
           </div>
         </div>
