@@ -41,7 +41,7 @@ export default function Navbar() {
               </Link>
 
             <Link
-            href="/search"
+            href="/communities"
              className="text-gray-600 hover:text-indigo-600 font-medium">
               Communities
               </Link>

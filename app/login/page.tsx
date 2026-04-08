@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../context/AuthContext'
 import { ArrowLeft, Heart, Mail, Lock, Loader2, ArrowRight } from 'lucide-react'
+import ForgotPasswordModal from '@/components/ForgotPasswordModal'
 
 export default function LoginPage() {
   const { loginWithEmail, user, role, loading } = useAuth()
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false)
 
   // 🔁 AUTO REDIRECT AFTER LOGIN
   useEffect(() => {
@@ -113,7 +115,13 @@ export default function LoginPage() {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-sm font-medium text-slate-700">Password</label>
-              <a href="#" className="text-xs text-rose-600 hover:text-rose-700 font-medium">Forgot Password?</a>
+              <button 
+                type="button"
+                onClick={() => setIsForgotModalOpen(true)}
+                className="text-xs text-rose-600 hover:text-rose-700 font-medium"
+              >
+                Forgot Password?
+              </button>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -159,6 +167,11 @@ export default function LoginPage() {
       <div className="absolute bottom-4 text-center w-full text-slate-400 text-xs">
         &copy; {new Date().getFullYear()} Trusathi. All rights reserved.
       </div>
+
+      <ForgotPasswordModal 
+        isOpen={isForgotModalOpen} 
+        onClose={() => setIsForgotModalOpen(false)} 
+      />
     </div>
   )
 }

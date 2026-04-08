@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { 
   MapPin, Briefcase, Calendar, Ruler, Heart, 
   Users, GraduationCap, Banknote, Building2, 
-  Baby, Home, User
+  Baby, Home, User, Download, Printer
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
@@ -63,9 +63,33 @@ export default async function ProfilePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Navbar />
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          .no-print { display: none !important; }
+          body { background: white !important; }
+          main { padding: 0 !important; max-width: 100% !important; }
+          .rounded-3xl { border-radius: 0 !important; }
+          .shadow-xl { box-shadow: none !important; }
+          .border { border: none !important; }
+          .bg-slate-50 { background-color: white !important; }
+          .profile-container { border: 1px solid #eee !important; }
+        }
+      `}} />
+      <div className="no-print">
+        <Navbar />
+      </div>
       
-      <main className="max-w-5xl mx-auto px-4 py-12 md:py-20">
+      <main className="max-w-5xl mx-auto px-4 py-12 md:py-20 profile-container">
+        {/* Quick Actions (Floating on mobile, sidebar on desktop) */}
+        <div className="flex justify-end mb-4 no-print gap-3">
+           <button 
+             onClick={() => window.print()}
+             className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center gap-2"
+           >
+              <Printer size={18} /> Print / Save as PDF
+           </button>
+        </div>
+
         <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 overflow-hidden border border-slate-100">
           
           {/* Header/Banner Section */}
@@ -182,7 +206,7 @@ export default async function ProfilePage({ params }: Props) {
                    </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-4 no-print">
                     <button className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-rose-200 transition-all transform hover:-translate-y-1">
                         Connect Now
                     </button>
@@ -195,7 +219,9 @@ export default async function ProfilePage({ params }: Props) {
         </div>
       </main>
 
-      <Footer />
+      <div className="no-print">
+        <Footer />
+      </div>
     </div>
   );
 }

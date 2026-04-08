@@ -28,10 +28,10 @@ export default function Footer() {
             <div>
               <h4 className="font-bold text-gray-900 mb-6">Explore</h4>
               <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-indigo-600 transition">Browse Brides</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Browse Grooms</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Success Stories</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Group List</a></li>
+                <li><Link href="/search?role=Bride" className="hover:text-indigo-600 transition">Browse Brides</Link></li>
+                <li><Link href="/search?role=Groom" className="hover:text-indigo-600 transition">Browse Grooms</Link></li>
+                <li><Link href="/success-stories" className="hover:text-indigo-600 transition">Success Stories</Link></li>
+                <li><Link href="/communities" className="hover:text-indigo-600 transition">Group List</Link></li>
               </ul>
             </div>
 
@@ -45,8 +45,8 @@ export default function Footer() {
                     support@trusathi.com
                   </a>
                 </li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Help Center</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition">Safety Tips</a></li>
+                <li><Link href="/support" className="hover:text-indigo-600 transition">Help Center</Link></li>
+                <li><Link href="/support#safety" className="hover:text-indigo-600 transition">Safety Tips</Link></li>
               </ul>
             </div>
 
