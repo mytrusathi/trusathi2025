@@ -60,7 +60,7 @@ export default function OverviewView() {
       }
     };
 
-    fetchStats();
+    fetchData();
 
     // 2. Real-time Unread Notifications
     const notifQuery = query(
