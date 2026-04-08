@@ -26,7 +26,7 @@ export default function LoginPage() {
         router.replace('/dashboard/super-admin')
       } else if (role === 'group-admin') {
         if (user.isApproved === false) {
-           router.replace('/register/pending')
+           router.replace('/pending-approval')
         } else {
            router.replace('/dashboard/group-admin')
         }

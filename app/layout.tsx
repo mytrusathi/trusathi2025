@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import { Inter, Outfit } from "next/font/google"; // [NEW] Added premium fonts
 import "./globals.css";
 import { AuthProvider } from '../context/AuthContext'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: {
@@ -18,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+      <body className="antialiased font-sans text-slate-900 selection:bg-rose-100 selection:text-rose-900">
         <AuthProvider>
           {children}
         </AuthProvider>

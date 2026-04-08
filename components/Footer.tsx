@@ -1,92 +1,87 @@
-
-import { Heart, Shield, Facebook, Twitter, Instagram, Mail} from 'lucide-react';
+import { Heart, Shield, Facebook, Twitter, Instagram, Mail, ShieldCheck } from 'lucide-react';
 import Link from 'next/link' 
 import VisitorCounter from './VisitorCounter';
 
 export default function Footer() {
   return (
-      <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-            <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
-                  <Heart fill="currentColor" size={20} />
-                </div>
-                <span className="text-xl font-bold text-gray-900">Trusathi</span>
+    <footer className="bg-slate-50 border-t border-slate-100 pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          <div className="col-span-2 lg:col-span-1">
+            <Link href="/" className="flex items-center gap-3 mb-6 group">
+              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform">
+                 <Heart fill="currentColor" size={20} />
               </div>
-              <p className="text-gray-500 text-sm leading-relaxed mb-6">
-               Connecting hearts, families, and communities through lifelong bonds. Safe, authentic, and reliable matchmaking for everyone.
-              </p>
-              <div className="flex gap-4">
-                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Facebook size={20} /></a>
-                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Twitter size={20} /></a>
-                <a href="#" className="text-gray-400 hover:text-indigo-600 transition"><Instagram size={20} /></a>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-bold text-gray-900 mb-6">Explore</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                <li><Link href="/search?role=Bride" className="hover:text-indigo-600 transition">Browse Brides</Link></li>
-                <li><Link href="/search?role=Groom" className="hover:text-indigo-600 transition">Browse Grooms</Link></li>
-                <li><Link href="/success-stories" className="hover:text-indigo-600 transition">Success Stories</Link></li>
-                <li><Link href="/communities" className="hover:text-indigo-600 transition">Group List</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-gray-900 mb-6">Support</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                {/* UPDATED: Support Email Link */}
-                <li className="flex items-center gap-2">
-                  <Mail size={14}/> 
-                  <a href="mailto:support@trusathi.com" className="hover:text-indigo-600 transition">
-                    support@trusathi.com
-                  </a>
-                </li>
-                <li><Link href="/support" className="hover:text-indigo-600 transition">Help Center</Link></li>
-                <li><Link href="/support#safety" className="hover:text-indigo-600 transition">Safety Tips</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-gray-900 mb-6">Legal</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                <li>
-                  <Link 
-                  href="/terms" 
-                  className="hover:text-indigo-600 transition">
-                    Terms & Conditions
-                    </Link></li>
-                <li>
-             <Link href="/privacy" className="hover:text-indigo-600 transition">
-               Privacy Policy
-             </Link>
-          </li>
-                <li>
-                  <Link
-                   href="/cookie-policy" className="hover:text-indigo-600 transition">
-                    Cookie Policy
-                    </Link></li>
-              </ul>
+              <span className="text-2xl font-black text-indigo-900 tracking-tight">TruSathi</span>
+            </Link>
+            <p className="text-slate-500 text-sm leading-relaxed mb-8 max-w-xs">
+              The premier community-verified matrimony platform. Connecting families through trust and authenticity.
+            </p>
+            <div className="flex gap-4">
+              <SocialIcon icon={<Facebook size={18} />} />
+              <SocialIcon icon={<Twitter size={18} />} />
+              <SocialIcon icon={<Instagram size={18} />} />
             </div>
           </div>
+          
+          <div>
+            <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-8">Platform</h4>
+            <ul className="space-y-4 text-sm font-bold text-slate-500">
+              <li><Link href="/search?role=Bride" className="hover:text-indigo-600 transition-colors">Browse Brides</Link></li>
+              <li><Link href="/search?role=Groom" className="hover:text-indigo-600 transition-colors">Browse Grooms</Link></li>
+              <li><Link href="/communities" className="hover:text-indigo-600 transition-colors">Verified Groups</Link></li>
+              <li><Link href="/success-stories" className="hover:text-indigo-600 transition-colors">Success Stories</Link></li>
+            </ul>
+          </div>
 
-          <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-400">© 2025 Trusathi. All rights reserved.</p>
-            <div className="mt-4">
-            <VisitorCounter />
-           </div>
-            <div className="flex gap-6 text-sm text-gray-400">
-              <span className="flex items-center gap-1"><Shield size={14} /> 100% Secure</span>
-            </div>
+          <div>
+            <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-8">Support</h4>
+            <ul className="space-y-4 text-sm font-bold text-slate-500">
+              <li><Link href="/support" className="hover:text-indigo-600 transition-colors">Help Center</Link></li>
+              <li><Link href="/support#safety" className="hover:text-indigo-600 transition-colors">Safety Tips</Link></li>
+              <li><Link href="/about" className="hover:text-indigo-600 transition-colors">About TruSathi</Link></li>
+              <li className="flex items-center gap-2 pt-2">
+                <Mail size={16} className="text-slate-400" />
+                <a href="mailto:support@trusathi.com" className="text-indigo-600 hover:underline">
+                  support@trusathi.com
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-8">Legal</h4>
+            <ul className="space-y-4 text-sm font-bold text-slate-500">
+              <li><Link href="/terms" className="hover:text-indigo-600 transition-colors">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="hover:text-indigo-600 transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/cookie-policy" className="hover:text-indigo-600 transition-colors">Cookie Policy</Link></li>
+            </ul>
           </div>
         </div>
 
-        
+        <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-col items-center md:items-start gap-1">
+             <p className="text-sm font-bold text-slate-400">© {new Date().getFullYear()} TruSathi. Handcrafted with heart.</p>
+             <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Designed for Communities</p>
+          </div>
+          
+          <div className="flex items-center gap-8">
+             <VisitorCounter />
+             <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-slate-200 shadow-sm">
+                <ShieldCheck size={16} className="text-emerald-500" />
+                <span className="text-xs font-black text-slate-700 uppercase tracking-wider">Secure</span>
+             </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
 
-      </footer>
-
-    )
+function SocialIcon({ icon }: { icon: React.ReactNode }) {
+  return (
+    <a href="#" className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-100 hover:shadow-lg hover:shadow-indigo-100 transition-all">
+      {icon}
+    </a>
+  );
 }

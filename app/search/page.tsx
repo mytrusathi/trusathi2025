@@ -23,56 +23,53 @@ function SearchResults() {
   const maxAge = searchParams.get('maxAge') ? parseInt(searchParams.get('maxAge')!, 10) : 60;
   const community = searchParams.get('community') || 'All Communities';
 
+  // Helper: Calculate Age from DOB
+  const getAge = (dob?: string) => {
+    if (!dob) return 0;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   useEffect(() => {
     const fetchProfiles = async () => {
       setLoading(true);
       try {
         const profilesRef = collection(db, 'profiles');
+        // Simple query: only filters that don't require composite indexes
         const constraints: QueryConstraint[] = [
           where('isPublic', '==', true),
           where('gender', '==', role === 'Bride' ? 'female' : 'male'),
+          limit(500)
         ];
-
-        // 1. Community Filter (Exact match on Religion)
-        if (community !== 'All Communities') {
-          constraints.push(where('religion', '==', community));
-        }
-
-        // 2. Age Range via DOB logic
-        // minAge 18 -> latest dob should be approx 18 years ago
-        // maxAge 30 -> oldest dob should be approx 30 years ago
-        const now = new Date();
-        const maxDobYear = now.getFullYear() - minAge;
-        const minDobYear = now.getFullYear() - maxAge;
-        
-        // Formulate ISO-like date strings for string comparison (YYYY-MM-DD)
-        const maxDob = `${maxDobYear}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        const minDob = `${minDobYear}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        
-        // Note: Using multiple range/inequality filters requires composite indexes.
-        // We will stick to fetching and refining if needed, but the prompt asked for functional query.
-        // Let's add the DOB constraints.
-        constraints.push(where('dob', '>=', minDob));
-        constraints.push(where('dob', '<=', maxDob));
-        
-        constraints.push(limit(500));
 
         const q = query(profilesRef, ...constraints);
         const querySnapshot = await getDocs(q);
 
         const fetchedProfiles: Profile[] = [];
         querySnapshot.forEach((doc) => {
-          fetchedProfiles.push({ ...doc.data(), id: doc.id } as Profile);
+          const data = doc.data() as Profile;
+          
+          // 1. Manual Age Filtering from DOB
+          const profileAge = getAge(data.dob);
+          const matchesAge = profileAge >= minAge && profileAge <= maxAge;
+          
+          // 2. Manual Community (Religion) Filtering
+          const matchesCommunity = community === 'All Communities' || data.religion === community;
+
+          if (matchesAge && matchesCommunity) {
+            fetchedProfiles.push({ ...data, id: doc.id });
+          }
         });
 
         setProfiles(fetchedProfiles);
       } catch (error: any) {
         console.error('Error fetching profiles:', error);
-        // If index is missing, Firebase usually provides a link in the console error.
-        // We'll fallback to a broader query if it fails (optional, but good for UX)
-        if (error.code === 'failed-precondition') {
-           console.warn("Firestore index missing for this query combination.");
-        }
       } finally {
         setLoading(false);
       }

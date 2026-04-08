@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Profile } from '../types/profile';
-import { MapPin, Briefcase, User, Calendar } from 'lucide-react';
+import { MapPin, Briefcase, User, Calendar, ShieldCheck, Heart, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface Props {
@@ -26,80 +26,95 @@ const PublicProfileCard = ({ profile }: Props) => {
   const age = getAge(profile.dob);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all group h-full flex flex-col">
+    <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500 group h-full flex flex-col relative">
+      
+      {/* Premium Badge */}
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm">
+         <ShieldCheck size={14} className="text-indigo-600" />
+         <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Verified</span>
+      </div>
+
+      <button className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-rose-500 hover:text-white transition-all">
+         <Heart size={16} />
+      </button>
+
       {/* Image Section */}
-      <div className="h-64 bg-slate-100 relative overflow-hidden">
+      <div className="h-80 bg-slate-100 relative overflow-hidden">
         {profile.imageUrl ? (
           <Image
             src={profile.imageUrl}
             alt={profile.name}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover group-hover:scale-110 transition-transform duration-700"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
-            <User size={64} strokeWidth={1.5} />
-            <span className="text-sm mt-2 font-medium">No Photo Available</span>
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-200 bg-slate-50">
+            <User size={80} strokeWidth={1} />
           </div>
         )}
         
-        {/* Overlay Gradient for Text Readability */}
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/80 to-transparent"></div>
+        {/* Elegant Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
         
-        {/* Quick Stats Overlay */}
-        <div className="absolute bottom-4 left-4 right-4 text-white">
-          <h3 className="font-bold text-xl truncate mb-1">{profile.name}</h3>
-          <div className="flex items-center gap-3 text-sm text-white/90">
-             <span className="flex items-center gap-1 bg-white/20 px-2 py-0.5 rounded backdrop-blur-sm">
-                <Calendar size={12} /> {age} yrs
-             </span>
-             <span className="truncate">{profile.religion}, {profile.caste}</span>
+        {/* Text Overlay */}
+        <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+          <div className="flex items-center justify-between">
+            <h3 className="font-black text-2xl text-white tracking-tight truncate">{profile.name}</h3>
+            <div className="flex items-center gap-1.5 bg-rose-500 text-white px-2 py-0.5 rounded-lg text-xs font-bold shadow-lg shadow-rose-900/20">
+               {age} Yrs
+            </div>
+          </div>
+          <div className="flex items-center gap-3 text-slate-200 text-sm font-medium">
+             <span>{profile.maritalStatus}</span>
+             <div className="w-1 h-1 bg-white/30 rounded-full"></div>
+             <span className="truncate">{profile.religion}</span>
           </div>
         </div>
       </div>
 
       {/* Details Section */}
-      <div className="p-5 flex flex-col grow space-y-4">
+      <div className="p-6 flex flex-col grow space-y-5 bg-white">
         
-        {/* Profession */}
-        <div className="flex items-start gap-3">
-            <div className="p-2 bg-rose-50 text-rose-600 rounded-lg mt-0.5">
-                <Briefcase size={16} />
-            </div>
-            <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Profession</p>
-                <p className="text-slate-800 font-medium leading-tight">
-                    {profile.profession || 'Not Specified'}
-                    {profile.company && <span className="text-slate-500 text-sm block mt-0.5">at {profile.company}</span>}
-                </p>
-            </div>
+        <div className="flex flex-col gap-4">
+           {/* Profession */}
+           <div className="flex items-center gap-4 group/item">
+               <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0 group-hover/item:bg-indigo-600 group-hover/item:text-white transition-colors duration-300">
+                  <Briefcase size={18} />
+               </div>
+               <div className="min-w-0">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Profession</p>
+                  <p className="text-slate-800 font-bold leading-tight truncate">
+                     {profile.profession || 'Not Specified'}
+                  </p>
+                  {profile.company && <p className="text-slate-500 text-xs truncate mt-0.5">at {profile.company}</p>}
+               </div>
+           </div>
+
+           {/* Location */}
+           <div className="flex items-center gap-4 group/item">
+               <div className="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center shrink-0 group-hover/item:bg-rose-600 group-hover/item:text-white transition-colors duration-300">
+                  <MapPin size={18} />
+               </div>
+               <div className="min-w-0">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Home City</p>
+                  <p className="text-slate-800 font-bold truncate">
+                     {profile.city || 'Unknown City'}
+                     {profile.state && <span className="text-slate-400 font-medium">, {profile.state}</span>}
+                  </p>
+               </div>
+           </div>
         </div>
 
-        {/* Location (Fixed Error Here) */}
-        <div className="flex items-start gap-3">
-            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg mt-0.5">
-                <MapPin size={16} />
-            </div>
-            <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Location</p>
-                <p className="text-slate-800 font-medium">
-                    {profile.city || 'Unknown City'}
-                    {profile.state && `, ${profile.state}`}
-                </p>
-            </div>
+        {/* Action Button */}
+        <div className="pt-2">
+           <Link 
+              href={`/profile/${profile.id}`}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-slate-900 text-white font-black hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 active:scale-95 text-sm"
+           >
+              Full Biodata <ArrowUpRight size={18} />
+           </Link>
         </div>
-
-      </div>
-
-      {/* Footer Action */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50 mt-auto">
-         <Link 
-            href={`/profile/${profile.id}`}
-            className="w-full py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors shadow-sm text-sm block text-center"
-         >
-            View Full Profile
-         </Link>
       </div>
     </div>
   );
