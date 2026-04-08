@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Heart, Send, Inbox, Bell, Star, 
   MessageSquare, LayoutDashboard, ArrowRight,
-  ShieldCheck, Sparkles, UserCircle2, Settings
+  ShieldCheck, Sparkles, UserCircle2, Settings, AlertCircle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/app/lib/firebase';
