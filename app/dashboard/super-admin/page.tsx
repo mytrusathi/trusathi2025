@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../../lib/firebase';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, getCountFromServer, query, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '../../../context/AuthContext';
 import { 
@@ -43,32 +43,29 @@ const SuperAdminDashboard = () => {
       const usersRef = collection(db, 'users');
       const usersSnap = await getDocs(usersRef);
       
-      // 2. Fetch Profiles (to count them)
-      const profilesRef = collection(db, 'profiles');
-      const profilesSnap = await getDocs(profilesRef);
-      
-      // Count profiles per creator
-      const profileCounts: Record<string, number> = {};
-      profilesSnap.forEach(doc => {
-        const data = doc.data();
-        if (data.createdBy) {
-          profileCounts[data.createdBy] = (profileCounts[data.createdBy] || 0) + 1;
-        }
-      });
-
       const fetchedUsers: DashboardUser[] = [];
-      usersSnap.forEach((docSnap) => {
+      
+      // 2. Map profiles via lightweight Server Aggregation completely avoiding document bulk loads
+      await Promise.all(usersSnap.docs.map(async (docSnap) => {
         const data = docSnap.data();
+        let pCount = 0;
+        try {
+           const coll = collection(db, 'profiles');
+           const countQuery = query(coll, where('createdBy', '==', docSnap.id));
+           const snapCount = await getCountFromServer(countQuery);
+           pCount = snapCount.data().count;
+        } catch (e) { console.error(e) }
+
         fetchedUsers.push({
           uid: docSnap.id,
           email: data.email || 'No Email',
           displayName: data.displayName || 'Unnamed User',
           role: data.role || 'member',
           createdAt: data.createdAt,
-          isApproved: data.isApproved, // Capture approval status
-          profileCount: profileCounts[docSnap.id] || 0
+          isApproved: data.isApproved,
+          profileCount: pCount
         });
-      });
+      }));
 
       setUsers(fetchedUsers);
 

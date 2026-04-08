@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Secure Users Collection
+    match /users/{userId} {
+      // Anyone can read (needed for public Community pages & metadata)
+      allow read: if true; 
+      
+      // Users can only update their own documents. Admins handle approval via Firebase limits.
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Secure Matrimony Profiles Collection
+    match /profiles/{profileId} {
+      // Public profiles are visible to all. Creators can read their own even if private.
+      allow read: if resource.data.isPublic == true || (request.auth != null && resource.data.createdBy == request.auth.uid);
+      
+      // Any authenticated admin/member can create a profile under their account.
+      allow create: if request.auth != null && request.resource.data.createdBy == request.auth.uid;
+      
+      // Only the creator can modify or delete their owned profiles.
+      allow update, delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
+    }
+  }
+}

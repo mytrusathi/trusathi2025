@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import imageCompression from 'browser-image-compression';
 import { db, storage } from '../../app/lib/firebase';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -81,7 +82,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (!file.type.startsWith('image/')) {
@@ -94,8 +95,17 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
         e.target.value = '';
         return;
       }
-      setImageFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+
+      try {
+         const options = { maxSizeMB: 0.2, maxWidthOrHeight: 800, useWebWorker: true };
+         const compressedFile = await imageCompression(file, options);
+         setImageFile(compressedFile);
+         setPreviewUrl(URL.createObjectURL(compressedFile));
+      } catch (error) {
+         console.error("Compression failed, using original", error);
+         setImageFile(file);
+         setPreviewUrl(URL.createObjectURL(file));
+      }
     }
   };
 
