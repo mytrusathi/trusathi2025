@@ -51,24 +51,22 @@ export default function Navbar() {
               About Us
               </Link>
 
-            {!user && (
-              <Link
-                href="/login"
-                className="text-indigo-600 font-medium hover:underline"
-              >
-                Login
-              </Link>
-            )}
-            {!user && (
-              <Link
-                href="/register"
-                className="bg-indigo-600 text-white px-5 py-2.5 rounded-full font-medium"
-              >
-                Register Free
-              </Link>
-            )}
-        
-            {user && (
+            {!user ? (
+              <>
+                <Link
+                  href="/login"
+                  className="text-indigo-600 font-medium hover:underline"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="bg-indigo-600 text-white px-5 py-2.5 rounded-full font-medium"
+                >
+                  Register Free
+                </Link>
+              </>
+            ) : (
               <button
                 onClick={handleLogout}
                 className="text-sm font-semibold text-red-600 hover:underline"
@@ -111,22 +109,34 @@ export default function Navbar() {
             About Us
             </Link>
 
-          {!user && (
-            <Link
-              href="/login"
-              className="w-full bg-indigo-600 text-white py-2 roundedr"
-              onClick={() => setIsMenuOpen(false)}
+          {!user ? (
+            <>
+              <Link
+                href="/login"
+                className="block w-full text-center bg-indigo-600 text-white py-2 rounded mb-2"
+                onClick={closeMenu}
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="block w-full text-center bg-indigo-600 text-white py-2 rounded"
+                onClick={closeMenu}
+              >
+                Register Free
+              </Link>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                handleLogout();
+                closeMenu();
+              }}
+              className="block w-full text-center bg-red-600 text-white py-2 rounded mt-2"
             >
-              Login
-            </Link>
+              Logout
+            </button>
           )}
-          <Link
-          href="/register"
-          className="block w-full text-center bg-indigo-600 text-white py-2 rounded"
-          onClick={()=>setIsMenuOpen(false)}>
-            Register Free
-          </Link>
-          
         </div>
       )}
     </nav>
