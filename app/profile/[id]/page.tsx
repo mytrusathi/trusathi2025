@@ -95,7 +95,7 @@ function ProfileView({ profile, age }: { profile: Profile; age: string | number 
       </div>
       
       <main className="max-w-5xl mx-auto px-4 py-12 md:py-20 profile-container">
-        <ProfileActions />
+        {/* ProfileActions removed from here to prevent duplication */}
 
         <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 overflow-hidden border border-slate-100">
           

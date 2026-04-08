@@ -5,7 +5,7 @@ import { auth, db } from '../lib/firebase';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { User, Users, Check, Loader2, TriangleAlert, Building2 } from 'lucide-react';
+import { User, Users, Check, Loader2, TriangleAlert, Building2, Heart, ArrowRight, ArrowLeft } from 'lucide-react';
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
@@ -22,9 +22,7 @@ const RegisterPage = () => {
     setError('');
     setLoading(true);
 
-
     try {
-      // Validate Group Name for admins
       if (role === 'group-admin' && !groupName.trim()) {
         throw new Error("Please provide your Community/Group Name.");
       }
@@ -36,22 +34,17 @@ const RegisterPage = () => {
         displayName: name,
       });
 
-      // SECURITY FIX: 
-      // Members are auto-approved. 
-      // Group Admins must be approved by Super Admin before accessing data.
       const isApproved = role === 'member';
 
-      // NEW: Auto-generate the slug from the group name
       let generatedSlug = '';
       if (role === 'group-admin') {
         generatedSlug = groupName
           .toLowerCase()
           .trim()
-          .replace(/\s+/g, '-')           // Replace spaces with hyphens
-          .replace(/[^a-z0-9-]/g, '');     // Remove special characters
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '');
       }
 
-      // Create user document in Firestore with SELECTED ROLE
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
         email: user.email,
@@ -62,7 +55,6 @@ const RegisterPage = () => {
         createdAt: new Date().toISOString(),
       });
 
-      // Redirect based on role
       if (role === 'group-admin') {
         router.push('/register/pending');
       } else {
@@ -73,168 +65,194 @@ const RegisterPage = () => {
       console.error(err);
       const firebaseError = err as { code?: string; message?: string };
       if (firebaseError.code === 'auth/email-already-in-use') {
-        setError('This email is already registered. Please login.');
-      } else if (firebaseError.code === 'auth/weak-password') {
-        setError('Password should be at least 6 characters.');
+        setError('This email is already registered.');
       } else {
-        setError(firebaseError.message || 'Failed to register. Please try again.');
+        setError(firebaseError.message || 'Registration failed.');
       }
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md">
-        
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-slate-800">Create Account</h2>
-          <p className="text-slate-500 mt-2">Join truSathi to manage profiles or find matches</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-4 relative overflow-hidden font-sans">
+      
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-rose-500/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
 
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm flex items-center gap-2">
-            <span className="font-bold">Error:</span> {error}
-          </div>
-        )}
+      <div className="absolute top-8 left-8 z-10">
+        <Link 
+          href="/" 
+          className="flex items-center gap-3 text-slate-400 hover:text-white font-bold transition-all px-4 py-2 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md"
+        >
+          <ArrowLeft size={18} /> <span className="text-sm uppercase tracking-widest">Home</span>
+        </Link>
+      </div>
 
-        <form onSubmit={handleRegister} className="space-y-5">
+      <div className="w-full max-w-xl animate-in fade-in zoom-in duration-700 relative z-10">
+        <div className="bg-white/5 backdrop-blur-3xl p-8 md:p-12 rounded-[3.5rem] border border-white/10 shadow-3xl shadow-black/50">
           
-          {/* Role Selection */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <button
-              type="button"
-              onClick={() => setRole('member')}
-              className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
-                role === 'member' 
-                  ? 'border-rose-500 bg-rose-50 text-rose-700' 
-                  : 'border-slate-200 hover:border-slate-300 text-slate-500'
-              }`}
-            >
-              <User size={24} />
-              <span className="text-sm font-semibold">Member</span>
-              {role === 'member' && <div className="absolute top-2 right-2 text-rose-500"><Check size={16} /></div>}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setRole('group-admin')}
-              className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
-                role === 'group-admin' 
-                  ? 'border-rose-500 bg-rose-50 text-rose-700' 
-                  : 'border-slate-200 hover:border-slate-300 text-slate-500'
-              }`}
-            >
-              <Users size={24} />
-              <span className="text-sm font-semibold">Group Admin</span>
-              {role === 'group-admin' && <div className="absolute top-2 right-2 text-rose-500"><Check size={16} /></div>}
-            </button>
+          <div className="text-center mb-10 space-y-4">
+             <div className="inline-flex items-center justify-center w-16 h-16 bg-white/5 rounded-2xl border border-white/10 mb-2">
+                <Heart fill="#F43F5E" className="text-rose-500" size={28} />
+             </div>
+             <div>
+                <h2 className="text-4xl font-black text-white tracking-tight">Create Account</h2>
+                <p className="text-slate-400 font-medium mt-2">Join TruSathi to serve or find your partner</p>
+             </div>
           </div>
-          
-  {/* Warning Message for Admins */}
-          {role === 'group-admin' && (
-            <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-lg flex gap-2">
-              <TriangleAlert className="shrink-0" size={16} />
-              <p>Note: Group Admin accounts require manual verification by the Trusathi team before you can access the dashboard.</p>
+
+          {error && (
+            <div className="bg-rose-500/10 text-rose-400 p-4 rounded-2xl mb-8 text-sm font-bold border border-rose-500/20">
+               {error}
             </div>
           )}
 
-              {/* NEW: Conditional Input for Group Name */}
-          {role === 'group-admin' && (
-            <div className="animate-in slide-in-from-top-2 duration-300">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Community / Group Name</label>
-              <div className="relative">
-                <Building2 className="absolute left-3 top-3 text-slate-400" size={18} />
-                <input
-                  type="text"
-                  className="w-full border border-slate-300 pl-10 pr-3 py-3 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
-                  placeholder="e.g. Agarwal Community"
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
-                  required
-                />
+          <form onSubmit={handleRegister} className="space-y-8">
+            
+            {/* Role Selection */}
+            <div className="grid grid-cols-2 gap-4">
+               <RoleButton 
+                  active={role === 'member'} 
+                  onClick={() => setRole('member')} 
+                  icon={<User size={20} />} 
+                  label="Member" 
+                  desc="Find profile"
+               />
+               <RoleButton 
+                  active={role === 'group-admin'} 
+                  onClick={() => setRole('group-admin')} 
+                  icon={<Users size={20} />} 
+                  label="Admin" 
+                  desc="Manage group"
+               />
+            </div>
+
+            {role === 'group-admin' && (
+              <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-2xl flex gap-3 animate-in slide-in-from-top-2 duration-300">
+                <TriangleAlert className="text-indigo-400 shrink-0" size={18} />
+                <p className="text-[11px] text-indigo-200 font-medium leading-relaxed">
+                   Admin accounts are manually verified by our team for community safety before dashboard access is granted.
+                </p>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1 ml-1 italic">
-                This name will be used to create your shareable URL.
-              </p>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="space-y-6">
+                  {role === 'group-admin' && (
+                    <div className="animate-in slide-in-from-left duration-500">
+                      <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Community Group Name</label>
+                      <div className="relative group">
+                        <Building2 className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-rose-500 transition-colors" size={20} />
+                        <input
+                          type="text"
+                          className="w-full bg-white/5 border border-white/10 pl-16 pr-6 py-4.5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-700 font-medium"
+                          placeholder="e.g. Agarwal Community"
+                          value={groupName}
+                          onChange={(e) => setGroupName(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Full Name</label>
+                    <input
+                      type="text"
+                      className="w-full bg-white/5 border border-white/10 px-6 py-4.5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-700 font-medium"
+                      placeholder="Your name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                  </div>
+               </div>
+
+               <div className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Email Address</label>
+                    <input
+                      type="email"
+                      className="w-full bg-white/5 border border-white/10 px-6 py-4.5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-700 font-medium"
+                      placeholder="name@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Create Password</label>
+                    <input
+                      type="password"
+                      className="w-full bg-white/5 border border-white/10 px-6 py-4.5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-700 font-medium"
+                      placeholder="Min. 6 chars"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                  </div>
+               </div>
             </div>
-          )}
 
-     
+            <div className="bg-white/5 p-6 rounded-3xl border border-white/10 flex items-start gap-3">
+              <input 
+                type="checkbox" 
+                id="terms" 
+                required 
+                className="mt-1 w-5 h-5 bg-transparent border-white/20 rounded focus:ring-rose-500"
+              />
+              <label htmlFor="terms" className="text-xs text-slate-400 font-medium leading-relaxed cursor-pointer">
+                I agree to serve the community in an authentic way and accept the{' '}
+                <Link href="/terms" className="text-white hover:underline underline-offset-4">Terms & Conditions</Link>.
+              </label>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Group Admin Name</label>
-            <input
-              type="text"
-              className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"
-              placeholder="e.g. Aarav Sharma"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-5 px-8 rounded-[2rem] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-2xl shadow-rose-900/40 transform active:scale-[0.98]"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : <>Complete Registration <ArrowRight size={20} /></>}
+            </button>
+          </form>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-            <input
-              type="email"
-              className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-            <input
-              type="password"
-              className="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
-          </div>
-
-          {/* Terms and Conditions Checkbox */}
-          {/* Terms and Conditions Checkbox */}
-          <div className="flex items-start gap-2 pt-2">
-            <input 
-              type="checkbox" 
-              id="terms" 
-              required 
-              className="mt-1 w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500 cursor-pointer"
-            />
-            <label htmlFor="terms" className="text-sm text-slate-600 cursor-pointer">
-              I agree to the{' '}
-              <Link href="/terms" target="_blank" rel="noopener noreferrer" className="text-rose-600 font-medium hover:underline">
-                Terms and Conditions
-              </Link>
-              {' '}and{' '}
-              <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="text-rose-600 font-medium hover:underline">
-                Privacy Policy
-              </Link>.
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {loading ? <Loader2 className="animate-spin" /> : 'Create Account'}
-          </button>
-        </form>
-
-         <p className="mt-6 text-center text-slate-600 text-sm">
-          Already have an account? <Link href="/login" className="text-rose-600 font-semibold hover:underline">Log in</Link>
-        </p>
+           <p className="mt-10 text-center text-slate-500 text-sm font-bold">
+            Joined already? <Link href="/login" className="text-white hover:text-rose-400 transition-colors ml-1">Sign In</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
 };
+
+function RoleButton({ active, onClick, icon, label, desc }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, desc: string }) {
+   return (
+      <button
+         type="button"
+         onClick={onClick}
+         className={`relative p-6 rounded-[2rem] border-2 flex flex-col items-center text-center gap-2 transition-all duration-300 ${
+            active 
+            ? 'border-rose-500 bg-rose-500/10 text-white' 
+            : 'border-white/10 bg-white/5 text-slate-500 hover:border-white/20'
+         }`}
+      >
+         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-1 ${active ? 'bg-rose-500 text-white' : 'bg-white/5 text-slate-600'}`}>
+            {icon}
+         </div>
+         <span className="text-sm font-black uppercase tracking-widest leading-none">{label}</span>
+         <span className={`text-[10px] font-bold uppercase tracking-widest opacity-40 ${active ? 'text-rose-200' : ''}`}>{desc}</span>
+         {active && (
+            <div className="absolute top-4 right-4 text-rose-500">
+               <div className="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center text-white scale-110 shadow-lg">
+                  <Check size={12} strokeWidth={4} />
+               </div>
+            </div>
+         )}
+      </button>
+   );
+}
 
 export default RegisterPage;

@@ -9,7 +9,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PublicProfileCard from '@/components/PublicProfileCard';
 import SearchBar from '@/components/SearchBar';
-import { Loader2, FilterX, SlidersHorizontal, Search } from 'lucide-react';
+import { Loader2, FilterX, SlidersHorizontal, Search, MapPin, Sparkles, Heart } from 'lucide-react';
 
 function SearchResults() {
   const searchParams = useSearchParams();
@@ -23,7 +23,6 @@ function SearchResults() {
   const maxAge = searchParams.get('maxAge') ? parseInt(searchParams.get('maxAge')!, 10) : 60;
   const community = searchParams.get('community') || 'All Communities';
 
-  // Helper: Calculate Age from DOB
   const getAge = (dob?: string) => {
     if (!dob) return 0;
     const birthDate = new Date(dob);
@@ -41,7 +40,6 @@ function SearchResults() {
       setLoading(true);
       try {
         const profilesRef = collection(db, 'profiles');
-        // Simple query: only filters that don't require composite indexes
         const constraints: QueryConstraint[] = [
           where('isPublic', '==', true),
           where('gender', '==', role === 'Bride' ? 'female' : 'male'),
@@ -54,12 +52,8 @@ function SearchResults() {
         const fetchedProfiles: Profile[] = [];
         querySnapshot.forEach((doc) => {
           const data = doc.data() as Profile;
-          
-          // 1. Manual Age Filtering from DOB
           const profileAge = getAge(data.dob);
           const matchesAge = profileAge >= minAge && profileAge <= maxAge;
-          
-          // 2. Manual Community (Religion) Filtering
           const matchesCommunity = community === 'All Communities' || data.religion === community;
 
           if (matchesAge && matchesCommunity) {
@@ -92,37 +86,56 @@ function SearchResults() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div>
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            Searching for {role === 'Bride' ? 'Brides' : 'Grooms'}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      
+      {/* Search Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+        <div className="space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-rose-50 rounded-full text-rose-600 text-xs font-black uppercase tracking-wider">
+             <Sparkles size={14} /> Verified Matches
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-none">
+            Browse {role === 'Bride' ? 'Brides' : 'Grooms'}
           </h1>
-          <p className="text-slate-500 text-lg">
-            Showing verified matches between <span className="font-bold text-rose-600">{minAge} - {maxAge} years</span>
-            {community !== 'All Communities' && <span> in the <span className="font-bold text-rose-600">{community}</span> community</span>}
+          <p className="text-slate-500 text-lg font-medium max-w-xl leading-relaxed">
+            Finding your partner within <span className="text-indigo-600 font-bold underline decoration-rose-200 decoration-4">{community}</span>. 
+            All profiles are manualy verified by community admins.
           </p>
         </div>
-        <div className="bg-slate-100 px-4 py-2 rounded-xl text-slate-600 font-bold text-sm flex items-center gap-2 border border-slate-200">
-           <SlidersHorizontal size={16} /> Filtered Results
+        
+        <div className="flex items-center gap-3">
+           <div className="flex -space-x-3">
+              {[1,2,3,4].map(i => (
+                <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden">
+                   <div className="w-full h-full bg-slate-200 animate-pulse"></div>
+                </div>
+              ))}
+              <div className="w-10 h-10 rounded-full border-2 border-white bg-indigo-600 flex items-center justify-center text-white text-[10px] font-black">
+                 {profiles.length}+
+              </div>
+           </div>
+           <p className="text-xs font-black text-slate-400 uppercase tracking-widest pl-2">Profiles Found</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl shadow-slate-100 border border-slate-100 p-6 mb-10 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-        <div className="md:col-span-2 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+      {/* Advanced Filters Bar */}
+      <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 p-3 mb-16 flex flex-col lg:flex-row gap-3">
+        <div className="flex-1 relative group">
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
           <input
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Search name, city, caste..."
-            className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-rose-500/20 outline-none transition-all"
+            placeholder="Search name, city, caste or profession..."
+            className="w-full pl-16 pr-6 py-4.5 bg-slate-50 border-none rounded-[2rem] focus:ring-2 focus:ring-indigo-500/10 outline-none transition-all font-medium text-slate-700"
           />
         </div>
-        <div className="relative">
+        
+        <div className="lg:w-64 relative group">
+           <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
            <select
             value={cityFilter}
             onChange={(e) => setCityFilter(e.target.value)}
-            className="w-full px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl appearance-none focus:ring-2 focus:ring-rose-500/20 outline-none whitespace-nowrap overflow-hidden text-ellipsis"
+            className="w-full pl-16 pr-10 py-4.5 bg-slate-50 border-none rounded-[2rem] appearance-none focus:ring-2 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 cursor-pointer"
           >
             <option value="all">All Cities</option>
             {cities.map((city) => (
@@ -131,34 +144,49 @@ function SearchResults() {
               </option>
             ))}
           </select>
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+             <SlidersHorizontal size={16} />
+          </div>
         </div>
-        <button className="h-full py-3.5 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl transition-all shadow-lg shadow-slate-200">
-           Apply Filters
+
+        <button className="lg:w-48 py-4.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-[2rem] transition-all shadow-xl shadow-indigo-100 active:scale-95">
+           Filter Results
         </button>
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24">
-          <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
-             <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+        <div className="flex flex-col items-center justify-center py-32 space-y-6">
+          <div className="relative">
+             <div className="w-20 h-20 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+             <div className="absolute inset-0 flex items-center justify-center text-indigo-600">
+                <Heart size={24} fill="currentColor" className="animate-pulse" />
+             </div>
           </div>
-          <p className="text-slate-500 font-medium">Finding your perfect match...</p>
+          <p className="text-slate-500 font-black uppercase tracking-[0.2em] text-sm">Curation in progress...</p>
         </div>
       ) : filteredProfiles.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in duration-700">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           {filteredProfiles.map((profile) => (
              <PublicProfileCard profile={profile} key={profile.id} />
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-4xl border border-slate-100 shadow-sm p-20 text-center space-y-4">
-          <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
-            <FilterX className="w-10 h-10" />
+        <div className="bg-white rounded-[4rem] border border-slate-100 shadow-sm p-24 text-center space-y-8">
+          <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-200 border-4 border-white shadow-inner">
+            <FilterX className="w-12 h-12" />
           </div>
-          <h3 className="text-2xl font-bold text-slate-800">No Matches Found</h3>
-          <p className="text-slate-500 max-w-md mx-auto">
-            Try broadening your search criteria or selecting &apos;All Communities&apos; to find more potential matches.
-          </p>
+          <div className="space-y-3">
+             <h3 className="text-3xl font-black text-slate-900 tracking-tight">No Matches Exactly Here</h3>
+             <p className="text-slate-500 max-w-md mx-auto font-medium text-lg leading-relaxed">
+               Try broadening your search criteria or selecting &apos;All Communities&apos; to find more potential TruSathi matches.
+             </p>
+          </div>
+          <button 
+             onClick={() => {setKeyword(''); setCityFilter('all');}}
+             className="px-10 py-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl transition-all"
+          >
+             Reset All Filters
+          </button>
         </div>
       )}
     </div>
@@ -176,27 +204,35 @@ function SearchPageContent() {
     <div className="min-h-screen flex flex-col bg-slate-50/50">
       <Navbar />
 
-      <div className="bg-indigo-900 pt-16 pb-24 px-4 relative overflow-hidden">
-        {/* Decorative background element */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-500/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
+      <div className="bg-indigo-900 pt-20 pb-32 px-4 relative overflow-hidden">
+        {/* Modern abstract decorative elements */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-[150px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-rose-500/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-[100px]" />
         
-        <div className="max-w-7xl mx-auto relative z-10">
-          <h2 className="text-indigo-200 text-sm font-bold uppercase tracking-widest mb-4 text-center md:text-left">Refine your search</h2>
-          <SearchBar
-            variant="embedded"
-            initialFilters={{
-              lookingFor: role,
-              ageMin: String(minAge),
-              ageMax: String(maxAge),
-              community,
-            }}
-          />
+        <div className="max-w-7xl mx-auto relative z-10 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-indigo-200 text-xs font-black uppercase tracking-[0.2em] mb-8 backdrop-blur-md">
+               <SlidersHorizontal size={14} /> Custom Match Engine
+            </div>
+            <h2 className="text-white text-4xl md:text-6xl font-black tracking-tight mb-12 leading-none">
+               Fine-tune your <br className="hidden md:block"/> search filters.
+            </h2>
+            
+            <div className="max-w-4xl mx-auto">
+               <SearchBar
+                 variant="embedded"
+                 initialFilters={{
+                   lookingFor: role,
+                   ageMin: String(minAge),
+                   ageMax: String(maxAge),
+                   community,
+                 }}
+               />
+            </div>
         </div>
       </div>
 
-      <div className="grow -mt-12 relative z-20">
-        <Suspense fallback={<div className="p-20 text-center"><Loader2 className="animate-spin mx-auto text-indigo-600" /></div>}>
+      <div className="grow -mt-20 relative z-20">
+        <Suspense fallback={<div className="p-32 text-center"><Loader2 className="animate-spin mx-auto text-indigo-600 w-12 h-12" /></div>}>
           <SearchResults />
         </Suspense>
       </div>
@@ -208,7 +244,7 @@ function SearchPageContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 p-10 text-center flex flex-col items-center justify-center"><Loader2 size={48} className="animate-spin text-rose-500" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center p-10"><Loader2 size={64} className="animate-spin text-white opacity-20" /></div>}>
       <SearchPageContent />
     </Suspense>
   );

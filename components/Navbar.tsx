@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart, Menu, X, User, LogOut, ChevronDown, Bell } from 'lucide-react'
+import { Heart, Menu, X, User, LogOut, ChevronDown, Bell, LayoutDashboard, Settings } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -36,14 +36,14 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform duration-300">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 group-hover:rotate-12 transition-transform duration-300">
                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.505 4.044 3 5.5L12 21l7-7Z" fill="currentColor" />
                </svg>
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-black text-indigo-900 leading-none">TruSathi</span>
-              <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest mt-0.5">Community Matrimony</span>
+              <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest mt-0.5 animate-pulse">Service to Mankind</span>
             </div>
           </Link>
 
@@ -51,7 +51,7 @@ export default function Navbar() {
           <div className="hidden md:flex space-x-1 items-center">
             <NavLink href="/search">Browse Profiles</NavLink>
             <NavLink href="/communities">Communities</NavLink>
-            <NavLink href="/success-stories">Stories</NavLink>
+            <NavLink href="/success-stories">Mission</NavLink>
             <NavLink href="/support">Support</NavLink>
 
             <div className="h-6 w-px bg-slate-200 mx-4"></div>
@@ -73,29 +73,49 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-6">
-                <button className="text-slate-400 hover:text-indigo-600 transition-colors">
+                <button className="text-slate-400 hover:text-indigo-600 transition-colors relative">
                    <Bell size={20} />
+                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
                 </button>
-                <div className="flex items-center gap-3 pl-4 border-l border-slate-100">
+                
+                {/* User Dropdown Group */}
+                <div className="flex items-center gap-3 pl-4 border-l border-slate-100 group relative">
                    <div className="text-right hidden sm:block">
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Welcome back,</p>
                       <p className="text-sm font-bold text-slate-800 truncate max-w-[120px]">{user.displayName || 'User'}</p>
                    </div>
-                   <div className="group relative">
-                      <button className="w-10 h-10 rounded-full bg-rose-50 border-2 border-rose-100 flex items-center justify-center text-rose-600 font-bold overflow-hidden">
-                         {user.photoURL ? (
-                           <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
-                         ) : (
-                           <User size={20} />
-                         )}
-                      </button>
-                      
-                      {/* Dropdown - Simple version */}
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all transform origin-top-right transform-gpu py-2 scale-95 group-hover:scale-100">
-                         <Link href={user.role === 'member' ? '/dashboard/member' : '/dashboard/group-admin'} className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-sm font-medium text-slate-700">
-                            <User size={16} /> My Dashboard
-                         </Link>
-                         <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-rose-50 text-sm font-medium text-red-600">
+                   
+                   {/* Trigger Button */}
+                   <button className="w-10 h-10 rounded-full bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center text-indigo-600 font-bold overflow-hidden shadow-sm transition-transform group-hover:scale-105">
+                      {user.photoURL ? (
+                        <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={20} />
+                      )}
+                   </button>
+                   
+                   {/* Dropdown Menu - Added pt-2 to create a hover bridge */}
+                   <div className="absolute right-0 top-full pt-2 w-56 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-[100]">
+                      <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden py-2">
+                         <div className="px-4 py-3 border-b border-slate-50 mb-1">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Account</p>
+                            <p className="text-sm font-bold text-slate-800 truncate">{user.email || user.displayName}</p>
+                         </div>
+                         
+                         <DropdownLink href={user.role === 'member' ? '/dashboard/member' : '/dashboard/group-admin'} icon={<LayoutDashboard size={16} />}>
+                            My Dashboard
+                         </DropdownLink>
+                         
+                         <DropdownLink href="/dashboard/settings" icon={<Settings size={16} />}>
+                            Account Settings
+                         </DropdownLink>
+                         
+                         <div className="h-px bg-slate-50 my-2 mx-4"></div>
+                         
+                         <button 
+                            onClick={handleLogout} 
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-rose-50 text-sm font-bold text-rose-600 transition-colors"
+                         >
                             <LogOut size={16} /> Logout
                          </button>
                       </div>
@@ -108,7 +128,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-4">
             {user && (
-               <div className="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center text-rose-600">
+               <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
                   <User size={18} />
                </div>
             )}
@@ -127,7 +147,7 @@ export default function Navbar() {
         <div className="md:hidden bg-white border-t p-6 space-y-4 animate-in slide-in-from-top duration-300">
           <MobileNavLink href="/search" onClick={closeMenu}>Browse Profiles</MobileNavLink>
           <MobileNavLink href="/communities" onClick={closeMenu}>Communities</MobileNavLink>
-          <MobileNavLink href="/success-stories" onClick={closeMenu}>Success Stories</MobileNavLink>
+          <MobileNavLink href="/success-stories" onClick={closeMenu}>Our Mission</MobileNavLink>
           <MobileNavLink href="/support" onClick={closeMenu}>Help & FAQ</MobileNavLink>
 
           <div className="pt-6 border-t border-slate-100">
@@ -180,11 +200,20 @@ function NavLink({ href, children }: { href: string, children: React.ReactNode }
   return (
     <Link 
       href={href} 
-      className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-indigo-600 rounded-xl hover:bg-indigo-50/50 transition-all"
+      className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-indigo-600 rounded-xl hover:bg-indigo-50/50 transition-all font-sans"
     >
       {children}
     </Link>
   )
+}
+
+function DropdownLink({ href, icon, children }: { href: string, icon: React.ReactNode, children: React.ReactNode }) {
+   return (
+      <Link href={href} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-sm font-bold text-slate-700 transition-colors">
+         <span className="text-slate-400">{icon}</span>
+         {children}
+      </Link>
+   );
 }
 
 function MobileNavLink({ href, onClick, children }: { href: string, onClick: () => void, children: React.ReactNode }) {
