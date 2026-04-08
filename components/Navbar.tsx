@@ -5,6 +5,7 @@ import { Heart, Menu, X, User, LogOut, ChevronDown, Bell, LayoutDashboard, Setti
 import { useAuth } from '../context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import NotificationBell from './NotificationBell'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -73,10 +74,7 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-6">
-                <button className="text-slate-400 hover:text-indigo-600 transition-colors relative">
-                   <Bell size={20} />
-                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
-                </button>
+                <NotificationBell />
                 
                 {/* User Dropdown Group */}
                 <div className="flex items-center gap-3 pl-4 border-l border-slate-100 group relative">

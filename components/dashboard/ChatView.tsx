@@ -4,6 +4,7 @@ import { db } from '@/app/lib/firebase';
 import { collection, query, where, getDocs, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { Loader2, MessageCircle, Send, User, ArrowLeft } from 'lucide-react';
+import { sendNotification } from '@/app/lib/notification-service';
 import Image from 'next/image';
 
 interface Connection {
@@ -118,6 +119,18 @@ export default function ChatView() {
         senderId: user.uid,
         createdAt: serverTimestamp()
       });
+
+      // Send Notification to Recipient
+      await sendNotification({
+        recipientId: selectedChat.otherId,
+        senderId: user.uid,
+        senderName: user.displayName || 'A Member',
+        type: 'message',
+        title: 'New Message',
+        message: newMessage.length > 50 ? newMessage.substring(0, 47) + '...' : newMessage,
+        link: '/dashboard/member?view=chats'
+      });
+
       setNewMessage('');
     } catch (err) {
       console.error(err);

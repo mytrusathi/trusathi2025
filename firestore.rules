@@ -60,5 +60,12 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants;
       allow create: if request.auth != null && request.auth.uid == request.resource.data.senderId;
     }
+
+    // NEW: Notifications
+    match /notifications/{notifId} {
+      allow read, update: if request.auth != null && request.auth.uid == resource.data.recipientId;
+      allow create: if request.auth != null && request.resource.data.senderId == request.auth.uid;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.recipientId;
+    }
   }
 }

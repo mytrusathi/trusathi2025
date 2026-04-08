@@ -43,6 +43,7 @@ const FIELD_ALIASES: Record<keyof Partial<Profile>, string[]> = {
   updatedAt: [],
   isPublic: [],
   profileNo: [],
+  revealContactOnInterest: [],
 };
 
 const normalizeText = (value: string) =>

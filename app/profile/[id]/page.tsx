@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { 
   MapPin, Briefcase, Calendar, Ruler, Heart, 
   Users, GraduationCap, Banknote, Building2, 
-  Baby, Home, User, Download, Printer
+  Baby, Home, User, Download, Printer, Shield
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import ProfileActions, { FavoriteButton } from '@/components/ProfileActions';

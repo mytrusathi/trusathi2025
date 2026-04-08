@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { db } from '@/app/lib/firebase';
 import { doc, getDoc, setDoc, addDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { Profile } from '@/types/profile';
+import { sendNotification } from '@/app/lib/notification-service';
 
 interface ProfileActionsProps {
   profile: Profile;
@@ -71,6 +72,18 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
         status: 'pending',
         createdAt: new Date().toISOString()
       });
+
+      // Send Notification
+      await sendNotification({
+        recipientId: receiverId,
+        senderId: user.uid,
+        senderName: user.displayName || 'A Member',
+        type: 'interest',
+        title: 'New Interest Received',
+        message: `${user.displayName || 'A Member'} has expressed interest in profile ${profile.profileNo}.`,
+        link: '/dashboard/member?view=received-interests'
+      });
+
       setInterestSent(true);
     } catch (error) {
       console.error("Interest failed", error);
@@ -222,6 +235,25 @@ export function FavoriteButton({ profileId }: { profileId?: string }) {
             profileId,
             createdAt: new Date().toISOString()
           });
+
+          // Notify the profile owner (if it's not the user themselves)
+          // We need to fetch the profile to get the createdBy
+          const profSnap = await getDoc(doc(db, 'profiles', profileId));
+          if (profSnap.exists()) {
+            const profData = profSnap.data();
+            if (profData.createdBy !== user.uid) {
+              await sendNotification({
+                recipientId: profData.createdBy,
+                senderId: user.uid,
+                senderName: user.displayName || 'A Member',
+                type: 'favorite',
+                title: 'Profile Favorited',
+                message: `Someone has added profile ${profData.profileNo || 'your profile'} to their favorites.`,
+                link: user.role === 'member' ? '/dashboard/member?view=favorites' : '/dashboard/group-admin'
+              });
+            }
+          }
+
           setIsFav(true);
         }
       } catch (error) {
