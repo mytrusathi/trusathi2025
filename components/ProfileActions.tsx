@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Check } from 'lucide-react';
+import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Check, Phone, Mail, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { db } from '@/app/lib/firebase';
@@ -21,14 +21,18 @@ export default function ProfileActions({ profile }: ProfileActionsProps) {
   useEffect(() => {
     const checkInterest = async () => {
       if (!user || !profile.id) return;
-      const q = query(
-        collection(db, 'interests'), 
-        where('senderId', '==', user.uid), 
-        where('profileId', '==', profile.id)
-      );
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        setInterestSent(true);
+      try {
+        const q = query(
+          collection(db, 'interests'), 
+          where('senderId', '==', user.uid), 
+          where('profileId', '==', profile.id)
+        );
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          setInterestSent(true);
+        }
+      } catch (err) {
+        console.error("Check interest error:", err);
       }
     };
     checkInterest();
@@ -50,12 +54,15 @@ export default function ProfileActions({ profile }: ProfileActionsProps) {
 
     setLoading(true);
     try {
-      if (!profile.id || !profile.createdBy) throw new Error("Invalid profile data");
+      if (!profile.id) throw new Error("Invalid profile ID");
+
+      // Use a fallback for createdBy if missing (legacy profiles)
+      const receiverId = profile.createdBy || 'system_admin';
 
       await addDoc(collection(db, 'interests'), {
         senderId: user.uid,
         senderName: user.displayName || 'Anonymous User',
-        receiverId: profile.createdBy,
+        receiverId: receiverId,
         profileId: profile.id,
         profileNo: profile.profileNo || 'Unknown',
         profileName: profile.name,
@@ -66,7 +73,7 @@ export default function ProfileActions({ profile }: ProfileActionsProps) {
       setInterestSent(true);
     } catch (error) {
       console.error("Interest failed", error);
-      alert("Something went wrong. Please try again.");
+      alert("Registration Error: Please ensure your profile is fully set up. If the error persists, contact support.");
     } finally {
       setLoading(false);
     }
@@ -86,38 +93,69 @@ export default function ProfileActions({ profile }: ProfileActionsProps) {
       </div>
 
       {/* Main Connect Action Card */}
-      <div className="bg-indigo-600 rounded-3xl p-8 no-print shadow-xl shadow-indigo-100 relative overflow-hidden group">
+      <div className={`rounded-3xl p-8 no-print shadow-xl transition-all relative overflow-hidden group ${
+        interestSent ? 'bg-emerald-600 shadow-emerald-100' : 'bg-indigo-600 shadow-indigo-100'
+      }`}>
           <ShieldCheck size={120} className="absolute -bottom-6 -right-6 text-white/10 -rotate-12 transition-transform group-hover:rotate-0 duration-700" />
           
           <div className="relative z-10 space-y-6">
             <div className="space-y-2">
-              <h4 className="text-white font-black text-xl leading-tight">Interest in this Profile?</h4>
-              <p className="text-indigo-100 text-sm font-medium leading-relaxed opacity-90">
-                 {user 
-                   ? (interestSent ? "You have expressed interest in this profile." : "Sending an interest is the first step towards a meaningful connection.") 
-                   : "Log in to view contact details or express interest in this verified match."}
+              <h4 className="text-white font-black text-xl leading-tight">
+                {interestSent ? "Interest Expressed!" : "Interest in this Profile?"}
+              </h4>
+              <p className="text-white/80 text-sm font-medium leading-relaxed">
+                 {interestSent 
+                   ? "As a verified member, you can now see the contact details below." 
+                   : "Sending an interest reveals the contact information immediately."}
               </p>
             </div>
 
-            <button 
-              onClick={handleConnect}
-              disabled={loading || interestSent}
-              className={`w-full font-black py-4 px-6 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 ${
-                interestSent 
-                ? "bg-emerald-500 text-white cursor-default shadow-emerald-900/20" 
-                : "bg-white text-indigo-900 hover:bg-indigo-50"
-              }`}
-            >
-                {loading ? <Loader2 className="animate-spin" /> : (
-                  <>
-                    {interestSent ? "Interest Sent" : (user ? "Send Interest Now" : "Login to Connect")} 
-                    {interestSent ? <Check size={18} /> : <ExternalLink size={18} />}
-                  </>
-                )}
-            </button>
+            {!interestSent ? (
+              <button 
+                onClick={handleConnect}
+                disabled={loading}
+                className="w-full font-black py-4 px-6 bg-white text-indigo-900 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 hover:bg-indigo-50"
+              >
+                  {loading ? <Loader2 className="animate-spin" /> : (
+                    <>
+                      {user ? "Send Interest Now" : "Login to Connect"} 
+                      <ExternalLink size={18} />
+                    </>
+                  )}
+              </button>
+            ) : (
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 space-y-4 animate-in zoom-in-95 duration-500">
+                 <div className="flex items-center gap-3 text-white">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                       <Phone size={18} />
+                    </div>
+                    <div>
+                       <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Contact Number</p>
+                       <p className="font-bold text-lg">{profile.contact || 'Contact Admin'}</p>
+                    </div>
+                 </div>
+                 
+                 <div className="pt-4 flex gap-2">
+                    <a 
+                      href={`https://wa.me/${profile.contact?.replace(/\D/g, '')}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all"
+                    >
+                       <MessageSquare size={14} /> WhatsApp
+                    </a>
+                    <button 
+                      onClick={() => router.push('/dashboard/member?view=chats')}
+                      className="flex-1 bg-white/20 hover:bg-white/30 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all"
+                    >
+                       <Check size={14} /> Logged
+                    </button>
+                 </div>
+              </div>
+            )}
             
-            <p className="text-center text-[10px] text-indigo-200 font-bold uppercase tracking-widest leading-none">
-                {user ? "Verified Member" : "Auth Required"}
+            <p className="text-center text-[10px] text-white/40 font-bold uppercase tracking-widest leading-none">
+                {interestSent ? "Direct Connection Active" : (user ? "Verified Member" : "Auth Required")}
             </p>
           </div>
       </div>
@@ -133,9 +171,13 @@ export function FavoriteButton({ profileId }: { profileId?: string }) {
     useEffect(() => {
       const checkFav = async () => {
         if (!user || !profileId) return;
-        const favRef = doc(db, 'favorites', `${user.uid}_${profileId}`);
-        const snap = await getDoc(favRef);
-        setIsFav(snap.exists());
+        try {
+          const favRef = doc(db, 'favorites', `${user.uid}_${profileId}`);
+          const snap = await getDoc(favRef);
+          setIsFav(snap.exists());
+        } catch (err) {
+          console.error("Check fav error:", err);
+        }
       };
       checkFav();
     }, [user, profileId]);
@@ -163,6 +205,7 @@ export function FavoriteButton({ profileId }: { profileId?: string }) {
         }
       } catch (error) {
         console.error("Favorite toggle failed", error);
+        alert("Error updating favorites. Please try again.");
       } finally {
         setLoading(false);
       }
