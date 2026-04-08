@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from 'react';
 import { db } from '../../app/lib/firebase';
-import { collection, query, where, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc, updateDoc, limit } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
 import { Profile } from '../../types/profile';
 import { Loader2, Plus, Search, FilterX, SlidersHorizontal, Users, Eye, EyeOff } from 'lucide-react';
@@ -26,7 +26,7 @@ const ProfileList = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const q = query(collection(db, 'profiles'), where('createdBy', '==', user.uid));
+      const q = query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(500));
       const querySnapshot = await getDocs(q);
       const fetchedProfiles: Profile[] = [];
       querySnapshot.forEach((doc) => {

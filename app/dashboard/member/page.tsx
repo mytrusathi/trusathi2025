@@ -2,7 +2,7 @@
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { db } from '../../lib/firebase';
-import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc, limit } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { Profile } from '@/types/profile';
 import ProfileCard from '@/components/group-admin/ProfileCard'; // Named import not needed, it is default
@@ -30,7 +30,7 @@ function MemberDashboardContent() {
     if (!user) return;
     setLoading(true);
     try {
-      const q = query(collection(db, 'profiles'), where('createdBy', '==', user.uid));
+      const q = query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(500));
       const querySnapshot = await getDocs(q);
       const fetched: Profile[] = [];
       querySnapshot.forEach((doc) => {

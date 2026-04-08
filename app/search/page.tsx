@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { db } from '../lib/firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, limit, orderBy } from 'firebase/firestore';
 import { Profile } from '@/types/profile';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -55,7 +55,13 @@ function SearchResults() {
       setLoading(true);
       try {
         const profilesRef = collection(db, 'profiles');
-        const querySnapshot = await getDocs(query(profilesRef, where('isPublic', '==', true), where('gender', '==', role === 'Bride' ? 'female' : 'male')));
+        const querySnapshot = await getDocs(query(
+          profilesRef, 
+          where('isPublic', '==', true), 
+          where('gender', '==', role === 'Bride' ? 'female' : 'male'),
+          
+          limit(500)
+        ));
 
         const fetchedProfiles: Profile[] = [];
 
