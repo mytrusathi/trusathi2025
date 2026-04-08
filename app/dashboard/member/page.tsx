@@ -1,5 +1,6 @@
 "use client";
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { db } from '../../lib/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
@@ -201,8 +202,10 @@ function MemberDashboardContent() {
 
 export default function MemberDashboard() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
-      <MemberDashboardContent />
-    </Suspense>
+    <ProtectedRoute allowedRoles={['member', 'group-admin', 'super-admin']}>
+      <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+        <MemberDashboardContent />
+      </Suspense>
+    </ProtectedRoute>
   );
 }

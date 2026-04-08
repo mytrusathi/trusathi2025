@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { db } from '../lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Profile } from '@/types/profile';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -55,19 +55,15 @@ function SearchResults() {
       setLoading(true);
       try {
         const profilesRef = collection(db, 'profiles');
-        const querySnapshot = await getDocs(profilesRef);
+        const querySnapshot = await getDocs(query(profilesRef, where('isPublic', '==', true), where('gender', '==', role === 'Bride' ? 'female' : 'male')));
 
         const fetchedProfiles: Profile[] = [];
 
         querySnapshot.forEach((doc) => {
           const data = doc.data() as Profile;
-          if (data.isPublic === false) {
-            return;
-          }
+          // We removed the local isPublic and gender matching block
+          // since Firebase natively pre-filters them over the network.
 
-          if (!matchesRole(data.gender, role)) {
-            return;
-          }
 
           if (community !== 'All Communities') {
             const religion = data.religion || '';

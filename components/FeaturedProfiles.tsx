@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { db } from '../app/lib/firebase'
-import { collection, query, limit, getDocs } from 'firebase/firestore'
+import { collection, query, limit, getDocs, orderBy } from 'firebase/firestore'
 import { Profile } from '../types/profile'
 import PublicProfileCard from './PublicProfileCard' // Import the new card
 import { ChevronRight, Loader2 } from 'lucide-react'
@@ -17,7 +17,7 @@ export default function FeaturedProfiles() {
       try {
         // Fetch last 3 created profiles
         // Note: You need an index for 'createdAt' descending in Firestore if this warns you
-        const q = query(collection(db, 'profiles'), limit(3)) 
+        const q = query(collection(db, 'profiles'), orderBy('createdAt', 'desc'), limit(3)) 
         const snap = await getDocs(q)
         
         const fetched = snap.docs.map(doc => ({

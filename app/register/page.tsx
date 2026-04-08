@@ -210,11 +210,11 @@ const RegisterPage = () => {
             />
             <label htmlFor="terms" className="text-sm text-slate-600 cursor-pointer">
               I agree to the{' '}
-              <Link href="/terms" target="_blank" className="text-rose-600 font-medium hover:underline">
+              <Link href="/terms" target="_blank" rel="noopener noreferrer" className="text-rose-600 font-medium hover:underline">
                 Terms and Conditions
               </Link>
               {' '}and{' '}
-              <Link href="/privacy" target="_blank" className="text-rose-600 font-medium hover:underline">
+              <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="text-rose-600 font-medium hover:underline">
                 Privacy Policy
               </Link>.
             </label>

@@ -6,6 +6,7 @@ import { LogOut, LayoutDashboard, Users, Settings, KeyRound, Globe } from 'lucid
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface Props {
   children: React.ReactNode;
@@ -18,6 +19,12 @@ const GroupAdminLayoutContent = ({ children }: Props) => {
   const isPasswordView = activeView === 'change-password';
   const isCommunityLinkView = activeView === 'community-link';
   const isDashboardView = !isPasswordView && !isCommunityLinkView;
+
+  const NAV_LINKS = [
+    { href: '/dashboard/group-admin', icon: LayoutDashboard, label: 'My Profiles', active: isDashboardView },
+    { href: '/dashboard/group-admin?view=community-link', icon: Globe, label: 'Community Link', active: isCommunityLinkView },
+    { href: '/dashboard/group-admin?view=change-password', icon: KeyRound, label: 'Change Your Password', active: isPasswordView },
+  ];
 
   const handleLogout = async () => {
     try {
@@ -46,33 +53,18 @@ const GroupAdminLayoutContent = ({ children }: Props) => {
         </div>
         
         <nav className="flex-1 p-4 space-y-2">
-          <Link
-            href="/dashboard/group-admin"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-              isDashboardView ? 'bg-rose-50 text-rose-700' : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <LayoutDashboard size={20} />
-            My Profiles
-          </Link>
-          <Link
-            href="/dashboard/group-admin?view=community-link"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-              isCommunityLinkView ? 'bg-rose-50 text-rose-700' : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <Globe size={20} />
-            Community Link
-          </Link>
-          <Link
-            href="/dashboard/group-admin?view=change-password"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-              isPasswordView ? 'bg-rose-50 text-rose-700' : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <KeyRound size={20} />
-            Change Your Password
-          </Link>
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                link.active ? 'bg-rose-50 text-rose-700' : 'text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <link.icon size={20} />
+              {link.label}
+            </Link>
+          ))}
           <div className="px-4 py-3 text-slate-400 flex items-center gap-3 cursor-not-allowed">
             <Users size={20} />
             <span className="text-slate-400">Team (Coming Soon)</span>
@@ -110,15 +102,11 @@ const GroupAdminLayoutContent = ({ children }: Props) => {
           <p className="text-xs text-slate-500">{user?.displayName || user?.email || 'Group Admin'}</p>
           <p className="text-sm font-semibold text-rose-600">{user?.groupName || 'No Group Name Set'}</p>
           <div className="mt-3 flex items-center gap-2">
-            <Link href="/dashboard/group-admin" className={`px-3 py-1.5 text-xs rounded-full font-semibold ${isDashboardView ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>
-              Profiles
-            </Link>
-            <Link href="/dashboard/group-admin?view=community-link" className={`px-3 py-1.5 text-xs rounded-full font-semibold ${isCommunityLinkView ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>
-              Community Link
-            </Link>
-            <Link href="/dashboard/group-admin?view=change-password" className={`px-3 py-1.5 text-xs rounded-full font-semibold ${isPasswordView ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>
-              Password
-            </Link>
+            {NAV_LINKS.map((link) => (
+              <Link key={link.href} href={link.href} className={`px-3 py-1.5 text-xs rounded-full font-semibold ${link.active ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>
+                {link.label === 'Change Your Password' ? 'Password' : link.label === 'My Profiles' ? 'Profiles' : link.label}
+              </Link>
+            ))}
           </div>
         </div>
 
@@ -131,9 +119,11 @@ const GroupAdminLayoutContent = ({ children }: Props) => {
 
 const GroupAdminLayout = ({ children }: Props) => {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
-      <GroupAdminLayoutContent>{children}</GroupAdminLayoutContent>
-    </Suspense>
+    <ProtectedRoute requireAdmin>
+      <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+        <GroupAdminLayoutContent>{children}</GroupAdminLayoutContent>
+      </Suspense>
+    </ProtectedRoute>
   );
 };
 
