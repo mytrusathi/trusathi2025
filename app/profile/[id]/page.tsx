@@ -143,7 +143,7 @@ function ProfileView({
              )}
              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
              
-             <FavoriteButton profileId={profile.id} />
+             <FavoriteButton profile={profile} />
              
              <div className="absolute bottom-8 left-8 right-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="flex items-center gap-6">

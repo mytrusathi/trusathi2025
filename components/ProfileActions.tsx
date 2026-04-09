@@ -61,6 +61,12 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
       // Use a fallback for createdBy if missing (legacy profiles)
       const receiverId = profile.createdBy || 'system_admin';
 
+      // Prevent self-connect
+      if (user.uid === profile.createdBy) {
+        alert("You cannot send an interest to your own profile.");
+        return;
+      }
+
       await addDoc(collection(db, 'interests'), {
         senderId: user.uid,
         senderName: user.displayName || 'Anonymous User',
@@ -86,11 +92,11 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
 
       setInterestSent(true);
     } catch (error: any) {
-      console.error("Interest failed", error);
+      console.error("Interest failed:", error);
       if (error.code === 'permission-denied') {
-        alert("Permission Denied: Please ensure your account has been approved and you have filled in your name in settings.");
+        alert("Permission Denied: Your account may need approval or completion. Please check your dashboard.");
       } else {
-        alert("Connection Error: Could not send interest. Our team has been notified. Please try again later.");
+        alert(`Error: ${error.message || 'Could not send interest'}`);
       }
     } finally {
       setLoading(false);
@@ -201,10 +207,11 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
   );
 }
 
-export function FavoriteButton({ profileId }: { profileId?: string }) {
+export function FavoriteButton({ profile }: { profile: Profile }) {
     const { user } = useAuth();
     const [isFav, setIsFav] = useState(false);
     const [loading, setLoading] = useState(false);
+    const profileId = profile.id;
 
     useEffect(() => {
       const checkFav = async () => {
@@ -227,6 +234,12 @@ export function FavoriteButton({ profileId }: { profileId?: string }) {
       }
       if (!profileId) return;
 
+      // Prevent self-favorite
+      if (user.uid === profile.createdBy) {
+        alert("You cannot add your own profile to favorites.");
+        return;
+      }
+
       setLoading(true);
       const favRef = doc(db, 'favorites', `${user.uid}_${profileId}`);
       try {
@@ -234,41 +247,40 @@ export function FavoriteButton({ profileId }: { profileId?: string }) {
           await deleteDoc(favRef);
           setIsFav(false);
         } else {
-          await setDoc(favRef, {
+          const favoriteData = {
             userId: user.uid,
             profileId,
+            profileNo: profile.profileNo || '',
+            profileName: profile.name || '',
             createdAt: new Date().toISOString()
-          });
+          };
 
+          await setDoc(favRef, favoriteData);
           setIsFav(true);
 
           // Notify owner (Background - don't block UI if it fails)
           try {
-             const profSnap = await getDoc(doc(db, 'profiles', profileId));
-             if (profSnap.exists()) {
-                const profData = profSnap.data();
-                if (profData.createdBy && profData.createdBy !== user.uid) {
-                   await sendNotification({
-                      recipientId: profData.createdBy,
-                      senderId: user.uid,
-                      senderName: user.displayName || 'A Member',
-                      type: 'favorite',
-                      title: 'Profile Favorited',
-                      message: `Someone has added profile ${profData.profileNo || 'your profile'} to their favorites.`,
-                      link: user.role === 'member' ? '/dashboard/member?view=favorites' : '/dashboard/group-admin'
-                   });
-                }
+             if (profile.createdBy && profile.createdBy !== user.uid) {
+                await sendNotification({
+                   recipientId: profile.createdBy,
+                   senderId: user.uid,
+                   senderName: user.displayName || 'A Member',
+                   type: 'favorite',
+                   title: 'Profile Favorited',
+                   message: `Someone has added profile ${profile.profileNo || 'your profile'} to their favorites.`,
+                   link: user.role === 'member' ? '/dashboard/member?view=favorites' : '/dashboard/group-admin'
+                });
              }
           } catch (notifErr) {
              console.warn("Notification for favorite failed:", notifErr);
           }
         }
       } catch (error: any) {
-        console.error("Favorite toggle failed", error);
+        console.error("Favorite toggle failed:", error);
         if (error.code === 'permission-denied') {
-           alert("Permission denied. Check your dashboard to ensure your member registration is complete.");
+           alert("Permission Denied: Your account may need approval or completion. Please check your dashboard.");
         } else {
-           alert("Error updating favorites. Please try again.");
+           alert(`Error: ${error.message || 'Could not update favorites'}`);
         }
       } finally {
         setLoading(false);

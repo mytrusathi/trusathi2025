@@ -4,6 +4,7 @@ import { Profile } from '../types/profile';
 import { MapPin, Briefcase, User, Calendar, ShieldCheck, Heart, ArrowUpRight, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { FavoriteButton } from './ProfileActions';
 
 interface Props {
   profile: Profile;
@@ -62,12 +63,7 @@ const PublicProfileCard = ({ profile }: Props) => {
          )}
       </div>
 
-      <button 
-        onClick={(e) => { e.preventDefault(); alert('Please visit the full profile to mark as favorite!'); }}
-        className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-rose-500 hover:text-white transition-all shadow-lg active:scale-90"
-      >
-         <Heart size={18} />
-      </button>
+      <FavoriteButton profile={profile} />
 
       {/* Image Section */}
       <div className="h-80 bg-slate-100 relative overflow-hidden">
