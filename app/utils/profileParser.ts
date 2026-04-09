@@ -44,6 +44,9 @@ const FIELD_ALIASES: Record<keyof Partial<Profile>, string[]> = {
   isPublic: [],
   profileNo: [],
   revealContactOnInterest: [],
+  heightValue: [],
+  occupationCategory: ['occupation category', 'job type', 'work type'],
+  privacyLevel: [],
 };
 
 const normalizeText = (value: string) =>

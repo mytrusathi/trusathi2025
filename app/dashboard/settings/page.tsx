@@ -7,7 +7,10 @@ import {
 import { deleteUserAccount } from '@/app/lib/account-service';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
-import { auth } from '@/app/lib/firebase';
+import { auth, db } from '@/app/lib/firebase';
+import { useAuth } from '@/context/AuthContext';
+import { useState } from 'react';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export default function SettingsPage() {
   const { user } = useAuth();

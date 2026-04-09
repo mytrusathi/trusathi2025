@@ -131,6 +131,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     try {
       // Convert height to numeric value for filtering
       const heightValue = heightToCm(formData.height || '');
+      let imageUrl = formData.imageUrl;
 
       if (imageFile) {
         const storageRef = ref(storage, `profiles/${user.uid}/${Date.now()}_${imageFile.name}`);
