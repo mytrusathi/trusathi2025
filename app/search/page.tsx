@@ -22,6 +22,8 @@ function SearchResults() {
   const minAge = searchParams.get('minAge') ? parseInt(searchParams.get('minAge')!, 10) : 18;
   const maxAge = searchParams.get('maxAge') ? parseInt(searchParams.get('maxAge')!, 10) : 60;
   const community = searchParams.get('community') || 'All Communities';
+  const occupation = searchParams.get('occupation') || 'All';
+  const education = searchParams.get('education') || '';
 
   const getAge = (dob?: string) => {
     if (!dob) return 0;
@@ -53,10 +55,13 @@ function SearchResults() {
         querySnapshot.forEach((doc) => {
           const data = doc.data() as Profile;
           const profileAge = getAge(data.dob);
+          
           const matchesAge = profileAge >= minAge && profileAge <= maxAge;
           const matchesCommunity = community === 'All Communities' || data.religion === community;
+          const matchesOccupation = occupation === 'All' || data.occupationCategory === occupation;
+          const matchesEducation = !education || (data.education || '').toLowerCase().includes(education.toLowerCase());
 
-          if (matchesAge && matchesCommunity) {
+          if (matchesAge && matchesCommunity && matchesOccupation && matchesEducation) {
             fetchedProfiles.push({ ...data, id: doc.id });
           }
         });
@@ -70,7 +75,7 @@ function SearchResults() {
     };
 
     fetchProfiles();
-  }, [role, minAge, maxAge, community]);
+  }, [role, minAge, maxAge, community, occupation, education]);
 
   const cities = Array.from(new Set(profiles.map((p) => p.city).filter(Boolean))).sort((a, b) => a.localeCompare(b));
 
@@ -199,6 +204,8 @@ function SearchPageContent() {
   const minAge = searchParams.get('minAge') ? parseInt(searchParams.get('minAge')!, 10) : 18;
   const maxAge = searchParams.get('maxAge') ? parseInt(searchParams.get('maxAge')!, 10) : 60;
   const community = searchParams.get('community') || 'All Communities';
+  const occupation = searchParams.get('occupation') || 'All';
+  const education = searchParams.get('education') || '';
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50">
@@ -225,6 +232,8 @@ function SearchPageContent() {
                    ageMin: String(minAge),
                    ageMax: String(maxAge),
                    community,
+                   occupation,
+                   education,
                  }}
                />
             </div>

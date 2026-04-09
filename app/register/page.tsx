@@ -56,9 +56,9 @@ const RegisterPage = () => {
       });
 
       if (role === 'group-admin') {
-        router.push('/register/pending');
+        router.push('/pending-approval');
       } else {
-        router.push('/dashboard/member');
+        router.push('/register/success');
       }
       
     } catch (err: unknown) {

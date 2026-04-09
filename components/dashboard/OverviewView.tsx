@@ -11,6 +11,7 @@ import { db } from '@/app/lib/firebase';
 import { collection, query, where, getDoc, getDocs, onSnapshot, limit, orderBy, doc } from 'firebase/firestore';
 import Link from 'next/link';
 import CompletenessMeter from './CompletenessMeter';
+import MatchRecommendations from './MatchRecommendations';
 import { Profile } from '@/types/profile';
 
 export default function OverviewView() {
@@ -157,6 +158,8 @@ export default function OverviewView() {
             isAlert={stats.unreadNotifs > 0}
          />
       </div>
+
+      <MatchRecommendations />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
          {/* Profile Focus */}

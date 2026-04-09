@@ -45,6 +45,11 @@ export interface Profile {
   createdAt: string;
   updatedAt?: string;
   isPublic?: boolean;
-  profileNo?: string; // Human readable ID like TS-1001
+  profileNo?: string; 
   revealContactOnInterest?: boolean;
+  
+  // New Fields for Advanced Features
+  heightValue?: number; // Numeric height in cm for easy filtering
+  occupationCategory?: 'Govt' | 'Private' | 'Business' | 'Professional' | 'Self-Employed' | 'Other';
+  privacyLevel?: 'Public' | 'MembersOnly' | 'Private'; 
 }

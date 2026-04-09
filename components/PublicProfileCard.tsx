@@ -1,15 +1,22 @@
 import React from 'react';
 import Image from 'next/image';
 import { Profile } from '../types/profile';
-import { MapPin, Briefcase, User, Calendar, ShieldCheck, Heart, ArrowUpRight } from 'lucide-react';
+import { MapPin, Briefcase, User, Calendar, ShieldCheck, Heart, ArrowUpRight, Lock } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
 interface Props {
   profile: Profile;
 }
 
 const PublicProfileCard = ({ profile }: Props) => {
+  const { user } = useAuth();
   
+  // Privacy Logic: Mask if not public and user not authorized
+  const isOwner = user?.uid === profile.createdBy;
+  const isMasked = !isOwner && profile.privacyLevel === 'Private';
+  const isMembersOnly = profile.privacyLevel === 'MembersOnly' && !user;
+
   // Helper: Calculate Age from DOB
   const getAge = (dob?: string) => {
     if (!dob) return 'N/A';
@@ -24,18 +31,32 @@ const PublicProfileCard = ({ profile }: Props) => {
   };
 
   const age = getAge(profile.dob);
+  const displayName = isMasked ? (profile.name.split(' ')[0] + ' ***') : profile.name;
+
+  if (isMembersOnly) {
+    return (
+      <div className="bg-white rounded-[2rem] border border-slate-100 p-8 flex flex-col items-center justify-center text-center space-y-4 shadow-sm">
+         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+            <Lock size={32} />
+         </div>
+         <h3 className="font-black text-slate-800 tracking-tight">Members Only</h3>
+         <p className="text-slate-500 text-xs">This profile is only visible to logged-in members of TruSathi.</p>
+         <Link href="/login" className="text-indigo-600 text-xs font-black uppercase tracking-widest hover:underline">Sign in to View</Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500 group h-full flex flex-col relative">
+    <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/30 transition-all duration-500 group h-full flex flex-col relative">
       
       {/* Premium Badge & Profile No */}
       <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
-         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm">
+         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm border border-slate-100/50">
             <ShieldCheck size={14} className="text-indigo-600" />
             <span className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Verified</span>
          </div>
          {profile.profileNo && (
-            <div className="px-3 py-1 bg-slate-900/40 backdrop-blur-md text-white rounded-full text-[9px] font-black tracking-widest uppercase border border-white/10 w-fit">
+            <div className="px-3 py-1 bg-slate-900/60 backdrop-blur-md text-white rounded-full text-[9px] font-black tracking-widest uppercase border border-white/10 w-fit">
                {profile.profileNo}
             </div>
          )}
@@ -43,7 +64,7 @@ const PublicProfileCard = ({ profile }: Props) => {
 
       <button 
         onClick={(e) => { e.preventDefault(); alert('Please visit the full profile to mark as favorite!'); }}
-        className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-rose-500 hover:text-white transition-all shadow-lg"
+        className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-rose-500 hover:text-white transition-all shadow-lg active:scale-90"
       >
          <Heart size={18} />
       </button>
@@ -53,24 +74,32 @@ const PublicProfileCard = ({ profile }: Props) => {
         {profile.imageUrl ? (
           <Image
             src={profile.imageUrl}
-            alt={profile.name}
+            alt={displayName}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover group-hover:scale-110 transition-transform duration-700"
+            className={`object-cover group-hover:scale-110 transition-transform duration-700 ${isMasked ? 'blur-xl grayscale' : ''}`}
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-slate-200 bg-slate-50">
             <User size={80} strokeWidth={1} />
           </div>
         )}
+
+        {isMasked && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+             <div className="px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/20 text-white text-[10px] font-black uppercase tracking-widest">
+                Photo Hidden
+             </div>
+          </div>
+        )}
         
         {/* Elegant Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
         
         {/* Text Overlay */}
         <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
           <div className="flex items-center justify-between">
-            <h3 className="font-black text-2xl text-white tracking-tight truncate">{profile.name}</h3>
+            <h3 className="font-black text-2xl text-white tracking-tight truncate">{displayName}</h3>
             <div className="flex items-center gap-1.5 bg-rose-500 text-white px-2 py-0.5 rounded-lg text-xs font-bold shadow-lg shadow-rose-900/20">
                {age} Yrs
             </div>
@@ -97,7 +126,7 @@ const PublicProfileCard = ({ profile }: Props) => {
                   <p className="text-slate-800 font-bold leading-tight truncate">
                      {profile.profession || 'Not Specified'}
                   </p>
-                  {profile.company && <p className="text-slate-500 text-xs truncate mt-0.5">at {profile.company}</p>}
+                  {profile.occupationCategory && <p className="text-indigo-600 text-[10px] font-black uppercase tracking-wider">{profile.occupationCategory}</p>}
                </div>
            </div>
 

@@ -1,50 +1,71 @@
 "use client";
-import React, { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { db } from '@/app/lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
 import { 
   Settings, User, Shield, CheckCircle2, 
-  AlertCircle, Save, Globe, EyeOff, Loader2 
+  AlertCircle, Save, Globe, EyeOff, Loader2, Trash2, TriangleAlert, X,
+  LogOut
 } from 'lucide-react';
+import { deleteUserAccount } from '@/app/lib/account-service';
+import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/app/lib/firebase';
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [groupName, setGroupName] = useState(user?.groupName || '');
-  const [isPublic, setIsPublic] = useState(user?.isApproved !== false); // fallback to something
-  // Wait, I should add a specific field for account visibility in the plan, I'll use 'isAccountPublic'
+  const [isPublic, setIsPublic] = useState(user?.isApproved !== false); 
   const [isAccountPublic, setIsAccountPublic] = useState(true); 
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  
+  // Deletion State
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteStep, setDeleteStep] = useState(1);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handleUpdate = async (e: React.FormEvent) => {
+    // ... same logic as before ...
     e.preventDefault();
     if (!user) return;
-    
     setLoading(true);
     setMessage(null);
-    
     try {
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, {
         displayName: displayName.trim(),
         groupName: groupName.trim(),
-        // We'll store account visibility preference here
         isAccountPublic: isAccountPublic,
         updatedAt: new Date().toISOString()
       });
-      
       setMessage({ type: 'success', text: 'Settings updated successfully!' });
-      // The AuthContext will pick up changes on next reload or we could manually refresh.
-      // Since it's a client component using useAuth, it should ideally update if AuthContext listens to doc changes.
-      // But standard Firebase onAuthStateChanged doesn't listen to Firestore doc changes.
     } catch (error) {
       console.error("Update settings error:", error);
       setMessage({ type: 'error', text: 'Failed to update settings. Please try again.' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true);
+    try {
+      await deleteUserAccount();
+      // On success, redirect to login or home
+      router.push('/login?deleted=true');
+    } catch (err: any) {
+      console.error("Deletion error:", err);
+      if (err.message === "REAUTH_REQUIRED") {
+        alert("For security reasons, please sign out and sign back in again before deleting your account.");
+        await signOut(auth);
+        window.location.href = '/login';
+      } else {
+        alert("Failed to delete account. Please contact support.");
+      }
+    } finally {
+      setDeleteLoading(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -147,13 +168,109 @@ export default function SettingsPage() {
            <button 
              type="submit" 
              disabled={loading}
-             className="px-8 py-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-2xl shadow-lg shadow-rose-200 transition-all flex items-center gap-3 disabled:opacity-70"
+             className="px-8 py-4 bg-slate-900 border border-slate-800 hover:bg-black text-white font-bold rounded-2xl shadow-lg transition-all flex items-center gap-3 disabled:opacity-70"
            >
              {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
              Save Settings
            </button>
         </div>
       </form>
+
+      {/* Danger Zone */}
+      <div className="pt-8 border-t border-slate-200">
+         <div className="bg-rose-50/50 border border-rose-100 rounded-[2.5rem] p-8 md:p-12 space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+               <div className="space-y-2">
+                  <h2 className="text-2xl font-black text-rose-900 flex items-center gap-3">
+                    <TriangleAlert className="text-rose-500" /> Danger Zone
+                  </h2>
+                  <p className="text-rose-700/70 font-medium">
+                    Permanently delete your account and all associated data. This action is irreversible.
+                  </p>
+               </div>
+               <button 
+                 onClick={() => setShowDeleteConfirm(true)}
+                 className="bg-white border-2 border-rose-200 text-rose-600 px-8 py-4 rounded-2xl font-black hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all shadow-sm"
+               >
+                 Delete My Account
+               </button>
+            </div>
+         </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !deleteLoading && setShowDeleteConfirm(false)}></div>
+          <div className="bg-white w-full max-w-lg rounded-[3rem] p-8 md:p-12 relative z-10 shadow-2xl animate-in zoom-in-95 duration-300">
+            <button 
+              onClick={() => setShowDeleteConfirm(false)}
+              className="absolute top-8 right-8 text-slate-400 hover:text-slate-600 transition-colors"
+              disabled={deleteLoading}
+            >
+               <X size={24} />
+            </button>
+
+            {deleteStep === 1 ? (
+              <div className="space-y-8">
+                <div className="w-20 h-20 bg-rose-100 text-rose-600 rounded-3xl flex items-center justify-center mx-auto">
+                   <Trash2 size={40} />
+                </div>
+                <div className="text-center space-y-3">
+                   <h3 className="text-3xl font-black text-slate-900">Are you absolutely sure?</h3>
+                   <p className="text-slate-500 font-medium leading-relaxed">
+                     This will permanently delete your profile, all photos, interests, messages, and account information. 
+                     <b> This action cannot be undone.</b>
+                   </p>
+                </div>
+                <div className="flex flex-col gap-3">
+                   <button 
+                     onClick={() => setDeleteStep(2)}
+                     className="w-full bg-rose-600 text-white font-black py-5 rounded-2xl hover:bg-rose-700 transition-all shadow-xl shadow-rose-200"
+                   >
+                     Yes, I understand the risks
+                   </button>
+                   <button 
+                     onClick={() => setShowDeleteConfirm(false)}
+                     className="w-full bg-slate-100 text-slate-600 font-black py-5 rounded-2xl hover:bg-slate-200 transition-all"
+                   >
+                     Cancel
+                   </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                <div className="w-20 h-20 bg-rose-600 text-white rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-rose-200">
+                   <TriangleAlert size={40} />
+                </div>
+                <div className="text-center space-y-3">
+                   <h3 className="text-3xl font-black text-slate-900">Final Confirmation</h3>
+                   <p className="text-slate-500 font-medium leading-relaxed">
+                     To confirm, please click the button below. You will be immediately signed out and all your data will be wiped from our systems.
+                   </p>
+                </div>
+                <div className="flex flex-col gap-3">
+                   <button 
+                     onClick={handleDeleteAccount}
+                     disabled={deleteLoading}
+                     className="w-full bg-rose-600 text-white font-black py-5 rounded-2xl hover:bg-rose-700 transition-all shadow-xl shadow-rose-200 flex items-center justify-center gap-3"
+                   >
+                     {deleteLoading ? <Loader2 className="animate-spin" /> : "Permanently Delete Everything"}
+                   </button>
+                   <button 
+                     onClick={() => setDeleteStep(1)}
+                     disabled={deleteLoading}
+                     className="w-full bg-slate-100 text-slate-600 font-black py-5 rounded-2xl hover:bg-slate-200 transition-all"
+                   >
+                     Go Back
+                   </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

@@ -58,7 +58,21 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     about: '',
     imageUrl: '',
     isPublic: true,
+    occupationCategory: 'Private',
+    privacyLevel: 'Public',
+    heightValue: 0,
   });
+
+  const heightToCm = (h: string) => {
+    if(!h) return 0;
+    const match = h.match(/(\d+)ft (\d+)in/);
+    if(match) {
+        const ft = parseInt(match[1]);
+        const inch = parseInt(match[2]);
+        return Math.round((ft * 30.48) + (inch * 2.54));
+    }
+    return 0;
+  };
 
   // --- HEIGHT GENERATOR ---
   // Generates options from 4ft 0in to 7ft 0in
@@ -115,7 +129,8 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
 
     setLoading(true);
     try {
-      let imageUrl = formData.imageUrl;
+      // Convert height to numeric value for filtering
+      const heightValue = heightToCm(formData.height || '');
 
       if (imageFile) {
         const storageRef = ref(storage, `profiles/${user.uid}/${Date.now()}_${imageFile.name}`);
@@ -129,6 +144,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
         createdBy: user.uid,
         nameLowerCase: formData.name?.toLowerCase(), 
         isPublic: formData.isPublic ?? true,
+        heightValue: heightValue,
       };
 
       if (initialData?.id) {
@@ -362,6 +378,13 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <Input label="Highest Education" name="education" value={formData.education} onChange={handleChange} placeholder="e.g. MBA, B.Tech" />
                     <Input label="Profession" name="profession" value={formData.profession} onChange={handleChange} placeholder="e.g. Software Engineer" />
+                    <Select 
+                      label="Occupation Category" 
+                      name="occupationCategory" 
+                      value={formData.occupationCategory} 
+                      onChange={handleChange}
+                      options={['Govt', 'Private', 'Business', 'Professional', 'Self-Employed', 'Other']}
+                    />
                     <Input label="Company Name" name="company" value={formData.company} onChange={handleChange} />
                     <Input label="Annual Income" name="income" value={formData.income} onChange={handleChange} placeholder="e.g. 12 LPA" />
                 </div>
@@ -423,6 +446,17 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                   >
                     <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.isPublic !== false ? 'translate-x-6' : 'translate-x-1'}`} />
                   </button>
+               </div>
+
+               <div className="space-y-2 mt-2">
+                  <Select 
+                    label="Privacy Level" 
+                    name="privacyLevel" 
+                    value={formData.privacyLevel} 
+                    onChange={handleChange}
+                    options={['Public', 'MembersOnly', 'Private']}
+                    displayFormat={(v: string) => v === 'Public' ? 'Public (All)' : v === 'MembersOnly' ? 'Members Only' : 'Private (Explicit Permission)'}
+                  />
                </div>
             </div>
 
