@@ -116,9 +116,9 @@ const SuperAdminDashboard = () => {
       <div className="min-h-screen bg-white flex flex-col font-sans text-slate-900 overflow-x-hidden">
         <Navbar />
         
-        <div className="flex pt-20 h-screen">
+        <div className="flex pt-16 min-h-screen">
           {/* Sidebar (Desktop) */}
-          <aside className="hidden lg:flex flex-col w-72 glass-effect border-r border-slate-200/50 fixed h-[calc(100vh-100px)] top-24 left-4 z-10 p-6 rounded-[2.5rem] shadow-2xl">
+          <aside className="hidden lg:flex flex-col w-72 bg-slate-50 border-r border-slate-200 fixed h-[calc(100vh-64px)] top-16 left-0 z-10 p-6">
             <div className="flex-1 space-y-4">
                <div className="px-4 py-6">
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 rounded-full border border-indigo-500/20 mb-4">
@@ -158,7 +158,7 @@ const SuperAdminDashboard = () => {
           </aside>
 
           {/* Main Content */}
-          <div className="flex-1 lg:ml-80 flex flex-col min-h-screen pr-4">
+          <div className="flex-1 lg:pl-72 min-h-screen bg-slate-50/50">
             <header className="h-20 flex items-center justify-between px-8">
                <div className="flex items-center gap-2 text-slate-400">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em]">Platform Administration</span>

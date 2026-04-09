@@ -23,6 +23,7 @@ export default function PartnerPreferences() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [prefs, setPrefs] = useState<Preferences>({
     ageMin: '18',
     ageMax: '35',
@@ -54,15 +55,17 @@ export default function PartnerPreferences() {
     e.preventDefault();
     if (!user) return;
     setSaving(true);
+    setToast(null);
     try {
       await setDoc(doc(db, 'partner_preferences', user.uid), {
         ...prefs,
         updatedAt: new Date().toISOString()
       });
-      alert('Preferences saved successfully!');
+      setToast({ type: 'success', msg: 'Preferences saved successfully!' });
+      setTimeout(() => setToast(null), 4000);
     } catch (err) {
       console.error(err);
-      alert('Failed to save preferences.');
+      setToast({ type: 'error', msg: 'Failed to save. Please try again.' });
     } finally {
       setSaving(false);
     }
@@ -166,16 +169,28 @@ export default function PartnerPreferences() {
             </div>
          </div>
 
-         <div className="pt-10 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-[11px] text-slate-400 font-medium">Changes affect recommendations immediately.</p>
-            <button 
-              type="submit"
-              disabled={saving}
-              className="w-full md:w-auto px-16 py-6 bg-slate-900 text-white rounded-[2rem] font-black flex items-center justify-center gap-4 hover:bg-indigo-600 transition-all shadow-2xl active:scale-95 disabled:opacity-50 group/btn"
-            >
-               {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} className="group-hover/btn:scale-110 transition-transform" />}
-               <span className="uppercase tracking-[0.2em] text-xs">Authorize Preferences</span>
-            </button>
+         <div className="pt-8 border-t border-slate-100 space-y-4">
+            {toast && (
+              <div className={`flex items-center gap-3 p-4 rounded-2xl text-sm font-semibold ${
+                toast.type === 'success'
+                  ? 'bg-green-50 text-green-800 border border-green-200'
+                  : 'bg-rose-50 text-rose-800 border border-rose-200'
+              }`}>
+                <span className={`w-2 h-2 rounded-full shrink-0 ${toast.type === 'success' ? 'bg-green-500' : 'bg-rose-500'}`} />
+                {toast.msg}
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-xs text-slate-400">Changes take effect immediately.</p>
+              <button
+                type="submit"
+                disabled={saving}
+                className="w-full sm:w-auto px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-3 hover:bg-indigo-600 transition-all shadow-lg active:scale-95 disabled:opacity-50"
+              >
+                {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                Save Preferences
+              </button>
+            </div>
          </div>
       </form>
     </div>

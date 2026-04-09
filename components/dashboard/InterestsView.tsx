@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { db } from '@/app/lib/firebase';
-import { collection, query, where, getDocs, doc, updateDoc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { Loader2, Send, Inbox, Check, X, Clock, ExternalLink, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
@@ -36,21 +36,20 @@ export default function InterestsView({ type }: Props) {
       setLoading(true);
       setError(null);
       try {
+        // Single-field query only — no composite index required in Firestore
         const q = query(
-          collection(db, 'interests'), 
-          where(type === 'sent' ? 'senderId' : 'receiverId', '==', user.uid),
-          orderBy('createdAt', 'desc')
+          collection(db, 'interests'),
+          where(type === 'sent' ? 'senderId' : 'receiverId', '==', user.uid)
         );
         const snap = await getDocs(q);
-        const fetched = snap.docs.map(d => ({ ...d.data(), id: d.id } as Interest));
+        const fetched = snap.docs
+          .map(d => ({ ...d.data(), id: d.id } as Interest))
+          // Sort newest-first on the client
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setInterests(fetched);
       } catch (err: any) {
-        console.error("Interest Fetch Error:", err);
-        if (err.message?.includes('index')) {
-          setError("MATCHING_INDEX_REQUIRED");
-        } else {
-          setError("Failed to load interests. Please try again.");
-        }
+        console.error('Interest Fetch Error:', err);
+        setError('Failed to load interests. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -67,111 +66,138 @@ export default function InterestsView({ type }: Props) {
     }
   };
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center p-32 space-y-4">
-      <Loader2 className="animate-spin text-indigo-600" size={48} />
-      <p className="text-slate-400 font-black uppercase tracking-[0.3em] text-[10px]">Syncing Data...</p>
-    </div>
-  );
+  /* ---------- States ---------- */
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-28 gap-3">
+        <Loader2 className="animate-spin text-indigo-600" size={36} />
+        <p className="text-slate-500 font-medium text-sm">Loading interests…</p>
+      </div>
+    );
+  }
 
   if (error) {
     return (
-      <div className="bg-white p-12 rounded-[3.5rem] border border-slate-100 text-center space-y-6 shadow-2xl shadow-indigo-100/20">
-        <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto text-rose-500">
-           <AlertCircle size={40} />
+      <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center space-y-4 shadow-sm">
+        <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto text-rose-500">
+          <AlertCircle size={28} />
         </div>
-        <div className="space-y-2">
-           <h3 className="text-2xl font-black text-slate-900">Connection Error</h3>
-           <p className="text-slate-500 max-w-sm mx-auto font-medium">
-              {error === 'MATCHING_INDEX_REQUIRED' 
-                ? "The database interests index is still building or missing. Please contact support or retry in a few minutes." 
-                : error}
-           </p>
-        </div>
-        <button onClick={() => window.location.reload()} className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest">Retry Connection</button>
+        <h3 className="text-lg font-bold text-slate-900">Could Not Load Interests</h3>
+        <p className="text-slate-500 text-sm max-w-xs mx-auto leading-relaxed">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-7 py-2.5 bg-slate-900 text-white rounded-xl font-semibold text-sm hover:bg-indigo-600 transition-colors"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
 
   if (interests.length === 0) {
     return (
-      <div className="text-center py-24 bg-white rounded-[4rem] border border-dashed border-slate-200">
-         <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-slate-300">
-            {type === 'sent' ? <Send size={32} /> : <Inbox size={32} />}
-         </div>
-         <h3 className="text-2xl font-black text-slate-800">No {type === 'sent' ? 'Sent' : 'Received'} Interests</h3>
-         <p className="text-slate-500 font-medium mt-2">Your activity log is waiting for connections.</p>
+      <div className="bg-white rounded-2xl border border-dashed border-slate-200 py-20 text-center">
+        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-5 text-slate-300">
+          {type === 'sent' ? <Send size={24} /> : <Inbox size={24} />}
+        </div>
+        <h3 className="text-base font-bold text-slate-800 mb-1">
+          No {type === 'sent' ? 'Sent' : 'Received'} Interests Yet
+        </h3>
+        <p className="text-slate-400 text-sm">Your activity will appear here once you start connecting.</p>
       </div>
     );
   }
 
+  /* ---------- List ---------- */
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-3">
       {interests.map((interest) => (
-        <div key={interest.id} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500 group">
-           <div className="flex items-center gap-6 w-full">
-              <div className="w-24 h-24 rounded-[2rem] bg-slate-100 relative overflow-hidden shrink-0 border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-500">
-                 {interest.profileImage ? (
-                   <Image src={interest.profileImage} alt={interest.profileName} fill className="object-cover" />
-                 ) : (
-                   <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50 font-black text-[10px] uppercase tracking-widest">No Image</div>
-                 )}
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
-              <div className="min-w-0 flex-1">
-                 <div className="flex items-center gap-3 mb-2">
-                    <h4 className="font-black text-slate-900 text-xl tracking-tight truncate">{interest.profileName}</h4>
-                    <span className="px-3 py-1 bg-slate-100 text-slate-500 text-[9px] font-black rounded-full uppercase tracking-[0.2em]">{interest.profileNo}</span>
-                 </div>
-                 <p className="text-sm text-slate-400 font-medium mb-4 leading-relaxed">
-                    {type === 'sent' 
-                      ? "You've expressed interest in connecting with this candidate." 
-                      : `Highly interested inquiry received from ${interest.senderName}.`}
-                 </p>
-                 <div className="flex items-center gap-4">
-                    <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-sm ${
-                       interest.status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
-                       interest.status === 'accepted' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
-                    }`}>
-                       <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-                          interest.status === 'pending' ? 'bg-amber-400' :
-                          interest.status === 'accepted' ? 'bg-emerald-400' : 'bg-rose-400'
-                       }`}></div>
-                       {interest.status}
-                    </span>
-                    <span className="text-[10px] text-slate-300 font-black uppercase tracking-widest flex items-center gap-1.5">
-                       <Clock size={12} />
-                       {new Date(interest.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
-                 </div>
-              </div>
-           </div>
+        <div
+          key={interest.id}
+          className="bg-white rounded-2xl border border-slate-100 hover:border-indigo-100 hover:shadow-md transition-all duration-200"
+        >
+          <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
 
-           <div className="flex items-center gap-3 shrink-0 w-full md:w-auto">
-              <Link 
-                href={`/profile/${interest.profileId}`} 
-                className="flex-1 md:flex-none px-6 py-4 bg-slate-50 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest border border-transparent hover:border-indigo-100"
-              >
-                 View Bio <ExternalLink size={14} />
-              </Link>
-              
-              {type === 'received' && interest.status === 'pending' && (
-                 <div className="flex items-center gap-2 w-full md:w-auto">
-                    <button 
-                      onClick={() => handleAction(interest.id, 'accepted')}
-                      className="flex-1 md:flex-none px-6 py-4 bg-emerald-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 hover:-translate-y-0.5"
-                    >
-                       Connect
-                    </button>
-                    <button 
-                      onClick={() => handleAction(interest.id, 'rejected')}
-                      className="flex-1 md:flex-none p-4 bg-rose-50 text-rose-600 rounded-2xl font-black text-[11px] uppercase hover:bg-rose-100 transition-all"
-                    >
-                       <X size={18} />
-                    </button>
-                 </div>
+            {/* Avatar */}
+            <div className="w-14 h-14 rounded-xl bg-slate-100 relative overflow-hidden shrink-0 border border-slate-200">
+              {interest.profileImage ? (
+                <Image src={interest.profileImage} alt={interest.profileName} fill className="object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-400 text-[10px] font-bold">
+                  No Photo
+                </div>
               )}
-           </div>
+            </div>
+
+            {/* Info block */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                <h4 className="font-bold text-slate-900 text-[15px] truncate">{interest.profileName}</h4>
+                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-wide shrink-0">
+                  {interest.profileNo}
+                </span>
+              </div>
+
+              <p className="text-sm text-slate-500 mb-2 leading-snug">
+                {type === 'sent'
+                  ? 'You expressed interest in this candidate.'
+                  : `Interest received from ${interest.senderName}.`}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Status badge */}
+                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg ${
+                  interest.status === 'pending'
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                    : interest.status === 'accepted'
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                    interest.status === 'pending' ? 'bg-amber-400' :
+                    interest.status === 'accepted' ? 'bg-green-500' : 'bg-rose-400'
+                  }`} />
+                  {interest.status === 'pending' ? 'Pending' : interest.status === 'accepted' ? 'Accepted' : 'Declined'}
+                </span>
+
+                {/* Date */}
+                <span className="text-xs text-slate-400 flex items-center gap-1">
+                  <Clock size={11} />
+                  {new Date(interest.createdAt).toLocaleDateString(undefined, {
+                    month: 'short', day: 'numeric', year: 'numeric',
+                  })}
+                </span>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <Link
+                href={`/profile/${interest.profileId}`}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 rounded-xl font-semibold text-sm transition-all whitespace-nowrap"
+              >
+                View Profile <ExternalLink size={13} />
+              </Link>
+
+              {type === 'received' && interest.status === 'pending' && (
+                <>
+                  <button
+                    onClick={() => handleAction(interest.id, 'accepted')}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-sm transition-all shadow-sm whitespace-nowrap"
+                  >
+                    <Check size={14} /> Accept
+                  </button>
+                  <button
+                    onClick={() => handleAction(interest.id, 'rejected')}
+                    className="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition-all"
+                    title="Decline"
+                  >
+                    <X size={15} />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       ))}
     </div>

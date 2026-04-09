@@ -161,7 +161,7 @@ function MemberDashboardContent() {
       <Navbar />
       
       <main className="grow">
-        <section className="bg-slate-900 pt-20 pb-28 px-4 relative overflow-hidden">
+        <section className="bg-slate-900 pt-20 pb-16 px-4 relative overflow-hidden">
            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.2),transparent_70%)]"></div>
            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
               <div className="space-y-6 text-center md:text-left">
@@ -194,8 +194,10 @@ function MemberDashboardContent() {
         </section>
 
         {/* Dynamic Content Grid */}
-        <div className="max-w-6xl mx-auto px-4 -mt-12 pb-20">
-           {renderView()}
+        <div className="bg-slate-50 min-h-screen">
+          <div className="max-w-6xl mx-auto px-4 py-8 pb-20">
+            {renderView()}
+          </div>
         </div>
       </main>
 
