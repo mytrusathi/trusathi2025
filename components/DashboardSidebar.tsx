@@ -5,7 +5,7 @@ import { auth } from '@/app/lib/firebase';
 import { 
   LogOut, LayoutDashboard, Users, Settings, 
   KeyRound, Globe, User, Search, Home,
-  Heart, Send, Inbox, MessageCircle, SlidersHorizontal
+  Heart, Send, Inbox, MessageCircle, SlidersHorizontal, Bell
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -51,6 +51,30 @@ export default function DashboardSidebar() {
         icon: Globe, 
         label: 'Community Link', 
         active: activeView === 'community-link' 
+      },
+      { 
+        href: '/dashboard/group-admin?view=sent-interests', 
+        icon: Send, 
+        label: 'Sent Interests', 
+        active: activeView === 'sent-interests' 
+      },
+      { 
+        href: '/dashboard/group-admin?view=received-interests', 
+        icon: Inbox, 
+        label: 'Received Interests', 
+        active: activeView === 'received-interests' 
+      },
+      { 
+        href: '/dashboard/group-admin?view=chats', 
+        icon: MessageCircle, 
+        label: 'Messages', 
+        active: activeView === 'chats' 
+      },
+      { 
+        href: '/dashboard/group-admin?view=notifications', 
+        icon: Bell, 
+        label: 'Notifications', 
+        active: activeView === 'notifications' 
       }
     );
   } else if (isRole('member')) {

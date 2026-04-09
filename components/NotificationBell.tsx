@@ -136,16 +136,15 @@ export default function NotificationBell() {
                )}
             </div>
 
-            {notifications.length > 0 && (
-              <div className="p-3 bg-slate-50 border-t border-slate-100">
-                 <button 
-                   onClick={() => {/* Mark all as read logic */}}
-                   className="w-full text-center py-2 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 hover:text-indigo-700 transition-colors"
-                 >
-                    View All Activity
-                 </button>
-              </div>
-            )}
+          <div className="p-3 bg-slate-50 border-t border-slate-100">
+             <Link 
+               href={user.role === 'member' ? '/dashboard/member?view=notifications' : '/dashboard/group-admin?view=notifications'}
+               onClick={() => setIsOpen(false)}
+               className="block w-full text-center py-2 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 hover:text-indigo-700 transition-colors"
+             >
+                View All Activity
+             </Link>
+          </div>
           </div>
         </>
       )}
