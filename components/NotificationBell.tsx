@@ -9,6 +9,8 @@ import { Notification } from '@/types/notification';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
+import NotificationItem from './NotificationItem';
+
 export default function NotificationBell() {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -52,15 +54,6 @@ export default function NotificationBell() {
     }
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'message': return <MessageSquare size={16} className="text-indigo-500" />;
-      case 'interest': return <ExternalLink size={16} className="text-emerald-500" />;
-      case 'favorite': return <Heart size={16} className="text-rose-500 fill-rose-500" />;
-      default: return <CheckCircle size={16} className="text-slate-400" />;
-    }
-  };
-
   const toggleOpen = () => setIsOpen(!isOpen);
 
   if (!user) return null;
@@ -69,13 +62,15 @@ export default function NotificationBell() {
     <div className="relative">
       <button 
         onClick={toggleOpen}
-        className={`relative p-2.5 rounded-2xl transition-all ${
-          isOpen ? 'bg-indigo-50 text-indigo-600 shadow-inner' : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-50'
+        className={`relative p-3 rounded-2xl transition-all duration-300 ${
+          isOpen 
+            ? 'bg-indigo-600 text-white shadow-[0_10px_20px_-5px_rgba(79,70,229,0.4)] scale-105' 
+            : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50/50'
         }`}
       >
-        <Bell size={22} />
+        <Bell size={22} className={isOpen ? 'animate-bounce' : ''} />
         {unreadCount > 0 && (
-          <span className="absolute top-2 right-2 w-4 h-4 bg-rose-500 border-2 border-white rounded-full flex items-center justify-center text-[8px] font-black text-white animate-in zoom-in-50 duration-300">
+          <span className="absolute top-2.5 right-2.5 w-5 h-5 bg-rose-500 border-[3px] border-white rounded-full flex items-center justify-center text-[8px] font-black text-white animate-in zoom-in-50 duration-500 shadow-sm">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -83,68 +78,50 @@ export default function NotificationBell() {
 
       {isOpen && (
         <>
-          {/* Backdrop for mobile closing */}
           <div className="fixed inset-0 z-[90]" onClick={toggleOpen}></div>
           
-          <div className="absolute right-0 top-full mt-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-[100] animate-in slide-in-from-top-2 duration-200">
-            <div className="p-5 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
-               <h4 className="font-black text-slate-900 text-sm tracking-tight uppercase tracking-widest">Notifications</h4>
-               <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-200 text-slate-500 rounded-lg">{unreadCount} New</span>
+          <div className="absolute right-0 top-full mt-4 w-96 bg-white/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] border border-white/50 overflow-hidden z-[100] animate-in slide-in-from-top-4 zoom-in-95 duration-300 origin-top-right">
+            <div className="p-6 border-b border-slate-100/50 flex items-center justify-between">
+               <div>
+                  <h4 className="font-black text-slate-900 text-sm uppercase tracking-[0.2em]">Activity Hub</h4>
+                  <p className="text-[10px] text-slate-400 font-bold mt-0.5">Stay updated with your latest matches</p>
+               </div>
+               <span className="text-[10px] font-black px-3 py-1 bg-indigo-600 text-white rounded-full shadow-lg shadow-indigo-100">{unreadCount} NEW</span>
             </div>
 
-            <div className="max-h-[400px] overflow-y-auto overflow-x-hidden">
+            <div className="max-h-[450px] overflow-y-auto custom-scrollbar">
                {notifications.length === 0 ? (
-                 <div className="p-12 text-center text-slate-400">
-                    <Bell size={32} className="mx-auto mb-3 opacity-20" />
-                    <p className="text-xs font-bold uppercase tracking-widest italic">All Quiet</p>
+                 <div className="py-20 text-center">
+                    <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4 text-slate-200">
+                       <Bell size={32} />
+                    </div>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No New Alerts</p>
                  </div>
                ) : (
-                 notifications.map((notif) => (
-                   <Link
-                     key={notif.id}
-                     href={notif.link}
-                     onClick={() => {
-                        if (!notif.isRead && notif.id) markAsRead(notif.id);
-                        setIsOpen(false);
-                     }}
-                     className={`flex items-start gap-4 p-5 border-b border-slate-50 transition-colors hover:bg-slate-50 relative group ${
-                        !notif.isRead ? 'bg-indigo-50/20' : ''
-                     }`}
-                   >
-                     {!notif.isRead && <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-full"></div>}
-                     
-                     <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shrink-0 shadow-sm relative">
-                        {getIcon(notif.type)}
-                     </div>
-
-                     <div className="flex-1 min-w-0 pr-6">
-                        <p className="font-black text-slate-800 text-sm leading-tight mb-0.5">{notif.title}</p>
-                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-medium">{notif.message}</p>
-                        <p className="text-[9px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest">
-                           {formatDistanceToNow(new Date(notif.createdAt))} ago
-                        </p>
-                     </div>
-
-                     <button 
-                       onClick={(e) => clearNotification(e, notif.id!)}
-                       className="absolute right-3 top-5 opacity-0 group-hover:opacity-100 p-1.5 text-slate-300 hover:text-rose-500 transition-all"
-                     >
-                        <Trash2 size={14} />
-                     </button>
-                   </Link>
-                 ))
+                 <div className="divide-y divide-slate-50/50">
+                   {notifications.map((notif) => (
+                      <NotificationItem 
+                        key={notif.id}
+                        notification={notif}
+                        onRead={markAsRead}
+                        onClear={clearNotification}
+                        onClose={() => setIsOpen(false)}
+                      />
+                   ))}
+                 </div>
                )}
             </div>
 
-          <div className="p-3 bg-slate-50 border-t border-slate-100">
-             <Link 
-               href={user.role === 'member' ? '/dashboard/member?view=notifications' : '/dashboard/group-admin?view=notifications'}
-               onClick={() => setIsOpen(false)}
-               className="block w-full text-center py-2 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 hover:text-indigo-700 transition-colors"
-             >
-                View All Activity
-             </Link>
-          </div>
+            <div className="p-4 bg-slate-50/50 border-t border-slate-100 group">
+               <Link 
+                 href={user.role === 'member' ? '/dashboard/member?view=notifications' : '/dashboard/group-admin?view=notifications'}
+                 onClick={() => setIsOpen(false)}
+                 className="flex items-center justify-center gap-2 w-full py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-indigo-600 transition-all"
+               >
+                  See All Notifications
+                  <ExternalLink size={12} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+               </Link>
+            </div>
           </div>
         </>
       )}

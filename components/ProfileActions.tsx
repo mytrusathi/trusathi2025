@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Check, Phone, Mail, MessageSquare, AlertCircle, Info } from 'lucide-react';
+import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Check, Phone, Mail, MessageSquare, AlertCircle, Info, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { db } from '@/app/lib/firebase';
@@ -107,37 +107,55 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
   const canSeeContact = interestSent && profile.revealContactOnInterest;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Branding for PDF/Print - Visible only on Print via globals.css .print-only class */}
+      <div className="print-only mb-12 border-b-2 border-slate-900 pb-8">
+        <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tighter mb-1">TruSathi</h1>
+              <p className="text-xs font-black text-indigo-600 uppercase tracking-[0.3em]">Service to Mankind</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] font-black uppercase text-slate-400">Matchmaking Vision</p>
+              <p className="text-xs font-bold text-slate-700 max-w-[200px]">A verified, secure, and free matchmaking service dedicated to building a better society.</p>
+            </div>
+        </div>
+      </div>
+
       {/* Print Button Wrapper */}
       <div className="flex justify-end no-print">
          <button 
            onClick={handlePrint}
-           className="w-full md:w-auto px-6 py-3 bg-white border-2 border-slate-100 hover:border-indigo-100 hover:bg-indigo-50/30 text-slate-700 font-bold rounded-2xl transition-all flex items-center justify-center gap-2 group"
+           className="px-8 py-4 bg-white border border-slate-200 hover:border-indigo-200 hover:bg-indigo-50/30 text-slate-600 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl transition-all flex items-center justify-center gap-3 group shadow-sm"
          >
             <Printer size={18} className="text-slate-400 group-hover:text-indigo-600 transition-colors" /> 
-            <span>Print / Save PDF</span>
+            <span>Capture Portfolio / PDF</span>
          </button>
       </div>
 
       {/* Main Connect Action Card */}
-      <div className={`rounded-3xl p-8 no-print shadow-xl transition-all relative overflow-hidden group ${
-        interestSent ? (canSeeContact ? 'bg-emerald-600 shadow-emerald-100' : 'bg-slate-800 shadow-slate-100') : 'bg-indigo-600 shadow-indigo-100'
+      <div className={`rounded-[3.5rem] p-10 no-print shadow-2xl transition-all duration-700 relative overflow-hidden group ${
+        interestSent ? (canSeeContact ? 'bg-slate-900' : 'bg-slate-800') : 'bg-indigo-600'
       }`}>
-          <ShieldCheck size={120} className="absolute -bottom-6 -right-6 text-white/10 -rotate-12 transition-transform group-hover:rotate-0 duration-700" />
+          <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors"></div>
           
-          <div className="relative z-10 space-y-6">
-            <div className="space-y-2">
-              <h4 className="text-white font-black text-xl leading-tight">
-                {interestSent ? (canSeeContact ? "Interest Expressed!" : "Request Pending") : "Interest in this Profile?"}
+          <div className="relative z-10 space-y-8">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                 <ShieldCheck size={20} className="text-white/40" />
+                 <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/50">Secure Matchmaking</span>
+              </div>
+              <h4 className="text-white font-black text-3xl md:text-4xl tracking-tight leading-none">
+                {interestSent ? (canSeeContact ? "Connection Established" : "Requested Access") : "Forge a Connection?"}
               </h4>
-              <p className="text-white/80 text-sm font-medium leading-relaxed">
+              <p className="text-white/60 text-lg font-medium leading-relaxed max-w-md">
                  {interestSent 
                    ? (canSeeContact 
-                      ? "As a verified member, you can now see the contact details below." 
-                      : `Your interest has been sent to ${managerName || 'the Group Admin'} for review.`) 
+                      ? "Direct communication is now authorized. You can view private details below." 
+                      : `Access request has been safely dispatched to ${managerName || 'the Admin'} for verification.`) 
                    : (profile.revealContactOnInterest 
-                      ? `Interest will reveal contact details immediately as authorized by ${managerName || 'Admin'}.` 
-                      : `Sending interest will notify ${managerName || 'the Group Admin'} to share details with you.`)}
+                      ? `Accessing this profile will reveal verified contact details immediately.` 
+                      : `A formal interest notifies ${managerName || 'the Admin'} to facilitate a secure introduction.`)}
               </p>
             </div>
 
@@ -145,62 +163,83 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
               <button 
                 onClick={handleConnect}
                 disabled={loading}
-                className="w-full font-black py-4 px-6 bg-white text-indigo-900 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 hover:bg-indigo-50"
+                className="w-full font-black py-6 px-8 bg-white text-indigo-900 rounded-[2.5rem] transition-all shadow-[0_20px_40px_-10px_rgba(255,255,255,0.2)] active:scale-95 flex items-center justify-center gap-4 hover:bg-slate-50 uppercase tracking-[0.2em] text-xs"
               >
-                  {loading ? <Loader2 className="animate-spin" /> : (
+                  {loading ? <Loader2 className="animate-spin text-indigo-600" /> : (
                     <>
-                      {user ? "Send Interest Now" : "Login to Connect"} 
-                      <ExternalLink size={18} />
+                      {user ? "Dispatch Interest Now" : "Authorize to Connect"} 
+                      <ExternalLink size={20} className="text-indigo-400" />
                     </>
                   )}
               </button>
             ) : (
-              <>
+              <div className="space-y-6">
                 {canSeeContact ? (
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 space-y-4 animate-in zoom-in-95 duration-500">
-                    <div className="flex items-center gap-3 text-white">
-                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                          <Phone size={18} />
+                  <div className="bg-white/5 backdrop-blur-3xl rounded-[3rem] p-10 border border-white/10 space-y-8 animate-in zoom-in-95 duration-700">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div className="flex items-center gap-5">
+                            <div className="w-14 h-14 bg-indigo-500/20 rounded-2xl flex items-center justify-center shrink-0 border border-indigo-500/30">
+                              <Phone size={24} className="text-indigo-400" />
+                            </div>
+                            <div>
+                              <p className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40 mb-1">Direct Contact Agent</p>
+                              <p className="font-black text-3xl text-white tracking-widest">{profile.contact || 'SECURE_HIDDEN'}</p>
+                            </div>
                         </div>
-                        <div>
-                          <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Contact Number</p>
-                          <p className="font-bold text-lg">{profile.contact || 'Contact Admin'}</p>
+                        
+                        <div className="flex items-center gap-3">
+                           <a 
+                              href={`https://wa.me/${profile.contact?.replace(/\D/g, '')}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="px-6 py-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-2xl flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest transition-all"
+                           >
+                              <MessageSquare size={16} /> WhatsApp
+                           </a>
                         </div>
                     </div>
-                    
-                    <div className="pt-4 flex gap-2">
-                        <a 
-                          href={`https://wa.me/${profile.contact?.replace(/\D/g, '')}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all"
-                        >
-                          <MessageSquare size={14} /> WhatsApp
-                        </a>
-                        <button 
-                          onClick={() => router.push('/dashboard/member?view=chats')}
-                          className="flex-1 bg-white/20 hover:bg-white/30 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all"
-                        >
-                          <Check size={14} /> View Chats
-                        </button>
+
+                    <div className="pt-8 border-t border-white/5">
+                        <div className="bg-indigo-500/10 rounded-2xl p-6 border border-indigo-500/20 flex flex-col md:flex-row items-center justify-between gap-4">
+                           <div className="text-center md:text-left">
+                              <p className="text-white font-black text-sm mb-1 uppercase tracking-tight">Stay within TruSathi?</p>
+                              <p className="text-indigo-200/50 text-xs font-medium">Keep your conversations secure on our platform.</p>
+                           </div>
+                           <button 
+                             onClick={() => router.push('/dashboard/member?view=chats')}
+                             className="w-full md:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20"
+                           >
+                             <MessageSquare size={16} /> Secure Chat Platform
+                           </button>
+                        </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 flex items-center gap-4 text-white animate-in slide-in-from-bottom-2 duration-500">
-                     <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center shrink-0">
-                        <AlertCircle size={20} className="text-amber-300" />
+                  <div className="bg-white/5 backdrop-blur-md rounded-[2.5rem] p-8 border border-white/10 flex flex-col items-center text-center gap-6 text-white animate-in slide-in-from-bottom-4 duration-700">
+                     <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center shrink-0 border border-amber-500/20">
+                        <Clock size={28} className="text-amber-400 animate-pulse" />
                      </div>
-                     <p className="text-[11px] font-bold leading-tight opacity-90">
-                        Waiting for {managerName || 'Admin'} to approve your request. You will be notified in your <b>Messages</b> tab.
-                     </p>
+                     <div className="space-y-2">
+                        <h5 className="font-black text-xl uppercase tracking-tight">Verification in Progress</h5>
+                        <p className="text-sm font-medium leading-relaxed text-white/60 max-w-xs">
+                           Waiting for {managerName || 'the Admin'} to approve your profile access. High-priority connections usually take 1-4 hours.
+                        </p>
+                     </div>
                   </div>
                 )}
-              </>
+              </div>
             )}
             
-            <p className="text-center text-[10px] text-white/40 font-bold uppercase tracking-widest leading-none">
-                {interestSent ? (canSeeContact ? "Direct Connection Active" : "Waiting for Admin Approval") : (user ? "Verified Member" : "Auth Required")}
-            </p>
+            <div className="flex items-center justify-center gap-6 pt-4 border-t border-white/5">
+                <div className="flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
+                   <span className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">Verified Secure</span>
+                </div>
+                <div className="flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                   <span className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">Privacy Shield</span>
+                </div>
+            </div>
           </div>
       </div>
     </div>

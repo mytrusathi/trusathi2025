@@ -29,22 +29,20 @@ export default function Navbar() {
   const closeMenu = () => setIsMenuOpen(false)
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
-      scrolled ? 'bg-white/80 backdrop-blur-md shadow-lg py-2' : 'bg-white py-4'
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      scrolled ? 'glass-effect shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2' : 'bg-transparent py-5'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+        <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200 group-hover:rotate-12 transition-transform duration-300">
-               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
-                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.505 4.044 3 5.5L12 21l7-7Z" fill="currentColor" />
-               </svg>
+          <Link href="/" className="flex items-center gap-4 group">
+            <div className="w-11 h-11 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-[0_10px_20px_-5px_rgba(79,70,229,0.3)] group-hover:scale-110 transition-all duration-500 group-hover:rotate-6">
+               <Heart size={24} fill="currentColor" className="animate-pulse" />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-black text-indigo-900 leading-none">TruSathi</span>
-              <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest mt-0.5 animate-pulse">Service to Mankind</span>
+              <span className="text-2xl font-black text-slate-900 tracking-tight leading-none">TruSathi</span>
+              <span className="text-[9px] font-black text-indigo-500 uppercase tracking-[0.3em] mt-1 opacity-80">Service to Mankind</span>
             </div>
           </Link>
 
@@ -58,7 +56,7 @@ export default function Navbar() {
             <div className="h-6 w-px bg-slate-200 mx-4"></div>
 
             {!user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-6">
                 <Link
                   href="/login"
                   className="text-slate-600 font-bold hover:text-indigo-600 transition-colors text-sm px-4"
@@ -67,7 +65,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-xl shadow-indigo-100 transform active:scale-95 text-sm"
+                  className="bg-slate-900 hover:bg-indigo-600 text-white px-7 py-3.5 rounded-2xl font-black transition-all shadow-[0_15px_30px_-10px_rgba(15,23,42,0.3)] transform active:scale-95 text-sm uppercase tracking-widest"
                 >
                   Register Free
                 </Link>
@@ -198,7 +196,7 @@ function NavLink({ href, children }: { href: string, children: React.ReactNode }
   return (
     <Link 
       href={href} 
-      className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-indigo-600 rounded-xl hover:bg-indigo-50/50 transition-all font-sans"
+      className="px-5 py-2.5 text-xs font-black text-slate-500 hover:text-indigo-600 rounded-xl hover:bg-indigo-50/50 transition-all font-sans uppercase tracking-[0.1em]"
     >
       {children}
     </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Shield, Users, Sparkles, Heart, Search, Star, MousePointer2 } from 'lucide-react'
+import { CheckCircle, Shield, ShieldCheck, Users, Sparkles, Heart, Search, Star, MousePointer2 } from 'lucide-react'
 import SearchBar from './SearchBar'
 import { db } from '@/app/lib/firebase'
 import { collection, query, where, getCountFromServer } from 'firebase/firestore'
@@ -34,126 +34,121 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative bg-[#0F172A] pt-12 pb-24 md:pt-32 md:pb-48 overflow-hidden">
+    <section className="relative bg-[#020617] pt-16 pb-32 md:pt-40 md:pb-56 overflow-hidden">
       
-      {/* Dynamic Animated Background */}
-      <div className="absolute top-0 inset-x-0 h-[800px] bg-gradient-to-b from-indigo-600/20 via-slate-900/0 to-slate-900/0 pointer-events-none"></div>
+      {/* Premium Ambient Background */}
+      <div className="absolute top-0 inset-x-0 h-[1000px] bg-[radial-gradient(circle_at_top,rgba(79,70,229,0.15),transparent_60%)] pointer-events-none"></div>
       
-      {/* Animated Orb 1 */}
-      <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse pointer-events-none"></div>
-      {/* Animated Orb 2 */}
-      <div className="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[100px] animate-bounce duration-[10000ms] pointer-events-none"></div>
-      {/* Animated Orb 3 */}
-      <div className="absolute top-[20%] left-[20%] w-[300px] h-[300px] bg-amber-500/5 rounded-full blur-[80px] pointer-events-none"></div>
+      {/* Sophisticated Animated Orbs */}
+      <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[150px] animate-pulse pointer-events-none"></div>
+      <div className="absolute bottom-[5%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[120px] animate-bounce duration-[15000ms] pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-400/5 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center">
           
-          {/* Modern Floating Badge */}
-          <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 text-white text-xs md:text-sm font-black backdrop-blur-xl mb-10 animate-in fade-in slide-in-from-top-4 duration-1000">
-            <span className="relative flex h-2 w-2">
-               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="tracking-[0.2em] uppercase opacity-80">Verified Community Network</span>
-            <div className="h-4 w-px bg-white/20"></div>
-            <span className="text-rose-400 flex items-center gap-1.5 font-black uppercase tracking-widest italic">
-               <Sparkles size={14} fill="currentColor" /> Service to Mankind
+          {/* Glassmorphic Badge */}
+          <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white text-[10px] md:text-xs font-black backdrop-blur-3xl mb-12 animate-in fade-in slide-in-from-top-4 duration-1000 shadow-2xl">
+            <div className="flex -space-x-2">
+               {[1,2,3].map(i => (
+                 <div key={i} className="w-5 h-5 rounded-full border-2 border-[#020617] bg-slate-800 flex items-center justify-center text-[8px]">
+                    <Heart size={8} fill="currentColor" className="text-white/40" />
+                 </div>
+               ))}
+            </div>
+            <span className="tracking-[0.3em] uppercase opacity-70">Community Managed Protocol</span>
+            <div className="h-4 w-px bg-white/10"></div>
+            <span className="text-emerald-400 flex items-center gap-2 font-black uppercase tracking-[0.3em]">
+               <Sparkles size={14} className="animate-pulse" /> 100% Free Service
             </span>
           </div>
 
-          {/* Ultra-Modern Heading */}
-          <h1 className="text-5xl md:text-8xl font-black text-white leading-[0.95] mb-10 max-w-6xl tracking-tighter animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
-             Your <span className="relative inline-block">
+          {/* Cinematic Heading */}
+          <h1 className="text-6xl md:text-9xl font-black text-white leading-[0.9] mb-12 max-w-7xl tracking-tighter animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100 italic">
+             Your <span className="relative inline-block not-italic">
                 True Sathi
-                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 358 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                   <path d="M3 17C118.333 5.66667 241.667 1.33333 355 17" stroke="#6366F1" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" className="animate-draw" />
+                <svg className="absolute -bottom-2 md:-bottom-4 left-0 w-full" viewBox="0 0 358 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M3 17C118.333 5.66667 241.667 1.33333 355 17" stroke="#4F46E5" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" className="animate-draw" />
                 </svg>
              </span> <br/>
-             In a <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-rose-400 to-amber-400">Verified Way.</span>
+             <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-indigo-300 to-slate-400 not-italic">Verified by Trust.</span>
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg md:text-2xl text-slate-400 mb-14 leading-relaxed max-w-3xl font-medium animate-in fade-in slide-in-from-bottom duration-1000 delay-200">
-            Connecting souls through <span className="text-white font-bold underline decoration-indigo-500 decoration-2 underline-offset-4">Community Trust</span>. 
-            No platform charges, no fake profiles—just pure service to help you find your partner.
+          <p className="text-lg md:text-2xl text-slate-400 mb-16 leading-relaxed max-w-4xl font-medium animate-in fade-in slide-in-from-bottom duration-1000 delay-200 px-4">
+            A verified matchmaking ecosystem where <span className="text-white font-black underline decoration-indigo-500/50 decoration-4 underline-offset-8">Trust is the Currency</span>. 
+            Direct portal access, community-vetted profiles, and zero platform fees.
           </p>
 
-          {/* Search Hub with Glassmorphism */}
+          {/* High-Contrast Search Hub */}
           <div className="w-full max-w-5xl group relative animate-in fade-in zoom-in duration-1000 delay-300">
-             {/* Glow Effect */}
-             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-rose-500 rounded-[3rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+             <div className="absolute -inset-2 bg-gradient-to-r from-indigo-500/20 to-emerald-500/20 rounded-[4rem] blur-2xl opacity-0 group-hover:opacity-100 transition duration-1000"></div>
              
-             <div className="relative bg-white/10 backdrop-blur-3xl p-4 md:p-6 rounded-[3rem] border border-white/20 shadow-2xl">
-                <div className="bg-white rounded-[2.2rem] p-2 md:p-3 shadow-inner">
+             <div className="relative bg-white/5 backdrop-blur-2xl p-6 rounded-[4rem] border border-white/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)]">
+                <div className="bg-white rounded-[3rem] p-3 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] overflow-hidden">
                    <SearchBar />
                 </div>
              </div>
              
-             {/* Floating Search Insight */}
-             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">
-                <span className="flex items-center gap-2"><CheckCircle size={14} className="text-emerald-500" /> 100% Free</span>
-                <span className="flex items-center gap-2"><CheckCircle size={14} className="text-emerald-500" /> Community Verified</span>
-                <span className="flex items-center gap-2"><CheckCircle size={14} className="text-emerald-500" /> No Fake Stories</span>
+             {/* Dynamic Key Benefits */}
+             <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-10 text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] whitespace-nowrap">
+                <span className="flex items-center gap-2 group/tip hover:text-white transition-colors cursor-default">
+                  <ShieldCheck size={14} className="text-emerald-500" /> Secure Protocol
+                </span>
+                <span className="flex items-center gap-2 group/tip hover:text-white transition-colors cursor-default">
+                  <Heart size={14} className="text-rose-500" /> Human Verified
+                </span>
+                <span className="flex items-center gap-2 group/tip hover:text-white transition-colors cursor-default">
+                  <Sparkles size={14} className="text-indigo-400" /> Pure Service
+                </span>
              </div>
           </div>
 
-          {/* Social Proof / Trust Indicators */}
-          <div className="mt-32 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 items-center opacity-60 hover:opacity-100 transition-opacity duration-500">
-             <div className="flex flex-col items-center">
-                <span className="text-3xl font-black text-white mb-1">{stats.profiles}</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active Members</span>
+          {/* Quantifiable Trust */}
+          <div className="mt-40 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-24 items-center animate-in fade-in slide-in-from-bottom-12 duration-[2000ms] delay-500">
+             <div className="flex flex-col items-center group">
+                <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter group-hover:scale-110 transition-transform">{stats.profiles}</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Active Bio-Data</span>
              </div>
-             <div className="flex flex-col items-center border-l border-white/10">
-                <span className="text-3xl font-black text-white mb-1">{stats.communities}</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Communities</span>
+             <div className="flex flex-col items-center md:border-l border-white/5 group">
+                <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter group-hover:scale-110 transition-transform">{stats.communities}</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Trusted Groups</span>
              </div>
-             <div className="flex flex-col items-center border-l border-white/10">
-                <span className="text-3xl font-black text-white mb-1">100%</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Verified</span>
+             <div className="flex flex-col items-center md:border-l border-white/5 group">
+                <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter text-emerald-400">100%</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Manual Audit</span>
              </div>
-             <div className="flex flex-col items-center border-l border-white/10">
-                <span className="text-3xl font-black text-white mb-1">Free</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Always</span>
+             <div className="flex flex-col items-center md:border-l border-white/5 group">
+                <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter text-indigo-400">0.00</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Platform Fee</span>
              </div>
           </div>
         </div>
       </div>
       
-      {/* Decorative Floating Cards (Background Layer) */}
-      <div className="absolute top-1/4 -left-20 animate-float pointer-events-none hidden lg:block">
-         <div className="p-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl rotate-12 shadow-2xl">
-            <div className="w-40 h-2 bg-white/20 rounded-full mb-3"></div>
-            <div className="w-24 h-2 bg-white/10 rounded-full"></div>
-         </div>
+      {/* Abstract Background Accents */}
+      <div className="absolute top-1/3 -left-20 animate-float pointer-events-none opacity-20 hidden lg:block">
+         <div className="w-64 h-64 bg-indigo-500/10 rounded-[4rem] border border-white/10 blur-xl"></div>
       </div>
-      <div className="absolute bottom-1/4 -right-20 animate-float-delayed pointer-events-none hidden lg:block">
-         <div className="p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] -rotate-6 shadow-2xl flex items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400">
-               <Heart size={24} fill="currentColor" />
-            </div>
-            <div>
-               <div className="w-20 h-2 bg-white/20 rounded-full mb-2"></div>
-               <div className="w-12 h-2 bg-white/10 rounded-full"></div>
-            </div>
-         </div>
+      <div className="absolute bottom-1/4 -right-32 animate-float-delayed pointer-events-none opacity-20 hidden lg:block">
+         <div className="w-96 h-96 bg-emerald-500/10 rounded-full border border-white/5 blur-2xl"></div>
       </div>
 
       <style jsx global>{`
         @keyframes float {
           0%, 100% { transform: translateY(0) rotate(12deg); }
-          50% { transform: translateY(-20px) rotate(12deg); }
+          50% { transform: translateY(-30px) rotate(15deg); }
         }
         @keyframes float-delayed {
           0%, 100% { transform: translateY(0) rotate(-6deg); }
-          50% { transform: translateY(-30px) rotate(-6deg); }
+          50% { transform: translateY(-40px) rotate(-10deg); }
         }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-float-delayed { animation: float-delayed 8s ease-in-out infinite; }
+        .animate-float { animation: float 10s ease-in-out infinite; }
+        .animate-float-delayed { animation: float-delayed 12s ease-in-out infinite; }
         .animate-draw {
            stroke-dasharray: 400;
            stroke-dashoffset: 400;
-           animation: draw 2s ease-out forwards 1s;
+           animation: draw 2.5s cubic-bezier(0.65, 0, 0.35, 1) forwards 1.2s;
         }
         @keyframes draw {
            to { stroke-dashoffset: 0; }

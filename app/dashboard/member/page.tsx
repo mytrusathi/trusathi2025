@@ -9,6 +9,7 @@ import ProfileCard from '@/components/group-admin/ProfileCard';
 import ProfileForm from '@/components/group-admin/ProfileForm';
 import { Loader2, Plus, FileText, Search, UserCircle2, ShieldCheck, LayoutDashboard } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import PasswordChangeModal from '@/components/PasswordChangeModal';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -160,23 +161,33 @@ function MemberDashboardContent() {
       <Navbar />
       
       <main className="grow">
-        {/* Profile Header Banner */}
-        <section className="bg-indigo-900 pt-16 pb-24 px-4 relative overflow-hidden">
-           <div className="absolute inset-0 bg-gradient-to-r from-indigo-800 to-transparent"></div>
-           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-              <div className="space-y-4 text-center md:text-left">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 text-white rounded-full text-xs font-black uppercase tracking-widest backdrop-blur-md border border-white/20">
-                     <ShieldCheck size={14} className="text-emerald-400" /> Member Center
+        <section className="bg-slate-900 pt-20 pb-28 px-4 relative overflow-hidden">
+           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.2),transparent_70%)]"></div>
+           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
+              <div className="space-y-6 text-center md:text-left">
+                  <div className="flex flex-col md:flex-row md:items-center gap-5">
+                    {activeView && (
+                      <Link 
+                        href="/dashboard/member" 
+                        className="inline-flex items-center justify-center w-12 h-12 bg-white/5 hover:bg-white/10 text-white rounded-2xl backdrop-blur-xl border border-white/10 transition-all hover:-translate-x-1 shadow-2xl"
+                      >
+                         <LayoutDashboard size={20} />
+                      </Link>
+                    )}
+                    <div className="inline-flex items-center gap-2 px-5 py-2 bg-indigo-500/10 text-indigo-300 rounded-full text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md border border-indigo-500/20">
+                       <ShieldCheck size={14} className="text-indigo-400" /> Member Center
+                    </div>
                   </div>
-                  <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">{header.title}</h1>
-                  <p className="text-indigo-200 text-lg font-medium">{header.desc}</p>
+                  <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter drop-shadow-2xl">{header.title}</h1>
+                  <p className="text-slate-400 text-lg font-medium max-w-2xl leading-relaxed">{header.desc}</p>
               </div>
               {!activeView && (
                 <button 
                   onClick={() => { setSelectedProfile(null); setShowForm(true); }}
-                  className="bg-white text-indigo-900 px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-slate-50 transition-all shadow-xl shadow-indigo-950/20 active:scale-95"
+                  className="bg-white text-slate-900 px-10 py-5 rounded-[2rem] font-black flex items-center gap-4 hover:bg-indigo-50 transition-all shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] active:scale-95 group"
                 >
-                  <Plus size={20} /> Add New Profile
+                  <Plus size={24} className="group-hover:rotate-90 transition-transform duration-500 text-indigo-600" /> 
+                  <span className="uppercase tracking-[0.2em] text-[10px]">Create New Profile</span>
                 </button>
               )}
            </div>
