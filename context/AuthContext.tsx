@@ -9,6 +9,7 @@ import {
 } from 'react'
 import {
   onAuthStateChanged,
+  reload,
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
@@ -30,6 +31,7 @@ interface AuthContextType {
   loginWithEmail: (email: string, password: string) => Promise<void>
   resetPassword: (email: string) => Promise<void>
   logout: () => Promise<void>
+  refreshUser: () => Promise<void>
 }
 
 /* -----------------------------
@@ -111,6 +113,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signOut(auth)
   }
 
+  const refreshUser = async () => {
+    if (!auth.currentUser) return
+
+    await reload(auth.currentUser)
+    const refreshedUser = auth.currentUser
+    if (!refreshedUser) return
+
+    const userRef = doc(db, 'users', refreshedUser.uid)
+    const userSnap = await getDoc(userRef)
+
+    const appUser: AppUser = {
+      ...(refreshedUser as AppUser),
+      role: userSnap.exists() ? userSnap.data().role : null,
+      groupName: userSnap.exists() ? userSnap.data().groupName : null,
+      groupId: userSnap.exists() ? userSnap.data().groupId : null,
+      slug: userSnap.exists() ? userSnap.data().slug : null,
+      isApproved: userSnap.exists() ? userSnap.data().isApproved : undefined,
+    }
+
+    setUser(appUser)
+    setRole(appUser.role ?? null)
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -120,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginWithEmail,
         resetPassword,
         logout,
+        refreshUser,
       }}
     >
       {children}

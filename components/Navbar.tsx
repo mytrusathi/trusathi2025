@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart, Menu, X, User, LogOut, ChevronDown, Bell, LayoutDashboard, Settings } from 'lucide-react'
+import Image from 'next/image'
+import { Heart, Menu, X, User, LogOut, ChevronDown, LayoutDashboard, Settings } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -94,7 +95,7 @@ export default function Navbar() {
                      scrolled ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-white/10 border-white/20 text-white'
                    }`}>
                       {user.photoURL ? (
-                        <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        <Image src={user.photoURL} alt="Profile" width={40} height={40} className="w-full h-full object-cover" />
                       ) : (
                         <User size={20} />
                       )}

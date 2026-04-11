@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import ProfileList from '@/components/group-admin/ProfileList';
 import { useSearchParams } from 'next/navigation';
 import { 
-  Share2, ExternalLink, Copy, LayoutDashboard, Users, Check, Home, ArrowLeft
+  Share2, ExternalLink, Copy, LayoutDashboard, Users, Check, Home
 } from 'lucide-react';
 import Link from 'next/link';
 import PasswordChangeModal from '@/components/PasswordChangeModal';

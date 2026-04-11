@@ -1,12 +1,12 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { db, auth } from '../../lib/firebase';
 import { collection, getDocs, doc, updateDoc, getCountFromServer, query, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '../../../context/AuthContext';
 import { 
   Users, Shield, Search, LogOut, 
-  LayoutDashboard, FileText, CheckCircle, AlertTriangle, AlertCircle, ShieldAlert, Home 
+  LayoutDashboard, FileText, CheckCircle, AlertTriangle, ShieldAlert, Home 
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import Navbar from '../../../components/Navbar';
@@ -38,7 +38,7 @@ const SuperAdminDashboard = () => {
     pendingApprovals: users.filter(u => u.role === 'group-admin' && u.isApproved === false).length
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const usersRef = collection(db, 'users');
       const usersSnap = await getDocs(usersRef);
@@ -72,11 +72,15 @@ const SuperAdminDashboard = () => {
       console.error("Error fetching data:", error);
       setMessage({ type: 'error', text: "Failed to load dashboard data." });
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const timeoutId = window.setTimeout(() => {
+      void fetchData();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [fetchData]);
 
   const handleApprove = async (uid: string) => {
     if(!confirm("Approve this Group Admin?")) return;

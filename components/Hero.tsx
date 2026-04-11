@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Shield, ShieldCheck, Users, Sparkles, Heart, Search, Star, MousePointer2 } from 'lucide-react'
+import { ShieldCheck, Sparkles, Heart } from 'lucide-react'
 import SearchBar from './SearchBar'
 import { db } from '@/app/lib/firebase'
 import { collection, query, where, getCountFromServer } from 'firebase/firestore'

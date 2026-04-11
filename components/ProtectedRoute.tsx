@@ -11,9 +11,15 @@ interface Props {
   allowedRoles?: ('super-admin' | 'group-admin' | 'member')[]; 
 }
 
+type UserRole = NonNullable<Props['allowedRoles']>[number];
+
 const ProtectedRoute = ({ children, requireAdmin, requireSuperAdmin, allowedRoles }: Props) => {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const currentRole = user?.role;
+  const hasAllowedRole = !allowedRoles || allowedRoles.length === 0
+    ? true
+    : (currentRole !== undefined && allowedRoles.includes(currentRole as UserRole));
 
   useEffect(() => {
     if (!loading) {
@@ -41,14 +47,12 @@ const ProtectedRoute = ({ children, requireAdmin, requireSuperAdmin, allowedRole
       }
 
       // 4. Check Allowed Roles List
-      if (allowedRoles && allowedRoles.length > 0) {
-        if (!allowedRoles.includes(user.role as any)) {
-          router.push('/dashboard/member');
-          return;
-        }
+      if (!hasAllowedRole) {
+        router.push('/dashboard/member');
+        return;
       }
     }
-  }, [user, loading, router, requireAdmin, requireSuperAdmin, allowedRoles]);
+  }, [user, loading, router, requireAdmin, requireSuperAdmin, hasAllowedRole]);
 
   if (loading) {
     return (
@@ -71,7 +75,7 @@ const ProtectedRoute = ({ children, requireAdmin, requireSuperAdmin, allowedRole
   // Strict Render Guards
   if (requireSuperAdmin && user.role !== 'super-admin') return null;
   if (requireAdmin && user.role !== 'group-admin' && user.role !== 'super-admin') return null;
-  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.role as any)) return null;
+  if (!hasAllowedRole) return null;
 
   return <>{children}</>;
 };

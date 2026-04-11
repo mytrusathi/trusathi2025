@@ -1,4 +1,4 @@
-import { Users, Shield, Lock, Heart, Globe, Sparkles } from 'lucide-react'
+import { Users, Shield, Heart, Globe, Sparkles } from 'lucide-react'
 
 export default function WhyChoose() {
   const features = [

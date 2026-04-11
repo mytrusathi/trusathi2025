@@ -1,10 +1,9 @@
 import { auth, db, storage } from './firebase';
 import { 
-  collection, query, where, getDocs, writeBatch, doc, 
-  deleteDoc, collectionGroup 
+  collection, query, where, getDocs, writeBatch, doc
 } from 'firebase/firestore';
-import { ref, listAll, deleteObject } from 'firebase/storage';
-import { deleteUser, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { ref, listAll, deleteObject, type StorageReference } from 'firebase/storage';
+import { deleteUser } from 'firebase/auth';
 
 /**
  * Clean up all user data and delete account.
@@ -74,18 +73,16 @@ export const deleteUserAccount = async () => {
 
   // 2. Clean up Storage
   try {
-    const storagePath = `profiles/${uid}`;
-    const folderRef = ref(storage, storagePath);
-    const listResult = await listAll(folderRef);
-    
-    // Delete all files and recurse into folders if any
-    const deleteRecursively = async (folder: any) => {
-        const result = await listAll(folder);
-        await Promise.all(result.items.map(item => deleteObject(item)));
-        await Promise.all(result.prefixes.map(prefix => deleteRecursively(prefix)));
+    const deleteRecursively = async (folder: StorageReference) => {
+      const result = await listAll(folder);
+      await Promise.all(result.items.map(item => deleteObject(item)));
+      await Promise.all(result.prefixes.map(prefix => deleteRecursively(prefix)));
     };
-    
-    await deleteRecursively(folderRef);
+
+    await Promise.all([
+      deleteRecursively(ref(storage, `profiles/${uid}`)),
+      deleteRecursively(ref(storage, `selfies/${uid}`)),
+    ]);
     console.log("Storage files cleared.");
   } catch (storageErr) {
     console.warn("Storage deletion skipped or failed:", storageErr);
@@ -95,8 +92,8 @@ export const deleteUserAccount = async () => {
   try {
     await deleteUser(user);
     console.log("Auth account deleted.");
-  } catch (authErr: any) {
-    if (authErr.code === 'auth/requires-recent-login') {
+  } catch (authErr: unknown) {
+    if (typeof authErr === 'object' && authErr && 'code' in authErr && authErr.code === 'auth/requires-recent-login') {
       throw new Error("REAUTH_REQUIRED");
     }
     throw authErr;

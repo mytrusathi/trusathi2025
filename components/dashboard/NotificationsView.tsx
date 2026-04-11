@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { db } from '@/app/lib/firebase';
-import { collection, query, where, orderBy, getDocs, updateDoc, doc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, doc, writeBatch } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { Notification } from '@/types/notification';
-import { Bell, CheckCircle, Trash2, ExternalLink, Calendar, MessageSquare, Heart, Clock, Loader2 } from 'lucide-react';
+import { Bell, ExternalLink, Calendar, MessageSquare, Heart, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -14,7 +14,7 @@ export default function NotificationsView() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user) return;
     try {
       const q = query(
@@ -30,11 +30,11 @@ export default function NotificationsView() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
-    fetchNotifications();
-  }, [user]);
+    void fetchNotifications();
+  }, [fetchNotifications]);
 
   const markAllAsRead = async () => {
     if (!user || notifications.length === 0) return;

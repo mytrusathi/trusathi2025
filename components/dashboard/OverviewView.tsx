@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Heart, Send, Inbox, Bell, Star, 
   MessageSquare, LayoutDashboard, ArrowRight,
@@ -8,61 +8,72 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/app/lib/firebase';
-import { collection, query, where, getDoc, getDocs, onSnapshot, limit, orderBy, doc } from 'firebase/firestore';
+import { collection, query, where, getDoc, getDocs, onSnapshot, limit, doc } from 'firebase/firestore';
 import Link from 'next/link';
 import CompletenessMeter from './CompletenessMeter';
 import MatchRecommendations from './MatchRecommendations';
 import AuthenticityChecklist from './AuthenticityChecklist';
 import { Profile } from '@/types/profile';
+import { ReactNode } from 'react';
 
 export default function OverviewView() {
   const { user } = useAuth();
   const [stats, setStats] = useState({
     sent: 0,
     received: 0,
-    favorites: 0,
+    shortlisted: 0,
     unreadNotifs: 0
   });
   const [mainProfile, setMainProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [userDocMissing, setUserDocMissing] = useState(false);
 
+  const fetchData = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists()) {
+        setUserDocMissing(true);
+      }
+
+      const [sentSnap, receivedSnap, favSnap, profileSnap] = await Promise.all([
+        getDocs(query(collection(db, 'interests'), where('senderId', '==', user.uid))),
+        getDocs(query(collection(db, 'interests'), where('receiverId', '==', user.uid))),
+        getDocs(query(collection(db, 'favorites'), where('userId', '==', user.uid))),
+        getDocs(query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(1))),
+      ]);
+
+      setStats(prev => ({
+        ...prev,
+        sent: sentSnap.size,
+        received: receivedSnap.size,
+        shortlisted: favSnap.size,
+      }));
+
+      if (!profileSnap.empty) {
+        setMainProfile({ ...profileSnap.docs[0].data(), id: profileSnap.docs[0].id } as Profile);
+      }
+    } catch (err) {
+      console.error("Stats fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
 
     // 1. Fetch Stats & Check User Doc
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (!userDoc.exists()) {
-          setUserDocMissing(true);
-        }
-
-        const [sentSnap, receivedSnap, favSnap, profileSnap] = await Promise.all([
-          getDocs(query(collection(db, 'interests'), where('senderId', '==', user.uid))),
-          getDocs(query(collection(db, 'interests'), where('receiverId', '==', user.uid))),
-          getDocs(query(collection(db, 'favorites'), where('userId', '==', user.uid))),
-          getDocs(query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(1)))
-        ]);
-
-        setStats(prev => ({
-          ...prev,
-          sent: sentSnap.size,
-          received: receivedSnap.size,
-          favorites: favSnap.size
-        }));
-
-        if (!profileSnap.empty) {
-          setMainProfile({ ...profileSnap.docs[0].data(), id: profileSnap.docs[0].id } as Profile);
-        }
+        await fetchData();
       } catch (err) {
-        console.error("Stats fetch error:", err);
-      } finally {
-        setLoading(false);
+        console.error("Dashboard fetch error:", err);
       }
     };
 
-    fetchData();
+    fetchDashboardData();
 
     // 2. Real-time Unread Notifications
     const notifQuery = query(
@@ -75,7 +86,7 @@ export default function OverviewView() {
     });
 
     return () => unsubscribeNotifs();
-  }, [user]);
+  }, [fetchData, user]);
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -154,8 +165,8 @@ export default function OverviewView() {
          />
          <StatCard 
             icon={<Heart className="text-rose-500" />} 
-            label="Favorites" 
-            value={stats.favorites} 
+            label="Shortlisted" 
+            value={stats.shortlisted} 
             href="/dashboard/member?view=favorites"
             color="bg-rose-50"
          />
@@ -216,7 +227,7 @@ export default function OverviewView() {
                <div className="space-y-4">
                   <h3 className="text-xl font-black text-slate-800 px-2">Authenticity Status</h3>
                   <CompletenessMeter profile={mainProfile} />
-                  <AuthenticityChecklist profile={mainProfile} />
+                  <AuthenticityChecklist profile={mainProfile} onProfileRefresh={fetchData} />
                </div>
             )}
 
@@ -236,7 +247,16 @@ export default function OverviewView() {
   );
 }
 
-function StatCard({ icon, label, value, href, color, isAlert }: any) {
+interface StatCardProps {
+  icon: ReactNode;
+  label: string;
+  value: number;
+  href: string;
+  color: string;
+  isAlert?: boolean;
+}
+
+function StatCard({ icon, label, value, href, color, isAlert }: StatCardProps) {
    return (
       <Link href={href} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-100/40 transition-all group">
          <div className="flex items-center justify-between mb-4">
@@ -251,7 +271,15 @@ function StatCard({ icon, label, value, href, color, isAlert }: any) {
    );
 }
 
-function ActionBox({ icon, title, desc, href, accent }: any) {
+interface ActionBoxProps {
+  icon: ReactNode;
+  title: string;
+  desc: string;
+  href: string;
+  accent: string;
+}
+
+function ActionBox({ icon, title, desc, href, accent }: ActionBoxProps) {
    return (
       <Link href={href} className="p-6 bg-white rounded-3xl border border-slate-100 hover:border-indigo-100 transition-all flex items-start gap-4 group">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${accent} group-hover:scale-110 transition-transform`}>

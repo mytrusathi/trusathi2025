@@ -2,7 +2,7 @@
 import { 
   Settings, User, Shield, CheckCircle2, 
   AlertCircle, Save, Globe, EyeOff, Loader2, Trash2, TriangleAlert, X,
-  LogOut, ArrowLeft
+  ArrowLeft
 } from 'lucide-react';
 import { deleteUserAccount } from '@/app/lib/account-service';
 import { useRouter } from 'next/navigation';
@@ -18,7 +18,6 @@ export default function SettingsPage() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [groupName, setGroupName] = useState(user?.groupName || '');
-  const [isPublic, setIsPublic] = useState(user?.isApproved !== false); 
   const [isAccountPublic, setIsAccountPublic] = useState(true); 
   
   const [loading, setLoading] = useState(false);
@@ -58,9 +57,9 @@ export default function SettingsPage() {
       await deleteUserAccount();
       // On success, redirect to login or home
       router.push('/login?deleted=true');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Deletion error:", err);
-      if (err.message === "REAUTH_REQUIRED") {
+      if (err instanceof Error && err.message === "REAUTH_REQUIRED") {
         alert("For security reasons, please sign out and sign back in again before deleting your account.");
         await signOut(auth);
         window.location.href = '/login';
@@ -285,4 +284,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

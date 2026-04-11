@@ -127,10 +127,10 @@ function MemberDashboardContent() {
 
   const getHeaderInfo = () => {
     switch(activeView) {
-      case 'favorites': return { title: 'My Favorites', desc: 'Profiles you have marked for later.' };
+      case 'favorites': return { title: 'Shortlisted Profiles', desc: 'Profiles you want to keep in your final review list.' };
       case 'sent-interests': return { title: 'Sent Interests', desc: 'Requests you have sent to other candidates.' };
       case 'received-interests': return { title: 'Received Interests', desc: 'Inquiry and interest requests from others.' };
-      case 'chats': return { title: 'Messaging Center', desc: 'Real-time conversations with your connections.' };
+      case 'chats': return { title: 'Messaging Center', desc: 'Real-time conversations with your matches and the super admin trust desk.' };
       case 'partner-preferences': return { title: 'Match Criteria', desc: 'Define who you are looking for.' };
       case 'my-profiles': return { title: 'My Managed Profiles', desc: 'Create and manage biodatas for yourself or family members.' };
       default: return { title: 'Member Overview', desc: 'Track your activity and manage your matchmaking journey.' };

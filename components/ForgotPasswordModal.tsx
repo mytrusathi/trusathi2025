@@ -25,9 +25,9 @@ export default function ForgotPasswordModal({ isOpen, onClose }: Props) {
     try {
       await resetPassword(email);
       setSuccess(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || 'Failed to send reset email. Please check the address.');
+      setError(err instanceof Error ? err.message : 'Failed to send reset email. Please check the address.');
     } finally {
       setLoading(false);
     }

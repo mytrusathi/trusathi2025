@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { db } from '@/app/lib/firebase';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
-import { Loader2, Send, Inbox, Check, X, Clock, ExternalLink, AlertCircle } from 'lucide-react';
+import { Loader2, Send, Inbox, Check, X, Clock, ExternalLink, AlertCircle, Ban } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -29,6 +29,7 @@ export default function InterestsView({ type }: Props) {
   const [interests, setInterests] = useState<Interest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingActionId, setPendingActionId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInterests = async () => {
@@ -36,42 +37,60 @@ export default function InterestsView({ type }: Props) {
       setLoading(true);
       setError(null);
       try {
-        // Single-field query only — no composite index required in Firestore
-        const q = query(
+        const interestsQuery = query(
           collection(db, 'interests'),
-          where(type === 'sent' ? 'senderId' : 'receiverId', '==', user.uid)
+          where(type === 'sent' ? 'senderId' : 'receiverId', '==', user.uid),
         );
-        const snap = await getDocs(q);
+        const snap = await getDocs(interestsQuery);
         const fetched = snap.docs
-          .map(d => ({ ...d.data(), id: d.id } as Interest))
-          // Sort newest-first on the client
+          .map((interestDoc) => ({ ...interestDoc.data(), id: interestDoc.id } as Interest))
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setInterests(fetched);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Interest Fetch Error:', err);
         setError('Failed to load interests. Please try again.');
       } finally {
         setLoading(false);
       }
     };
+
     fetchInterests();
   }, [user, type]);
 
   const handleAction = async (id: string, newStatus: 'accepted' | 'rejected') => {
+    setPendingActionId(id);
     try {
       await updateDoc(doc(db, 'interests', id), { status: newStatus });
-      setInterests(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i));
+      setInterests((prev) => prev.map((interest) => (
+        interest.id === id ? { ...interest, status: newStatus } : interest
+      )));
     } catch (err) {
       console.error(err);
+    } finally {
+      setPendingActionId(null);
     }
   };
 
-  /* ---------- States ---------- */
+  const handleCancel = async (id: string) => {
+    if (!confirm('Cancel this interest request?')) return;
+
+    setPendingActionId(id);
+    try {
+      await deleteDoc(doc(db, 'interests', id));
+      setInterests((prev) => prev.filter((interest) => interest.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('Unable to cancel this interest right now.');
+    } finally {
+      setPendingActionId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-28 gap-3">
         <Loader2 className="animate-spin text-indigo-600" size={36} />
-        <p className="text-slate-500 font-medium text-sm">Loading interests…</p>
+        <p className="text-slate-500 font-medium text-sm">Loading interests...</p>
       </div>
     );
   }
@@ -108,7 +127,6 @@ export default function InterestsView({ type }: Props) {
     );
   }
 
-  /* ---------- List ---------- */
   return (
     <div className="space-y-3">
       {interests.map((interest) => (
@@ -117,8 +135,6 @@ export default function InterestsView({ type }: Props) {
           className="bg-white rounded-2xl border border-slate-100 hover:border-indigo-100 hover:shadow-md transition-all duration-200"
         >
           <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-
-            {/* Avatar */}
             <div className="w-14 h-14 rounded-xl bg-slate-100 relative overflow-hidden shrink-0 border border-slate-200">
               {interest.profileImage ? (
                 <Image src={interest.profileImage} alt={interest.profileName} fill className="object-cover" />
@@ -129,7 +145,6 @@ export default function InterestsView({ type }: Props) {
               )}
             </div>
 
-            {/* Info block */}
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-0.5">
                 <h4 className="font-bold text-slate-900 text-[15px] truncate">{interest.profileName}</h4>
@@ -145,22 +160,23 @@ export default function InterestsView({ type }: Props) {
               </p>
 
               <div className="flex flex-wrap items-center gap-2">
-                {/* Status badge */}
                 <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg ${
                   interest.status === 'pending'
                     ? 'bg-amber-50 text-amber-700 border border-amber-200'
                     : interest.status === 'accepted'
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                      ? 'bg-green-50 text-green-700 border border-green-200'
+                      : 'bg-rose-50 text-rose-700 border border-rose-200'
                 }`}>
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                    interest.status === 'pending' ? 'bg-amber-400' :
-                    interest.status === 'accepted' ? 'bg-green-500' : 'bg-rose-400'
+                    interest.status === 'pending'
+                      ? 'bg-amber-400'
+                      : interest.status === 'accepted'
+                        ? 'bg-green-500'
+                        : 'bg-rose-400'
                   }`} />
                   {interest.status === 'pending' ? 'Pending' : interest.status === 'accepted' ? 'Accepted' : 'Declined'}
                 </span>
 
-                {/* Date */}
                 <span className="text-xs text-slate-400 flex items-center gap-1">
                   <Clock size={11} />
                   {new Date(interest.createdAt).toLocaleDateString(undefined, {
@@ -170,7 +186,6 @@ export default function InterestsView({ type }: Props) {
               </div>
             </div>
 
-            {/* Action buttons */}
             <div className="flex flex-wrap items-center gap-2 shrink-0">
               <Link
                 href={`/profile/${interest.profileId}`}
@@ -183,18 +198,31 @@ export default function InterestsView({ type }: Props) {
                 <>
                   <button
                     onClick={() => handleAction(interest.id, 'accepted')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-sm transition-all shadow-sm whitespace-nowrap"
+                    disabled={pendingActionId === interest.id}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-sm transition-all shadow-sm whitespace-nowrap disabled:opacity-70"
                   >
-                    <Check size={14} /> Accept
+                    {pendingActionId === interest.id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} Accept
                   </button>
                   <button
                     onClick={() => handleAction(interest.id, 'rejected')}
-                    className="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition-all"
+                    disabled={pendingActionId === interest.id}
+                    className="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition-all disabled:opacity-70"
                     title="Decline"
                   >
-                    <X size={15} />
+                    {pendingActionId === interest.id ? <Loader2 size={15} className="animate-spin" /> : <X size={15} />}
                   </button>
                 </>
+              )}
+
+              {type === 'sent' && interest.status === 'pending' && (
+                <button
+                  onClick={() => handleCancel(interest.id)}
+                  disabled={pendingActionId === interest.id}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-semibold text-sm transition-all whitespace-nowrap disabled:opacity-70"
+                >
+                  {pendingActionId === interest.id ? <Loader2 size={14} className="animate-spin" /> : <Ban size={14} />}
+                  Cancel Interest
+                </button>
               )}
             </div>
           </div>

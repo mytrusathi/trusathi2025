@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Check, Phone, Mail, MessageSquare, AlertCircle, Info, Clock } from 'lucide-react';
+import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Phone, MessageSquare, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { db } from '@/app/lib/firebase';
@@ -12,6 +12,11 @@ import { sendNotification } from '@/app/lib/notification-service';
 interface ProfileActionsProps {
   profile: Profile;
   managerName?: string;
+}
+
+interface FirebaseErrorLike {
+  code?: string;
+  message?: string;
 }
 
 export default function ProfileActions({ profile, managerName }: ProfileActionsProps) {
@@ -91,12 +96,13 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
       });
 
       setInterestSent(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Interest failed:", error);
-      if (error.code === 'permission-denied') {
+      const firebaseError = error as FirebaseErrorLike;
+      if (firebaseError.code === 'permission-denied') {
         alert("Permission Denied: Your account may need approval or completion. Please check your dashboard.");
       } else {
-        alert(`Error: ${error.message || 'Could not send interest'}`);
+        alert(`Error: ${firebaseError.message || 'Could not send interest'}`);
       }
     } finally {
       setLoading(false);
@@ -268,14 +274,14 @@ export function FavoriteButton({ profile }: { profile: Profile }) {
 
     const toggleFavorite = async () => {
       if (!user) {
-        alert("Please login as a member to save favorites.");
+        alert("Please login as a member to shortlist profiles.");
         return;
       }
       if (!profileId) return;
 
       // Prevent self-favorite
       if (user.uid === profile.createdBy) {
-        alert("You cannot add your own profile to favorites.");
+        alert("You cannot shortlist your own profile.");
         return;
       }
 
@@ -305,8 +311,8 @@ export function FavoriteButton({ profile }: { profile: Profile }) {
                    senderId: user.uid,
                    senderName: user.displayName || 'A Member',
                    type: 'favorite',
-                   title: 'Profile Favorited',
-                   message: `Someone has added profile ${profile.profileNo || 'your profile'} to their favorites.`,
+                   title: 'Profile Shortlisted',
+                   message: `Someone has shortlisted profile ${profile.profileNo || 'your profile'}.`,
                    link: user.role === 'member' ? '/dashboard/member?view=favorites' : '/dashboard/group-admin'
                 });
              }
@@ -314,12 +320,13 @@ export function FavoriteButton({ profile }: { profile: Profile }) {
              console.warn("Notification for favorite failed:", notifErr);
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Favorite toggle failed:", error);
-        if (error.code === 'permission-denied') {
+        const firebaseError = error as FirebaseErrorLike;
+        if (firebaseError.code === 'permission-denied') {
            alert("Permission Denied: Your account may need approval or completion. Please check your dashboard.");
         } else {
-           alert(`Error: ${error.message || 'Could not update favorites'}`);
+           alert(`Error: ${firebaseError.message || 'Could not update shortlist'}`);
         }
       } finally {
         setLoading(false);

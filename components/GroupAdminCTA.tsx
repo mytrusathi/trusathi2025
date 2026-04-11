@@ -25,7 +25,7 @@ export default function GroupAdminCTA() {
             <p className="text-indigo-100/70 text-lg md:text-xl font-medium leading-relaxed">
               Take your WhatsApp or Social media group to the next level. Become a 
               <strong> Group Admin</strong> on TruSathi to professionally manage, 
-              screen, and protect your members' biodata with state-of-the-art tools.
+              screen, and protect your members&apos; biodata with state-of-the-art tools.
             </p>
 
             <div className="flex flex-wrap items-center gap-6 pt-4">

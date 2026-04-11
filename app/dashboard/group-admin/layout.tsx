@@ -5,15 +5,12 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { LogOut } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/app/lib/firebase';
-import { useAuth } from '@/context/AuthContext';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const GroupAdminLayoutContent = ({ children }: Props) => {
-  const { user } = useAuth();
-
   const handleLogout = async () => {
     try {
       await signOut(auth);

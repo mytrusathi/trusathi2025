@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Profile } from '../types/profile';
-import { MapPin, Briefcase, User, Calendar, ShieldCheck, Heart, ArrowUpRight, Lock } from 'lucide-react';
+import { MapPin, Briefcase, User, ShieldCheck, ArrowUpRight, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { FavoriteButton } from './ProfileActions';

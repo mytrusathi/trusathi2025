@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { db } from '../lib/firebase';
-import { collection, getDocs, query, where, limit, orderBy, QueryConstraint } from 'firebase/firestore';
+import { collection, getDocs, query, where, limit, QueryConstraint } from 'firebase/firestore';
 import { Profile } from '@/types/profile';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -67,7 +67,7 @@ function SearchResults() {
         });
 
         setProfiles(fetchedProfiles);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error fetching profiles:', error);
       } finally {
         setLoading(false);

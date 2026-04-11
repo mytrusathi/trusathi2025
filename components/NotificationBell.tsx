@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Bell, MessageSquare, Heart, MapPin, CheckCircle, ExternalLink, Trash2 } from 'lucide-react';
+import { Bell, ExternalLink } from 'lucide-react';
 import { db } from '@/app/lib/firebase';
 import { collection, query, where, orderBy, onSnapshot, updateDoc, doc, deleteDoc, limit } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { Notification } from '@/types/notification';
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
 
 import NotificationItem from './NotificationItem';
 

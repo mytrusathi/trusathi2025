@@ -2,6 +2,7 @@
 import React from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/app/lib/firebase';
+import { type LucideIcon } from 'lucide-react';
 import { 
   LogOut, LayoutDashboard, Users, Settings, 
   KeyRound, Globe, User, Search, Home,
@@ -13,7 +14,7 @@ import { useAuth } from '@/context/AuthContext';
 
 interface SidebarLink {
   href: string;
-  icon: any;
+  icon: LucideIcon;
   label: string;
   active?: boolean;
 }
@@ -94,7 +95,7 @@ export default function DashboardSidebar() {
       { 
         href: '/dashboard/member?view=favorites', 
         icon: Heart, 
-        label: 'Favorites', 
+        label: 'Shortlisted', 
         active: activeView === 'favorites' 
       },
       { 

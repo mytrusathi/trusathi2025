@@ -10,7 +10,7 @@ import { Profile } from '../../types/profile';
 import { parseWhatsAppBiodataToProfile } from '../../app/utils/profileParser';
 import { 
   Loader2, Upload, X, Save, User, MapPin, Briefcase, 
-  Users, Star, ChevronDown, Ruler, Heart, Calendar, Wand2, Shield, Camera
+  Users, Star, Ruler, Heart, Calendar, Wand2, Shield, Camera
 } from 'lucide-react';
 import { Section, Input, Select } from '../ui/FormElements';
 
@@ -30,6 +30,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
   const [rawBiodata, setRawBiodata] = useState('');
   const [parserMessage, setParserMessage] = useState('');
   const [matchedFields, setMatchedFields] = useState<string[]>([]);
+  const selfieInputId = 'profile-selfie-input';
 
   const [formData, setFormData] = useState<Partial<Profile>>({
     name: '',
@@ -136,7 +137,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
          const compressedFile = await imageCompression(file, options);
          setSelfieFile(compressedFile);
          setSelfiePreviewUrl(URL.createObjectURL(compressedFile));
-      } catch (error) {
+      } catch {
          setSelfieFile(file);
          setSelfiePreviewUrl(URL.createObjectURL(file));
       }
@@ -289,11 +290,18 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                   accept="image/*"
                   capture="user"
                   onChange={handleSelfieChange}
+                  id={selfieInputId}
                   className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                 />
               </div>
               <p className="text-sm font-bold text-slate-700">Authenticity Selfie</p>
-              <p className="text-[10px] text-slate-400 mt-1 leading-tight">Click to take/upload a live selfie for verification.</p>
+              <p className="text-[10px] text-slate-400 mt-1 leading-tight">Tap to open your front camera and capture a live selfie for verification.</p>
+              <label
+                htmlFor={selfieInputId}
+                className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-colors"
+              >
+                <Camera size={14} /> Open Camera
+              </label>
             </div>
 
             <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">

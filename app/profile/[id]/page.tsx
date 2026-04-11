@@ -7,8 +7,8 @@ import Footer from '@/components/Footer';
 import Image from 'next/image';
 import { 
   MapPin, Briefcase, Calendar, Ruler, Heart, 
-  Users, GraduationCap, Banknote, Building2, 
-  Baby, Home, User, Download, Printer, Shield
+  GraduationCap, Building2, 
+  Baby, Home, User, Shield
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import ProfileActions, { FavoriteButton } from '@/components/ProfileActions';
@@ -100,7 +100,6 @@ function ProfileView({
   creatorName: string;
   managedByGroup: string;
 }) {
-  const isSelfManaged = profile.createdBy === creatorName; // This is a bit weak, but better than nothing
   const managerLabel = managedByGroup ? `${managedByGroup} (${creatorName})` : creatorName;
 
   return (

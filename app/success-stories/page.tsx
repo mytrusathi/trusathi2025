@@ -1,8 +1,7 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import Image from 'next/image';
-import { Heart, Star, Sparkles, ShieldCheck, Users, Globe, HandHeart } from 'lucide-react';
+import { Sparkles, ShieldCheck, Users, Globe, HandHeart } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SuccessStoriesPage() {

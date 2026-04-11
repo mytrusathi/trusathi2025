@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { db } from '@/app/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
-import { Loader2, Heart, Save, SlidersHorizontal, Sparkles, ChevronDown } from 'lucide-react';
+import { Loader2, Heart, Save, Sparkles, ChevronDown } from 'lucide-react';
 
 interface Preferences {
   ageMin: string;
