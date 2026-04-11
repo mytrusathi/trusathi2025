@@ -12,7 +12,7 @@ import { collection, query, where, getDoc, getDocs, onSnapshot, limit, orderBy, 
 import Link from 'next/link';
 import CompletenessMeter from './CompletenessMeter';
 import MatchRecommendations from './MatchRecommendations';
-import VerificationChecklist from './VerificationChecklist';
+import AuthenticityChecklist from './AuthenticityChecklist';
 import { Profile } from '@/types/profile';
 
 export default function OverviewView() {
@@ -107,7 +107,7 @@ export default function OverviewView() {
       <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-100 rounded-2xl">
         <Shield size={16} className="text-amber-600 shrink-0" />
         <p className="text-xs font-bold text-amber-700">
-          <strong>Safety Notice:</strong> Apni safety ki zimmedari user ki khud ki hai. Always meet in public places and verify identities independently.{' '}
+          <strong>Safety Notice:</strong> Apni safety ki zimmedari user ki khud ki hai. Always meet in public places and authenticate identities independently.{' '}
           <a href="/terms" className="underline hover:text-amber-900">Read our Terms</a>.
         </p>
       </div>
@@ -195,7 +195,7 @@ export default function OverviewView() {
                />
                <ActionBox 
                   icon={<ShieldCheck size={24} />} 
-                  title="Verify Profile" 
+                  title="Authenticate Profile" 
                   desc="Ensure your details are accurate"
                   href="/dashboard/member"
                   accent="text-emerald-600 bg-emerald-50"
@@ -216,7 +216,7 @@ export default function OverviewView() {
                <div className="space-y-4">
                   <h3 className="text-xl font-black text-slate-800 px-2">Authenticity Status</h3>
                   <CompletenessMeter profile={mainProfile} />
-                  <VerificationChecklist profile={mainProfile} />
+                  <AuthenticityChecklist profile={mainProfile} />
                </div>
             )}
 
@@ -224,7 +224,7 @@ export default function OverviewView() {
                <Sparkles className="absolute -top-4 -right-4 text-white/10 group-hover:scale-150 transition-transform duration-700" size={120} />
                <h4 className="text-xl font-black leading-tight">Finding a life partner is a journey.</h4>
                <p className="text-indigo-200 text-sm font-medium leading-relaxed">
-                  We verify every profile to make your search safe. Trust the process and keep your biodata updated.
+                  We screen every profile to make your search safe. Trust the process and keep your biodata updated.
                </p>
                <Link href="/search" className="inline-flex items-center gap-2 text-white font-black text-xs uppercase tracking-widest pt-2 group-hover:gap-4 transition-all">
                   Browse Profiles <ArrowRight size={14} />

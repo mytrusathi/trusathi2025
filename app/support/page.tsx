@@ -9,8 +9,8 @@ import {
 
 const FAQS = [
   {
-    question: "How does the community verification work?",
-    answer: "Every Group Admin on TruSathi is personally verified by our super admins. When an admin uploads a profile, they are vouching for the authenticity of that candidate within their specific community (e.g., local samaj or religious group)."
+    question: "How does the community screening work?",
+    answer: "Every Group Admin on TruSathi is personally screened by our super admins. When an admin uploads a profile, they are vouching for the authenticity of that candidate within their specific community (e.g., local samaj or religious group)."
   },
   {
     question: "Is TruSathi free to use?",
@@ -27,7 +27,7 @@ const FAQS = [
   {
     id: "safety",
     question: "What safety measures should I take?",
-    answer: "Always verify details independently before making financial commitments. TruSathi provides a layer of trust through community admins, but we recommend meeting in public places and involving family members in the initial conversations."
+    answer: "Always authenticate details independently before making financial commitments. TruSathi provides a layer of trust through community admins, but we recommend meeting in public places and involving family members in the initial conversations."
   }
 ];
 
@@ -102,7 +102,7 @@ export default function SupportPage() {
                  <div>
                     <h3 className="text-lg font-bold text-indigo-900 mb-1">Your Safety is Our Priority</h3>
                     <p className="text-indigo-700/80 text-sm">
-                       We use a combination of automated systems and manual community verification to keep TruSathi safe for everyone. Never share financial information with matches.
+                       We use a combination of automated systems and manual community screening to keep TruSathi safe for everyone. Never share financial information with matches.
                     </p>
                  </div>
               </div>

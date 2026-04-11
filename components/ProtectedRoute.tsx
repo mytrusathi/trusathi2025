@@ -55,7 +55,7 @@ const ProtectedRoute = ({ children, requireAdmin, requireSuperAdmin, allowedRole
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-2">
            <Loader2 className="w-8 h-8 animate-spin text-rose-600" />
-           <p className="text-slate-500 text-sm font-medium">Verifying access...</p>
+           <p className="text-slate-500 text-sm font-medium">Authenticating access...</p>
         </div>
       </div>
     );

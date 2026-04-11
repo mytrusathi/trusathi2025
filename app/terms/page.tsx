@@ -74,9 +74,9 @@ export default function TermsPage() {
               TruSathi operates on a decentralized model relying on <strong>Group Admins</strong>. By using the service, you acknowledge that:
             </p>
             <ul className="list-disc pl-5 space-y-2">
-              <li><strong>Verification:</strong> Group Admins are responsible for verifying the authenticity of the profiles they upload or approve within their community groups.</li>
+              <li><strong>Screening:</strong> Group Admins are responsible for screening the authenticity of the profiles they upload or approve within their community groups.</li>
               <li><strong>Trust:</strong> While TruSathi provides the technology, the primary trust layer resides with the Group Admin. We encourage users to only join groups administered by individuals they know or trust.</li>
-              <li><strong>Liability:</strong> TruSathi is an intermediary. We do not personally verify every profile and are not liable for the conduct or accuracy of Group Admins.</li>
+              <li><strong>Liability:</strong> TruSathi is an intermediary. We do not personally screen every profile and are not liable for the conduct or accuracy of Group Admins.</li>
             </ul>
           </section>
 
@@ -128,10 +128,10 @@ export default function TermsPage() {
                 <strong>7.1 Platform as Mediator:</strong> TruSathi acts solely as a <em>technology intermediary</em> and a facilitator of connections between individuals. We are NOT a matchmaking agency, NOT a background verification service, and NOT a guarantor of any user&apos;s character, background, or intentions.
               </p>
               <p>
-                <strong>7.2 No Guarantee of Accuracy:</strong> We do not independently verify the accuracy, truthfulness, or completeness of any profile information submitted by users or Group Admins. All information is self-declared or admin-facilitated.
+                <strong>7.2 No Guarantee of Accuracy:</strong> We do not independently screen the accuracy, truthfulness, or completeness of any profile information submitted by users or Group Admins. All information is self-declared or admin-facilitated.
               </p>
               <p>
-                <strong>7.3 User Responsibility:</strong> <strong>Your safety is your own responsibility.</strong> You are solely responsible for conducting your own due diligence — including but not limited to meeting in safe public places, verifying identities independently, and consulting family members before proceeding with any match.
+                <strong>7.3 User Responsibility:</strong> <strong>Your safety is your own responsibility.</strong> You are solely responsible for conducting your own due diligence — including but not limited to meeting in safe public places, authenticating identities independently, and consulting family members before proceeding with any match.
               </p>
               <p>
                 <strong>7.4 Exclusion of Damages:</strong> To the fullest extent permitted by applicable law, TruSathi, its founders, directors, employees, Group Admins, and affiliates shall <em>not</em> be liable for:
@@ -183,13 +183,13 @@ export default function TermsPage() {
                 <strong>9.2 What it measures:</strong>
               </p>
               <ul className="list-disc pl-5 space-y-1.5 text-sm">
-                <li><strong>Phone Verification (+20 pts):</strong> A valid phone number has been registered for this account.</li>
+                <li><strong>Mobile Authentication (+20 pts):</strong> A valid phone number has been registered for this account.</li>
                 <li><strong>Profile Completeness (+20 pts):</strong> Proportional points based on how many profile fields are filled.</li>
                 <li><strong>Selfie / Photo Uploaded (+30 pts):</strong> The user has uploaded a selfie or profile photo.</li>
                 <li><strong>Admin Screening (+30 pts):</strong> The profile has been manually reviewed and approved by a Group Admin.</li>
               </ul>
               <p className="font-semibold bg-white border border-indigo-200 rounded-2xl p-4 text-sm">
-                🔔 <strong>Important:</strong> The Authenticity Score is <em>NOT</em> a character certificate, background check, police verification, or any form of guarantee about a person&apos;s intentions, honesty, or suitability for marriage. A score of 100 does not mean a person is verified or trustworthy in any legal sense.
+                🔔 <strong>Important:</strong> The Authenticity Score is <em>NOT</em> a character certificate, background check, police screening, or any form of guarantee about a person&apos;s intentions, honesty, or suitability for marriage. A score of 100 does not mean a person is screened or trustworthy in any legal sense.
               </p>
               <p className="text-sm italic text-gray-500">
                 TruSathi expressly disclaims any liability arising from reliance on the Authenticity Score when making personal or matrimonial decisions.

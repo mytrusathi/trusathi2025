@@ -45,7 +45,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Information We Collect</h2>
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <strong>Identity Data:</strong> Name, email address, phone number, and government ID (for verification purposes only, not displayed publicly).
+                <strong>Identity Data:</strong> Name, email address, phone number, and government ID (for authentication purposes only, not displayed publicly).
               </li>
               <li>
                 <strong>Profile Data:</strong> Date of birth, religion, caste, education, profession, family details, and photos uploaded for your matrimonial profile.
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
               When you join a community group or upload a profile, you explicitly grant the <strong>Group Admin</strong> of that community access to your data. Group Admins use this information to:
             </p>
             <ul className="list-disc pl-5 space-y-2">
-              <li>Verify your identity and family background.</li>
+              <li>Screen your identity and family background.</li>
               <li>Approve your profile for listing within the community.</li>
               <li>Facilitate contact between families.</li>
             </ul>
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc pl-5 space-y-2">
               <li><strong>Public Visitors:</strong> Can only see basic details (Age, Religion, Profession) and blurred/restricted photos.</li>
-              <li><strong>Verified Members:</strong> Can see full profiles only after being approved by a Group Admin.</li>
+              <li><strong>Authenticated Members:</strong> Can see full profiles only after being approved by a Group Admin.</li>
               <li><strong>Contact Details:</strong> Are only shared when mutual interest is expressed or via the Group Admin.</li>
             </ul>
           </section>

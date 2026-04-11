@@ -26,7 +26,7 @@ interface Props {
   profile: Profile | null;
 }
 
-export default function VerificationChecklist({ profile }: Props) {
+export default function AuthenticityChecklist({ profile }: Props) {
   const { user } = useAuth();
   
   // Calculate profile completeness (simple check)
@@ -50,20 +50,20 @@ export default function VerificationChecklist({ profile }: Props) {
     },
     {
       id: 'phone',
-      title: 'Verify Phone Number',
+      title: 'Confirm Phone Number',
       desc: 'Confirm your phone via OTP to prevent fraud.',
       icon: <Phone size={20} />,
       isCompleted: !!profile?.phoneVerified,
-      buttonText: profile?.phoneVerified ? 'Verified' : 'Verify Now'
+      buttonText: profile?.phoneVerified ? 'Confirmed' : 'Confirm Now'
     },
     {
       id: 'email',
-      title: 'Verify Email',
+      title: 'Authenticate Email',
       desc: 'Stay updated with important match alerts.',
       icon: <Mail size={20} />,
       isCompleted: !!user?.emailVerified,
       isOptional: true,
-      buttonText: user?.emailVerified ? 'Verified' : 'Verify Email'
+      buttonText: user?.emailVerified ? 'Authenticated' : 'Authenticate Email'
     },
     {
       id: 'selfie',
@@ -77,7 +77,7 @@ export default function VerificationChecklist({ profile }: Props) {
     {
       id: 'admin',
       title: 'Chat with Admin',
-      desc: 'Final step for official community verification.',
+      desc: 'Final step for official community screening.',
       icon: <MessageSquare size={20} />,
       isCompleted: !!profile?.adminApproved,
       href: '/dashboard/member?view=chats',
@@ -154,7 +154,7 @@ export default function VerificationChecklist({ profile }: Props) {
                  </Link>
                ) : (
                  <button 
-                   onClick={() => alert("Verification logic coming soon. Ensure all profile fields are filled!")}
+                   onClick={() => alert("Authenticity logic coming soon. Ensure all profile fields are filled!")}
                    className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                      step.isCompleted 
                      ? 'bg-emerald-100 text-emerald-700' 

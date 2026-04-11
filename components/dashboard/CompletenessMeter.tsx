@@ -33,11 +33,11 @@ export default function CompletenessMeter({ profile }: Props) {
   const pillars: Pillar[] = [
     {
       icon: <Phone size={16} />,
-      label: 'Phone Verified',
+      label: 'Mobile Authenticated',
       points: 20,
       earned: profile.phoneVerified ? 20 : 0,
       met: !!profile.phoneVerified,
-      hint: 'Phone number registered and verified via OTP.',
+      hint: 'Phone number registered and confirmed via OTP.',
     },
     {
       icon: <User size={16} />,
@@ -112,7 +112,7 @@ export default function CompletenessMeter({ profile }: Props) {
           <div
             key={p.label}
             title={p.hint}
-            onClick={() => p.view ? router.push(`/dashboard/member?view=${p.view}`) : alert("Verification logic coming soon!")}
+            onClick={() => p.view ? router.push(`/dashboard/member?view=${p.view}`) : alert("Authenticity logic coming soon!")}
             className={`flex items-center justify-between p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer group/pill ${
               p.met
                 ? 'bg-emerald-50 border-emerald-100 text-emerald-700 hover:bg-emerald-100'
