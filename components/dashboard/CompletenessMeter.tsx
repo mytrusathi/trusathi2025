@@ -15,6 +15,7 @@ interface Pillar {
   earned: number;
   met: boolean;
   hint: string;
+  view?: string;
 }
 
 export default function CompletenessMeter({ profile }: Props) {
@@ -111,7 +112,7 @@ export default function CompletenessMeter({ profile }: Props) {
           <div
             key={p.label}
             title={p.hint}
-            onClick={() => (p as any).view ? router.push(`/dashboard/member?view=${(p as any).view}`) : alert("Verification logic coming soon!")}
+            onClick={() => p.view ? router.push(`/dashboard/member?view=${p.view}`) : alert("Verification logic coming soon!")}
             className={`flex items-center justify-between p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer group/pill ${
               p.met
                 ? 'bg-emerald-50 border-emerald-100 text-emerald-700 hover:bg-emerald-100'
