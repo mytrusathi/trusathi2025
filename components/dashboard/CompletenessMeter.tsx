@@ -1,7 +1,8 @@
 "use client";
 import React from 'react';
 import { Profile } from '@/types/profile';
-import { CheckCircle2, Phone, User, Camera, ShieldCheck, Info } from 'lucide-react';
+import { CheckCircle2, Phone, User, Camera, ShieldCheck, Info, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   profile: Profile;
@@ -17,6 +18,7 @@ interface Pillar {
 }
 
 export default function CompletenessMeter({ profile }: Props) {
+  const router = useRouter();
   // --- Profile Completeness (out of 20 points) ---
   const coreFields: (keyof Profile)[] = [
     'name', 'gender', 'dob', 'city', 'religion', 'caste',
@@ -43,6 +45,7 @@ export default function CompletenessMeter({ profile }: Props) {
       earned: profilePoints,
       met: profilePoints >= 20,
       hint: `${filledCount} of ${coreFields.length} fields filled (${profilePoints}/20 pts).`,
+      view: 'my-profiles'
     },
     {
       icon: <Camera size={16} />,
@@ -51,6 +54,7 @@ export default function CompletenessMeter({ profile }: Props) {
       earned: profile.selfieUrl ? 30 : 0,
       met: !!profile.selfieUrl,
       hint: 'A live selfie or profile photo has been uploaded.',
+      view: 'my-profiles'
     },
     {
       icon: <ShieldCheck size={16} />,
@@ -59,6 +63,7 @@ export default function CompletenessMeter({ profile }: Props) {
       earned: profile.adminApproved ? 30 : 0,
       met: !!profile.adminApproved,
       hint: 'Profile has been manually reviewed and approved by a Group Admin.',
+      view: 'chats'
     },
   ];
 
@@ -106,21 +111,25 @@ export default function CompletenessMeter({ profile }: Props) {
           <div
             key={p.label}
             title={p.hint}
-            className={`flex items-center gap-2.5 p-3 rounded-2xl border text-xs font-bold transition-all ${
+            onClick={() => (p as any).view ? router.push(`/dashboard/member?view=${(p as any).view}`) : alert("Verification logic coming soon!")}
+            className={`flex items-center justify-between p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer group/pill ${
               p.met
-                ? 'bg-emerald-50 border-emerald-100 text-emerald-700'
-                : 'bg-slate-50 border-slate-100 text-slate-400'
+                ? 'bg-emerald-50 border-emerald-100 text-emerald-700 hover:bg-emerald-100'
+                : 'bg-slate-50 border-slate-100 text-slate-400 hover:border-indigo-200 hover:text-indigo-600'
             }`}
           >
-            <div className={`shrink-0 ${p.met ? 'text-emerald-600' : 'text-slate-300'}`}>
-              {p.met ? <CheckCircle2 size={14} /> : p.icon}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className={`shrink-0 ${p.met ? 'text-emerald-600' : 'text-slate-300 group-hover/pill:text-indigo-500'}`}>
+                {p.met ? <CheckCircle2 size={14} /> : p.icon}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate leading-tight">{p.label}</p>
+                <p className={`text-[9px] font-black uppercase ${p.met ? 'text-emerald-500' : 'text-slate-300 group-hover/pill:text-indigo-400'}`}>
+                  +{p.earned}/{p.points} pts
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="truncate leading-tight">{p.label}</p>
-              <p className={`text-[9px] font-black uppercase ${p.met ? 'text-emerald-500' : 'text-slate-300'}`}>
-                +{p.earned}/{p.points} pts
-              </p>
-            </div>
+            {!p.met && <ArrowRight size={12} className="opacity-0 group-hover/pill:opacity-100 transition-opacity" />}
           </div>
         ))}
       </div>

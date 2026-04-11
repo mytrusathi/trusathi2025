@@ -10,7 +10,7 @@ import { Profile } from '../../types/profile';
 import { parseWhatsAppBiodataToProfile } from '../../app/utils/profileParser';
 import { 
   Loader2, Upload, X, Save, User, MapPin, Briefcase, 
-  Users, Star, ChevronDown, Ruler, Heart, Calendar, Wand2, Shield
+  Users, Star, ChevronDown, Ruler, Heart, Calendar, Wand2, Shield, Camera
 } from 'lucide-react';
 import { Section, Input, Select } from '../ui/FormElements';
 
@@ -24,7 +24,9 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [selfieFile, setSelfieFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selfiePreviewUrl, setSelfiePreviewUrl] = useState<string | null>(null);
   const [rawBiodata, setRawBiodata] = useState('');
   const [parserMessage, setParserMessage] = useState('');
   const [matchedFields, setMatchedFields] = useState<string[]>([]);
@@ -61,6 +63,9 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     occupationCategory: 'Private',
     privacyLevel: 'Public',
     heightValue: 0,
+    selfieUrl: '',
+    phoneVerified: false,
+    adminApproved: false,
   });
 
   const heightToCm = (h: string) => {
@@ -75,7 +80,6 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
   };
 
   // --- HEIGHT GENERATOR ---
-  // Generates options from 4ft 0in to 7ft 0in
   const heightOptions = [];
   for (let ft = 4; ft <= 7; ft++) {
     for (let inch = 0; inch < 12; inch++) {
@@ -88,6 +92,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     if (initialData) {
       setFormData(initialData);
       setPreviewUrl(initialData.imageUrl || null);
+      setSelfiePreviewUrl(initialData.selfieUrl || null);
     }
   }, [initialData]);
 
@@ -123,13 +128,27 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     }
   };
 
+  const handleSelfieChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      try {
+         const options = { maxSizeMB: 0.2, maxWidthOrHeight: 800, useWebWorker: true };
+         const compressedFile = await imageCompression(file, options);
+         setSelfieFile(compressedFile);
+         setSelfiePreviewUrl(URL.createObjectURL(compressedFile));
+      } catch (error) {
+         setSelfieFile(file);
+         setSelfiePreviewUrl(URL.createObjectURL(file));
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
     setLoading(true);
     try {
-      // Convert height to numeric value for filtering
       const heightValue = heightToCm(formData.height || '');
       let imageUrl = formData.imageUrl;
 
@@ -139,9 +158,17 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
         imageUrl = await getDownloadURL(snapshot.ref);
       }
 
+      let selfieUrl = formData.selfieUrl;
+      if (selfieFile) {
+        const selfieRef = ref(storage, `selfies/${user.uid}/${Date.now()}_${selfieFile.name}`);
+        const snapshot = await uploadBytes(selfieRef, selfieFile);
+        selfieUrl = await getDownloadURL(snapshot.ref);
+      }
+
       const profileData = {
         ...formData,
         imageUrl,
+        selfieUrl,
         createdBy: user.uid,
         nameLowerCase: formData.name?.toLowerCase(), 
         isPublic: formData.isPublic ?? true,
@@ -154,7 +181,6 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
           updatedAt: new Date().toISOString(),
         });
       } else {
-        // Generate a random Profile Number (e.g., TS-A712B)
         const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
         const profileNo = `TS-${randomStr}`;
 
@@ -246,6 +272,30 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
               <p className="text-xs text-slate-400 mt-1">Click to upload a clear image</p>
             </div>
 
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
+              <div className="relative group cursor-pointer mb-4">
+                <div className="relative w-48 h-48 rounded-2xl bg-slate-100 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                    {selfiePreviewUrl ? (
+                    <Image src={selfiePreviewUrl} alt="Selfie Preview" fill sizes="192px" className="object-cover" unoptimized />
+                    ) : (
+                    <Camera className="text-slate-300" size={80} />
+                    )}
+                </div>
+                <div className="absolute bottom-2 right-4 bg-indigo-600 text-white p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
+                   <Shield size={20} />
+                </div>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  capture="user"
+                  onChange={handleSelfieChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                />
+              </div>
+              <p className="text-sm font-bold text-slate-700">Authenticity Selfie</p>
+              <p className="text-[10px] text-slate-400 mt-1 leading-tight">Click to take/upload a live selfie for verification.</p>
+            </div>
+
             <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
                  <MapPin size={16} className="text-rose-500"/> Location & Contact
@@ -323,7 +373,6 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                       displayFormat={(opt: string) => opt.charAt(0).toUpperCase() + opt.slice(1)}
                     />
                     
-                    {/* UPDATED: Height Dropdown */}
                     <Select 
                       label="Height" 
                       name="height" 

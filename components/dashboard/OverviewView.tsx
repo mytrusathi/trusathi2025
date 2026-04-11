@@ -12,6 +12,7 @@ import { collection, query, where, getDoc, getDocs, onSnapshot, limit, orderBy, 
 import Link from 'next/link';
 import CompletenessMeter from './CompletenessMeter';
 import MatchRecommendations from './MatchRecommendations';
+import VerificationChecklist from './VerificationChecklist';
 import { Profile } from '@/types/profile';
 
 export default function OverviewView() {
@@ -213,8 +214,9 @@ export default function OverviewView() {
          <div className="space-y-8">
             {mainProfile && (
                <div className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-800 px-2">Authenticity Score</h3>
+                  <h3 className="text-xl font-black text-slate-800 px-2">Authenticity Status</h3>
                   <CompletenessMeter profile={mainProfile} />
+                  <VerificationChecklist profile={mainProfile} />
                </div>
             )}
 

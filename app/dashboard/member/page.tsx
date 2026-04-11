@@ -190,7 +190,7 @@ function MemberDashboardContent() {
                   <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter drop-shadow-2xl">{header.title}</h1>
                   <p className="text-slate-400 text-base font-medium max-w-2xl leading-relaxed">{header.desc}</p>
               </div>
-              {!activeView && (
+              {!activeView && profiles.length === 0 && (
                 <button 
                   onClick={() => { setSelectedProfile(null); setShowForm(true); }}
                   className="bg-white text-slate-900 px-8 py-4 rounded-[2rem] font-black flex items-center gap-4 hover:bg-indigo-50 transition-all shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] active:scale-95 group shrink-0"
