@@ -22,7 +22,7 @@ export default function Footer() {
            </div>
            <div className="flex gap-4 shrink-0">
               <div className="px-5 py-3 bg-indigo-50 rounded-2xl text-indigo-700 font-black text-sm uppercase tracking-wider flex items-center gap-2">
-                 <Sparkles size={18} /> Verified & Free
+                 <Sparkles size={18} /> Authentic & Free
               </div>
            </div>
         </div>
@@ -36,7 +36,7 @@ export default function Footer() {
               <span className="text-2xl font-black text-indigo-900 tracking-tight">TruSathi</span>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed mb-10 max-w-xs font-medium">
-              The premier community-verified matrimony platform. Connecting families through trust, tradition, and transparency.
+              The premier community-screened matrimony platform. Connecting families through trust, tradition, and transparency.
             </p>
             <div className="flex gap-4">
               <SocialIcon icon={<Facebook size={18} />} />
@@ -50,7 +50,7 @@ export default function Footer() {
             <ul className="space-y-4 text-sm font-bold text-slate-500">
               <li><Link href="/search?role=Bride" className="hover:text-indigo-600 transition-colors">Browse Brides</Link></li>
               <li><Link href="/search?role=Groom" className="hover:text-indigo-600 transition-colors">Browse Grooms</Link></li>
-              <li><Link href="/communities" className="hover:text-indigo-600 transition-colors">Verified Groups</Link></li>
+              <li><Link href="/communities" className="hover:text-indigo-600 transition-colors">Authentic Groups</Link></li>
               <li><Link href="/success-stories" className="hover:text-indigo-600 transition-colors">Our Mission</Link></li>
             </ul>
           </div>
@@ -73,7 +73,7 @@ export default function Footer() {
           <div>
             <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-8">Service Policy</h4>
             <p className="text-xs text-slate-400 mb-6 leading-relaxed bg-white p-4 rounded-xl border border-slate-100">
-              Direct portal users can access verified contacts free of cost. However, independent Community Group Admins have the freedom to keep their added profiles free or charge at their discretion.
+              Direct portal users can access authenticated contacts free of cost. However, independent Community Group Admins have the freedom to keep their added profiles free or charge at their discretion.
             </p>
             <ul className="space-y-4 text-sm font-bold text-slate-500">
               <li><Link href="/terms" className="hover:text-indigo-600 transition-colors">Terms of Service</Link></li>

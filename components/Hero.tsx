@@ -34,10 +34,10 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative bg-[#020617] pt-16 pb-32 md:pt-40 md:pb-56 overflow-hidden">
+    <section className="relative bg-[#01040f] pt-16 pb-32 md:pt-40 md:pb-56 overflow-hidden">
       
       {/* Premium Ambient Background */}
-      <div className="absolute top-0 inset-x-0 h-[1000px] bg-[radial-gradient(circle_at_top,rgba(79,70,229,0.15),transparent_60%)] pointer-events-none"></div>
+      <div className="absolute top-0 inset-x-0 h-[1000px] bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.12),transparent_60%)] pointer-events-none"></div>
       
       {/* Sophisticated Animated Orbs */}
       <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[150px] animate-pulse pointer-events-none"></div>
@@ -51,8 +51,8 @@ export default function Hero() {
           <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white text-[10px] md:text-xs font-black backdrop-blur-3xl mb-12 animate-in fade-in slide-in-from-top-4 duration-1000 shadow-2xl">
             <div className="flex -space-x-2">
                {[1,2,3].map(i => (
-                 <div key={i} className="w-5 h-5 rounded-full border-2 border-[#020617] bg-slate-800 flex items-center justify-center text-[8px]">
-                    <Heart size={8} fill="currentColor" className="text-white/40" />
+                 <div key={i} className="w-5 h-5 rounded-full border-2 border-[#01040f] bg-slate-800 flex items-center justify-center text-[8px]">
+                    <Heart size={8} fill="currentColor" className="text-indigo-400/40" />
                  </div>
                ))}
             </div>
@@ -68,15 +68,15 @@ export default function Hero() {
              Your <span className="relative inline-block not-italic">
                 True Sathi
                 <svg className="absolute -bottom-2 md:-bottom-4 left-0 w-full" viewBox="0 0 358 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                   <path d="M3 17C118.333 5.66667 241.667 1.33333 355 17" stroke="#4F46E5" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" className="animate-draw" />
+                   <path d="M3 17C118.333 5.66667 241.667 1.33333 355 17" stroke="#6366f1" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" className="animate-draw" />
                 </svg>
              </span> <br/>
-             <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-indigo-300 to-slate-400 not-italic">Verified by Trust.</span>
+             <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-indigo-200 to-slate-400 not-italic">Authenticity by Trust.</span>
           </h1>
 
           {/* Subheading */}
           <p className="text-lg md:text-2xl text-slate-400 mb-16 leading-relaxed max-w-4xl font-medium animate-in fade-in slide-in-from-bottom duration-1000 delay-200 px-4">
-            A verified matchmaking ecosystem where <span className="text-white font-black underline decoration-indigo-500/50 decoration-4 underline-offset-8">Trust is the Currency</span>. 
+            A screened matchmaking ecosystem where <span className="text-white font-black underline decoration-indigo-500/50 decoration-4 underline-offset-8">Trust is the Currency</span>. 
             Direct portal access, community-vetted profiles, and zero platform fees.
           </p>
 
@@ -96,7 +96,7 @@ export default function Hero() {
                   <ShieldCheck size={14} className="text-emerald-500" /> Secure Protocol
                 </span>
                 <span className="flex items-center gap-2 group/tip hover:text-white transition-colors cursor-default">
-                  <Heart size={14} className="text-rose-500" /> Human Verified
+                  <Heart size={14} className="text-rose-500" /> Community Screened
                 </span>
                 <span className="flex items-center gap-2 group/tip hover:text-white transition-colors cursor-default">
                   <Sparkles size={14} className="text-indigo-400" /> Pure Service
@@ -116,7 +116,7 @@ export default function Hero() {
              </div>
              <div className="flex flex-col items-center md:border-l border-white/5 group">
                 <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter text-emerald-400">100%</span>
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Manual Audit</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Manual Screening</span>
              </div>
              <div className="flex flex-col items-center md:border-l border-white/5 group">
                 <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter text-indigo-400">0.00</span>

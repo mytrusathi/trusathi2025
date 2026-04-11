@@ -473,7 +473,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
                   <div className="space-y-0.5">
                      <p className="text-sm font-bold text-slate-800">Auto-reveal Contact Details</p>
-                     <p className="text-xs text-slate-500">When enabled, verified members will see phone/WhatsApp immediately after sending interest.</p>
+                     <p className="text-xs text-slate-500">When enabled, authenticated members will see phone/WhatsApp immediately after sending interest.</p>
                   </div>
                   <button 
                     type="button"

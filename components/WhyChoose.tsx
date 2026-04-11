@@ -4,14 +4,14 @@ export default function WhyChoose() {
   const features = [
     {
       icon: <Users className="w-8 h-8 text-indigo-500" />,
-      title: 'Community Verified',
+      title: 'Screened Profiles',
       desc: 'Profiles are personally vetted by trusted Group Admins from your own local community circles.',
       accent: 'bg-indigo-50 border-indigo-100'
     },
     {
       icon: <Shield className="w-8 h-8 text-emerald-500" />,
       title: 'Vow of Honesty',
-      desc: 'No fake stories or bots. TruSathi is built on the integrity of real connections and verified truth.',
+      desc: 'No fake stories or bots. TruSathi is built on the integrity of real connections and confirmed truth.',
       accent: 'bg-emerald-50 border-emerald-100'
     },
     {
@@ -26,12 +26,13 @@ export default function WhyChoose() {
     <section id="about" className="py-24 md:py-32 bg-white relative overflow-hidden">
       
       {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-slate-50 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-50/30 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-rose-50/20 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-2 transform hover:scale-105 transition-transform duration-300">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-2 transform hover:scale-105 transition-transform duration-300 shadow-sm border border-indigo-100">
              <Sparkles size={14} /> Why Choose TruSathi
           </div>
           <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-none">
@@ -47,12 +48,11 @@ export default function WhyChoose() {
           {features.map((feature, idx) => (
             <div
               key={idx}
-              className="group p-10 bg-white rounded-[3rem] border border-slate-100 transition-all duration-500 relative overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-2"
+              className="group p-10 bg-white rounded-[3rem] border border-slate-100 transition-all duration-500 relative overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/40 hover:-translate-y-2"
             >
-              {/* Subtle entry animation class can be added if using a library, but here we use hover */}
               <div className={`absolute top-0 right-0 w-32 h-32 ${feature.accent.split(' ')[0]} rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 -translate-y-1/2 translate-x-1/2`}></div>
               
-              <div className={`w-16 h-16 ${feature.accent} rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+              <div className={`w-16 h-16 ${feature.accent} rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border border-white/50 bg-white/50 backdrop-blur-sm`}>
                 {feature.icon}
               </div>
               

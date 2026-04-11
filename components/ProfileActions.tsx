@@ -117,7 +117,7 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
             </div>
             <div className="text-right">
               <p className="text-[10px] font-black uppercase text-slate-400">Matchmaking Vision</p>
-              <p className="text-xs font-bold text-slate-700 max-w-[200px]">A verified, secure, and free matchmaking service dedicated to building a better society.</p>
+              <p className="text-xs font-bold text-slate-700 max-w-[200px]">An authentic, secure, and free matchmaking service dedicated to building a better society.</p>
             </div>
         </div>
       </div>
@@ -154,7 +154,7 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
                       ? "Direct communication is now authorized. You can view private details below." 
                       : `Access request has been safely dispatched to ${managerName || 'the Admin'} for verification.`) 
                    : (profile.revealContactOnInterest 
-                      ? `Accessing this profile will reveal verified contact details immediately.` 
+                      ? `Accessing this profile will reveal authenticated contact details immediately.` 
                       : `A formal interest notifies ${managerName || 'the Admin'} to facilitate a secure introduction.`)}
               </p>
             </div>
@@ -233,7 +233,7 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
             <div className="flex items-center justify-center gap-6 pt-4 border-t border-white/5">
                 <div className="flex items-center gap-2">
                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                   <span className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">Verified Secure</span>
+                   <span className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">Secure Authenticated</span>
                 </div>
                 <div className="flex items-center gap-2">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>

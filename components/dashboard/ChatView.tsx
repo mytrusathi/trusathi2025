@@ -274,7 +274,7 @@ export default function ChatView() {
                         <h4 className="font-black text-slate-900 tracking-tight leading-tight mb-1">{selectedChat.otherName}</h4>
                         <div className="flex items-center gap-2">
                            <ShieldCheck size={12} className="text-indigo-500" />
-                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{selectedChat.profileNo} • Verified</p>
+                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{selectedChat.profileNo} • Authenticated</p>
                         </div>
                      </div>
                   </div>
