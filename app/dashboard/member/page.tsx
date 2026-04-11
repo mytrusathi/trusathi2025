@@ -7,12 +7,10 @@ import { useAuth } from '@/context/AuthContext';
 import { Profile } from '@/types/profile';
 import ProfileCard from '@/components/group-admin/ProfileCard';
 import ProfileForm from '@/components/group-admin/ProfileForm';
-import { Loader2, Plus, FileText, Search, UserCircle2, ShieldCheck, LayoutDashboard } from 'lucide-react';
+import { Loader2, Plus, UserCircle2, ShieldCheck, Home, ArrowLeft } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import PasswordChangeModal from '@/components/PasswordChangeModal';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 
 // Dashboard views and components
 import FavoritesView from '@/components/dashboard/FavoritesView';
@@ -144,49 +142,60 @@ function MemberDashboardContent() {
   if (showForm) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <Navbar />
-        <main className="max-w-4xl mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <button
+            onClick={() => { setShowForm(false); setSelectedProfile(null); }}
+            className="mb-6 inline-flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-2xl font-bold text-sm transition-all hover:shadow-sm"
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </button>
            <ProfileForm 
             initialData={selectedProfile}
             onSuccess={handleSuccess}
             onCancel={() => { setShowForm(false); setSelectedProfile(null); }}
            />
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans">
-      <Navbar />
-      
       <main className="grow">
-        <section className="bg-slate-900 pt-20 pb-16 px-4 relative overflow-hidden">
+        {/* Dashboard Header */}
+        <section className="bg-slate-900 pt-8 pb-14 px-4 relative overflow-hidden">
            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.2),transparent_70%)]"></div>
            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
-              <div className="space-y-6 text-center md:text-left">
-                  <div className="flex flex-col md:flex-row md:items-center gap-5">
+              <div className="space-y-4 text-center md:text-left w-full">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    {/* Back to Home button */}
+                    <Link
+                      href="/"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-2xl border border-white/10 transition-all text-xs font-bold uppercase tracking-widest self-start"
+                    >
+                      <Home size={14} /> Home
+                    </Link>
                     {activeView && (
                       <Link 
                         href="/dashboard/member" 
-                        className="inline-flex items-center justify-center w-12 h-12 bg-white/5 hover:bg-white/10 text-white rounded-2xl backdrop-blur-xl border border-white/10 transition-all hover:-translate-x-1 shadow-2xl"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-2xl border border-white/10 transition-all hover:-translate-x-1 text-xs font-bold uppercase tracking-widest"
                       >
-                         <LayoutDashboard size={20} />
+                         <ArrowLeft size={14} /> Overview
                       </Link>
                     )}
                     <div className="inline-flex items-center gap-2 px-5 py-2 bg-indigo-500/10 text-indigo-300 rounded-full text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md border border-indigo-500/20">
                        <ShieldCheck size={14} className="text-indigo-400" /> Member Center
                     </div>
                   </div>
-                  <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter drop-shadow-2xl">{header.title}</h1>
-                  <p className="text-slate-400 text-lg font-medium max-w-2xl leading-relaxed">{header.desc}</p>
+                  <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter drop-shadow-2xl">{header.title}</h1>
+                  <p className="text-slate-400 text-base font-medium max-w-2xl leading-relaxed">{header.desc}</p>
               </div>
               {!activeView && (
                 <button 
                   onClick={() => { setSelectedProfile(null); setShowForm(true); }}
-                  className="bg-white text-slate-900 px-10 py-5 rounded-[2rem] font-black flex items-center gap-4 hover:bg-indigo-50 transition-all shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] active:scale-95 group"
+                  className="bg-white text-slate-900 px-8 py-4 rounded-[2rem] font-black flex items-center gap-4 hover:bg-indigo-50 transition-all shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] active:scale-95 group shrink-0"
                 >
-                  <Plus size={24} className="group-hover:rotate-90 transition-transform duration-500 text-indigo-600" /> 
+                  <Plus size={20} className="group-hover:rotate-90 transition-transform duration-500 text-indigo-600" /> 
                   <span className="uppercase tracking-[0.2em] text-[10px]">Create New Profile</span>
                 </button>
               )}
@@ -201,7 +210,6 @@ function MemberDashboardContent() {
         </div>
       </main>
 
-      <Footer />
       {searchParams.get('view') === 'change-password' && <PasswordChangeModal closeHref="/dashboard/member" />}
     </div>
   );

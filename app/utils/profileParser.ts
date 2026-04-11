@@ -47,6 +47,9 @@ const FIELD_ALIASES: Record<keyof Partial<Profile>, string[]> = {
   heightValue: [],
   occupationCategory: ['occupation category', 'job type', 'work type'],
   privacyLevel: [],
+  selfieUrl: [],
+  phoneVerified: [],
+  adminApproved: [],
 };
 
 const normalizeText = (value: string) =>

@@ -6,7 +6,7 @@ import { signOut } from 'firebase/auth';
 import { useAuth } from '../../../context/AuthContext';
 import { 
   Users, Shield, Search, LogOut, 
-  LayoutDashboard, FileText, CheckCircle, AlertTriangle, AlertCircle, ShieldAlert 
+  LayoutDashboard, FileText, CheckCircle, AlertTriangle, AlertCircle, ShieldAlert, Home 
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import Navbar from '../../../components/Navbar';
@@ -148,9 +148,15 @@ const SuperAdminDashboard = () => {
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">Super Admin</p>
                   </div>
                </div>
+               <Link 
+                  href="/"
+                  className="w-full mt-3 flex items-center justify-center gap-3 px-6 py-3.5 text-slate-500 hover:bg-slate-100 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all"
+               >
+                  <Home size={14} /> Back to Home
+               </Link>
                <button 
                   onClick={handleLogout} 
-                  className="w-full mt-4 flex items-center justify-center gap-3 px-6 py-4 text-rose-600 hover:bg-rose-50 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all"
+                  className="w-full mt-1 flex items-center justify-center gap-3 px-6 py-3.5 text-rose-600 hover:bg-rose-50 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all"
                >
                   <LogOut size={16} /> Logout System
                </button>

@@ -196,10 +196,17 @@ export default function DashboardSidebar() {
         </div>
       </nav>
 
-      <div className="p-4 border-t border-slate-100">
+      <div className="p-4 border-t border-slate-100 space-y-1">
+         <Link
+           href="/"
+           className="w-full flex items-center gap-3 px-4 py-3.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all font-bold text-sm"
+         >
+           <Home size={18} />
+           Back to Home
+         </Link>
          <button 
            onClick={handleLogout}
-           className="w-full flex items-center gap-3 px-4 py-4 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all font-bold text-sm"
+           className="w-full flex items-center gap-3 px-4 py-3.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all font-bold text-sm"
          >
            <LogOut size={18} />
            Sign Out

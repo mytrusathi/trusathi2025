@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Heart, Send, Inbox, Bell, Star, 
   MessageSquare, LayoutDashboard, ArrowRight,
-  ShieldCheck, Sparkles, UserCircle2, Settings, AlertCircle
+  ShieldCheck, Sparkles, UserCircle2, Settings, AlertCircle, Shield
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/app/lib/firebase';
@@ -101,6 +101,15 @@ export default function OverviewView() {
           </div>
         </div>
       )}
+
+      {/* Safety Disclaimer Banner */}
+      <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+        <Shield size={16} className="text-amber-600 shrink-0" />
+        <p className="text-xs font-bold text-amber-700">
+          <strong>Safety Notice:</strong> Apni safety ki zimmedari user ki khud ki hai. Always meet in public places and verify identities independently.{' '}
+          <a href="/terms" className="underline hover:text-amber-900">Read our Terms</a>.
+        </p>
+      </div>
 
       {/* Welcome Banner */}
       <div className="relative overflow-hidden bg-white p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-2xl shadow-indigo-100/20">
@@ -204,7 +213,7 @@ export default function OverviewView() {
          <div className="space-y-8">
             {mainProfile && (
                <div className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-800 px-2">Profile Strength</h3>
+                  <h3 className="text-xl font-black text-slate-800 px-2">Authenticity Score</h3>
                   <CompletenessMeter profile={mainProfile} />
                </div>
             )}

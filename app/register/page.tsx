@@ -146,7 +146,7 @@ const RegisterPage = () => {
                         <Building2 className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-rose-500 transition-colors" size={20} />
                         <input
                           type="text"
-                          className="w-full bg-white/5 border border-white/10 pl-16 pr-6 py-4.5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-700 font-medium"
+                          className="w-full bg-white/5 border border-white/10 pl-16 pr-6 py-4 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-500 font-medium"
                           placeholder="e.g. Agarwal Community"
                           value={groupName}
                           onChange={(e) => setGroupName(e.target.value)}
@@ -160,7 +160,7 @@ const RegisterPage = () => {
                     <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Full Name</label>
                     <input
                       type="text"
-                      className="w-full bg-white/5 border border-white/10 px-6 py-4.5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-700 font-medium"
+                      className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-500 font-medium"
                       placeholder="Your name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -174,7 +174,7 @@ const RegisterPage = () => {
                     <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Email Address</label>
                     <input
                       type="email"
-                      className="w-full bg-white/5 border border-white/10 px-6 py-4.5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-700 font-medium"
+                      className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-500 font-medium"
                       placeholder="name@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -186,7 +186,7 @@ const RegisterPage = () => {
                     <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Create Password</label>
                     <input
                       type="password"
-                      className="w-full bg-white/5 border border-white/10 px-6 py-4.5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-700 font-medium"
+                      className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-500 font-medium"
                       placeholder="Min. 6 chars"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

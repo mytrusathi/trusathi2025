@@ -2,7 +2,7 @@
 import { 
   Settings, User, Shield, CheckCircle2, 
   AlertCircle, Save, Globe, EyeOff, Loader2, Trash2, TriangleAlert, X,
-  LogOut
+  LogOut, ArrowLeft
 } from 'lucide-react';
 import { deleteUserAccount } from '@/app/lib/account-service';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,7 @@ import { auth, db } from '@/app/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -73,13 +74,21 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-          <Settings className="text-rose-500" size={32} /> Account Settings
-        </h1>
-        <p className="text-slate-500 mt-2">Manage your account information and preferences.</p>
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <Link
+            href={user?.role === 'member' ? '/dashboard/member' : '/dashboard/group-admin'}
+            className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold text-sm mb-4 transition-colors group"
+          >
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
+          </Link>
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+            <Settings className="text-rose-500" size={32} /> Account Settings
+          </h1>
+          <p className="text-slate-500 mt-2">Manage your account information and preferences.</p>
+        </div>
       </div>
 
       {message && (

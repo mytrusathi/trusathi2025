@@ -4,8 +4,9 @@ import { useAuth } from '@/context/AuthContext';
 import ProfileList from '@/components/group-admin/ProfileList';
 import { useSearchParams } from 'next/navigation';
 import { 
-  Share2, ExternalLink, Copy, LayoutDashboard, Users, Check
+  Share2, ExternalLink, Copy, LayoutDashboard, Users, Check, Home, ArrowLeft
 } from 'lucide-react';
+import Link from 'next/link';
 import PasswordChangeModal from '@/components/PasswordChangeModal';
 import CommunityLinkModal from '@/components/CommunityLinkModal';
 import InterestsView from '@/components/dashboard/InterestsView';
@@ -124,14 +125,20 @@ function GroupAdminDashboardContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-        <div>
+        <div className="space-y-1">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-700 font-bold text-xs uppercase tracking-widest mb-2 transition-colors group"
+          >
+            <Home size={13} className="group-hover:-translate-y-0.5 transition-transform" /> Back to Home
+          </Link>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
             <LayoutDashboard className="text-rose-500" /> Admin Center
           </h1>
-          <p className="text-slate-500">
+          <p className="text-slate-500 text-sm">
             {user?.displayName || user?.email || 'Admin'} {user?.groupName ? `| ${user.groupName}` : ''}
           </p>
         </div>

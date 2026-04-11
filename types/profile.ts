@@ -51,5 +51,10 @@ export interface Profile {
   // New Fields for Advanced Features
   heightValue?: number; // Numeric height in cm for easy filtering
   occupationCategory?: 'Govt' | 'Private' | 'Business' | 'Professional' | 'Self-Employed' | 'Other';
-  privacyLevel?: 'Public' | 'MembersOnly' | 'Private'; 
+  privacyLevel?: 'Public' | 'MembersOnly' | 'Private';
+
+  // Authenticity Score Fields
+  selfieUrl?: string;      // Live selfie uploaded during/after registration
+  phoneVerified?: boolean; // Phone OTP verified
+  adminApproved?: boolean; // Manually screened by Admin
 }
