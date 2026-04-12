@@ -46,31 +46,30 @@ export default function LoginPage() {
     }
   }
 
-  if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617] gap-6 text-white">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-brand-navy-900 gap-6 text-white">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-white/10 border-t-amber-500 rounded-full animate-spin"></div>
-          <div className="absolute inset-0 flex items-center justify-center text-amber-500">
+          <div className="w-16 h-16 border-4 border-white/10 border-t-brand-gold-500 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 flex items-center justify-center text-brand-gold-500">
             <Handshake size={24} className="animate-pulse" />
           </div>
         </div>
-        <p className="font-black uppercase tracking-[0.3em] text-[10px] text-amber-500/50">Securing Connection...</p>
+        <p className="font-black uppercase tracking-[0.3em] text-[10px] text-brand-gold-500/50">Securing Connection...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#020617] p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen flex items-center justify-center bg-brand-navy-900 p-4 relative overflow-hidden font-sans">
 
       {/* Premium Background Glows */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-slate-500/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-gold-500/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-navy-700/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
 
       <div className="absolute top-8 left-8 z-10">
         <Link
           href="/"
-          className="flex items-center gap-3 text-slate-400 hover:text-amber-500 font-bold transition-all px-4 py-2 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md"
+          className="flex items-center gap-3 text-slate-400 hover:text-brand-gold-500 font-bold transition-all px-4 py-2 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md"
         >
           <ArrowLeft size={18} /> <span className="text-[10px] uppercase tracking-widest">Back to Home</span>
         </Link>
@@ -82,18 +81,18 @@ export default function LoginPage() {
         <div className="bg-white/[0.02] backdrop-blur-3xl p-8 md:p-12 rounded-[3.5rem] border border-white/10 shadow-2xl shadow-black/60 relative overflow-hidden">
 
           {/* Decorative Inner Glow */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 blur-3xl rounded-full"></div>
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand-gold-500/10 blur-3xl rounded-full"></div>
 
           <div className="text-center mb-10 space-y-6">
             {/* Handshake Logo Box - Navy/Gold Theme */}
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_100%)] border border-amber-500/30 rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-500">
-              <Handshake className="text-amber-500" size={38} strokeWidth={1.5} />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-[linear-gradient(135deg,var(--brand-navy-800)_0%,var(--brand-navy-700)_100%)] border border-brand-gold-500/30 rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-500">
+              <Handshake className="text-brand-gold-500" size={38} strokeWidth={1.5} />
             </div>
 
             <div className="space-y-2">
               <h1 className="text-3xl font-black text-white tracking-tight">Welcome Back</h1>
               <p className="text-slate-500 font-medium text-sm leading-relaxed">
-                Continue your journey with a <span className="text-amber-500 font-bold">Sathi</span> you can Trust
+                Continue your journey with a <span className="text-brand-gold-500 font-bold">Sathi</span> you can Trust
               </p>
             </div>
           </div>
@@ -109,12 +108,12 @@ export default function LoginPage() {
             <div className="space-y-4">
               {/* Email Input */}
               <div className="relative group">
-                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-500 transition-colors">
+                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-brand-gold-500 transition-colors">
                   <Mail size={20} />
                 </div>
                 <input
                   type="email"
-                  className="w-full pl-16 pr-6 py-5 bg-white/5 border border-white/10 rounded-[2rem] focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/40 outline-none transition-all text-white placeholder:text-slate-700 font-medium"
+                  className="w-full pl-16 pr-6 py-5 bg-white/5 border border-white/10 rounded-[2rem] focus:ring-2 focus:ring-brand-gold-500/20 focus:border-brand-gold-500/40 outline-none transition-all text-white placeholder:text-slate-700 font-medium"
                   placeholder="Email Address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -124,12 +123,12 @@ export default function LoginPage() {
 
               {/* Password Input */}
               <div className="relative group">
-                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-500 transition-colors">
+                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-brand-gold-500 transition-colors">
                   <Lock size={20} />
                 </div>
                 <input
                   type="password"
-                  className="w-full pl-16 pr-6 py-5 bg-white/5 border border-white/10 rounded-[2rem] focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/40 outline-none transition-all text-white placeholder:text-slate-700 font-medium"
+                  className="w-full pl-16 pr-6 py-5 bg-white/5 border border-white/10 rounded-[2rem] focus:ring-2 focus:ring-brand-gold-500/20 focus:border-brand-gold-500/40 outline-none transition-all text-white placeholder:text-slate-700 font-medium"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -142,7 +141,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setIsForgotModalOpen(true)}
-                className="text-[10px] font-black text-slate-500 hover:text-amber-500 uppercase tracking-widest transition-colors"
+                className="text-[10px] font-black text-slate-500 hover:text-brand-gold-500 uppercase tracking-widest transition-colors"
               >
                 Forgot Password?
               </button>
@@ -152,7 +151,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-5 rounded-[2rem] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-amber-500/10 active:scale-[0.98] uppercase tracking-widest text-xs"
+              className="w-full bg-brand-gold-500 hover:bg-brand-gold-400 text-slate-950 font-black py-5 rounded-[2rem] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-brand-gold-500/10 active:scale-[0.98] uppercase tracking-widest text-xs"
             >
               {isSubmitting ? <Loader2 className="animate-spin" /> : <>Sign In <ArrowRight size={18} /></>}
             </button>
@@ -160,7 +159,7 @@ export default function LoginPage() {
 
           <div className="mt-12 text-center text-xs font-bold">
             <span className="text-slate-600 font-medium">Don't have an account?</span>{' '}
-            <Link href="/register" className="text-amber-500 hover:text-amber-400 transition-colors uppercase tracking-widest underline decoration-amber-500/20 underline-offset-4">
+            <Link href="/register" className="text-brand-gold-500 hover:text-brand-gold-400 transition-colors uppercase tracking-widest underline decoration-brand-gold-500/20 underline-offset-4">
               Create Account
             </Link>
           </div>
@@ -168,7 +167,7 @@ export default function LoginPage() {
 
         {/* Trust Badge Footer */}
         <div className="mt-10 flex items-center justify-center gap-6 text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] opacity-60">
-          <div className="flex items-center gap-2 pr-6 border-r border-white/10 text-amber-500/50"><ShieldCheck size={14} /> Secured by TruSathi</div>
+          <div className="flex items-center gap-2 pr-6 border-r border-white/10 text-brand-gold-500/50"><ShieldCheck size={14} /> Secured by TruSathi</div>
           <div className="flex items-center gap-2"><Sparkles size={14} /> Integrity First</div>
         </div>
       </div>

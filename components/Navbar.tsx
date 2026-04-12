@@ -39,7 +39,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-4 group">
-            <div className="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center text-amber-500 shadow-[0_10px_20px_-5px_rgba(15,23,42,0.3)] group-hover:scale-105 transition-all duration-500 border border-amber-500/20">
+            <div className="w-11 h-11 bg-brand-navy-900 rounded-xl flex items-center justify-center text-brand-gold-500 shadow-[0_10px_20px_-5px_rgba(15,23,42,0.3)] group-hover:scale-105 transition-all duration-500 border border-brand-gold-500/20">
               <Handshake size={24} strokeWidth={1.5} className="group-hover:rotate-3 transition-transform" />
             </div>
 
@@ -47,7 +47,7 @@ export default function Navbar() {
               <span className={`text-2xl font-black tracking-tight transition-colors duration-300 ${scrolled ? 'text-slate-900' : 'text-white'}`}>
                 truSathi
               </span>
-              <span className={`text-[9px] font-black tracking-[0.2em] uppercase transition-colors duration-300 ${scrolled ? 'text-amber-600' : 'text-amber-400'}`}>
+              <span className={`text-[9px] font-black tracking-[0.2em] uppercase transition-colors duration-300 ${scrolled ? 'text-brand-gold-600' : 'text-brand-gold-400'}`}>
                 Your Search Companion
               </span>
             </div>
@@ -66,15 +66,15 @@ export default function Navbar() {
               <div className="flex items-center gap-6">
                 <Link
                   href="/login"
-                  className={`font-black text-[11px] uppercase tracking-widest transition-colors px-4 ${scrolled ? 'text-slate-600 hover:text-amber-600' : 'text-white/80 hover:text-white'}`}
+                  className={`font-black text-[11px] uppercase tracking-widest transition-colors px-4 ${scrolled ? 'text-slate-600 hover:text-brand-gold-600' : 'text-white/80 hover:text-white'}`}
                 >
                   Log In
                 </Link>
                 <Link
                   href="/register"
                   className={`px-7 py-3.5 rounded-2xl transition-all transform active:scale-95 text-[11px] font-black uppercase tracking-widest shadow-xl ${scrolled
-                    ? 'bg-slate-900 text-white hover:bg-black shadow-slate-200'
-                    : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-amber-500/20'
+                    ? 'bg-brand-navy-900 text-white hover:bg-black shadow-slate-200'
+                    : 'bg-brand-gold-500 text-slate-950 hover:bg-brand-gold-400 shadow-brand-gold-500/20'
                     }`}
                 >
                   Register Free
@@ -166,7 +166,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="block w-full text-center py-5 rounded-[1.5rem] font-black text-slate-950 bg-amber-500 text-xs uppercase tracking-widest shadow-xl shadow-amber-500/20"
+                  className="block w-full text-center py-5 rounded-[1.5rem] font-black text-slate-950 bg-brand-gold-500 text-xs uppercase tracking-widest shadow-xl shadow-brand-gold-500/20"
                   onClick={closeMenu}
                 >
                   Join TruSathi
@@ -176,7 +176,7 @@ export default function Navbar() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mb-6 text-left">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-amber-500">
+                    <div className="w-10 h-10 rounded-full bg-brand-navy-900 flex items-center justify-center text-brand-gold-500">
                       <User size={20} />
                     </div>
                     <p className="font-black text-slate-800">{user.displayName}</p>
@@ -213,7 +213,7 @@ function NavLink({ href, children, scrolled }: { href: string, children: React.R
     <Link
       href={href}
       className={`px-5 py-2.5 text-[11px] font-black rounded-xl transition-all font-sans uppercase tracking-[0.15em] ${scrolled
-        ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50/50'
+        ? 'text-slate-500 hover:text-brand-gold-600 hover:bg-brand-gold-500/10'
         : 'text-white/70 hover:text-white hover:bg-white/10'
         }`}
     >
@@ -239,7 +239,7 @@ function MobileNavLink({ href, onClick, children }: { href: string, onClick: () 
       onClick={onClick}
     >
       {children}
-      <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-amber-500 transition-colors" size={24} />
+      <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-brand-gold-500 transition-colors" size={24} />
     </Link>
   )
 }

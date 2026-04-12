@@ -1,21 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --primary: #4338ca;
-  --primary-hover: #3730a3;
-  --accent: #f59e0b;
+  /* Brand - Navy (Deep) */
+  --brand-navy-950: #010409;
+  --brand-navy-900: #020617;
+  --brand-navy-800: #0f172a;
+  --brand-navy-700: #1e293b;
+
+  /* Brand - Gold (Accents) */
+  --brand-gold-500: #f59e0b;
+  --brand-gold-400: #fbbf24;
+  --brand-gold-600: #d97706;
+
+  /* Semantic UI */
+  --background: #ffffff;
+  --foreground: #020617;
+  --muted: #f8fafc;
+  --border: #e2e8f0;
+  
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.5);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-accent: var(--accent);
+  --color-brand-navy-950: var(--brand-navy-950);
+  --color-brand-navy-900: var(--brand-navy-900);
+  --color-brand-navy-800: var(--brand-navy-800);
+  --color-brand-navy-700: var(--brand-navy-700);
+  
+  --color-brand-gold-500: var(--brand-gold-500);
+  --color-brand-gold-400: var(--brand-gold-400);
+  --color-brand-gold-600: var(--brand-gold-600);
+
+  --color-bg-page: var(--background);
+  --color-bg-muted: var(--muted);
+  --color-ui-border: var(--border);
+
   --font-sans: "Outfit", "Inter", "Segoe UI", Roboto, sans-serif;
 }
 
