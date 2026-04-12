@@ -23,7 +23,7 @@ export default function WhyChoose() {
   ]
 
   return (
-    <section id="about" className="pt-24 md:pt-32 pb-8 md:pb-10 bg-white relative overflow-hidden">
+    <section id="about" className="pt-10 md:pt-10 pb-8 md:pb-0 bg-white relative overflow-hidden">
       {/* Background Decor - Updated with Amber/Slate tones */}
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-amber-50/30 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-slate-50/50 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>

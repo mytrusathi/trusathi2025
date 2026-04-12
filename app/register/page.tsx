@@ -1,11 +1,13 @@
 "use client";
+
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
 import { useRouter } from 'next/navigation';
 import { doc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { User, Users, Check, Loader2, TriangleAlert, Building2, Heart, ArrowRight, ArrowLeft } from 'lucide-react';
+// ShieldCheck yahan add kiya gaya hai
+import { User, Users, Check, Loader2, TriangleAlert, Building2, Handshake, ArrowRight, ArrowLeft, Sparkles, Mail, Lock, UserCircle, ShieldCheck } from 'lucide-react';
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
@@ -30,19 +32,12 @@ const RegisterPage = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      await updateProfile(user, {
-        displayName: name,
-      });
+      await updateProfile(user, { displayName: name });
 
       const isApproved = role === 'member';
-
       let generatedSlug = '';
       if (role === 'group-admin') {
-        generatedSlug = groupName
-          .toLowerCase()
-          .trim()
-          .replace(/\s+/g, '-')
-          .replace(/[^a-z0-9-]/g, '');
+        generatedSlug = groupName.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       }
 
       await setDoc(doc(db, 'users', user.uid), {
@@ -50,7 +45,7 @@ const RegisterPage = () => {
         email: user.email,
         displayName: name,
         role: role,
-        isApproved: isApproved, 
+        isApproved: isApproved,
         slug: role === 'group-admin' ? generatedSlug : null,
         createdAt: new Date().toISOString(),
       });
@@ -60,199 +55,213 @@ const RegisterPage = () => {
       } else {
         router.push('/register/success');
       }
-      
-    } catch (err: unknown) {
-      console.error(err);
-      const firebaseError = err as { code?: string; message?: string };
-      if (firebaseError.code === 'auth/email-already-in-use') {
-        setError('This email is already registered.');
-      } else {
-        setError(firebaseError.message || 'Registration failed.');
-      }
+
+    } catch (err: any) {
+      setError(err.message || 'Registration failed.');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0F172A] p-4 relative overflow-hidden font-sans">
-      
-      {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-rose-500/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+    <div className="min-h-screen flex items-center justify-center bg-[#010409] p-6 relative overflow-hidden font-sans">
 
-      <div className="absolute top-8 left-8 z-10">
-        <Link 
-          href="/" 
-          className="flex items-center gap-3 text-slate-400 hover:text-white font-bold transition-all px-4 py-2 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md"
+      {/* Cinematic Background Glows */}
+      <div className="absolute top-[-20%] right-[-10%] w-[1000px] h-[1000px] bg-amber-500/5 rounded-full blur-[180px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-slate-800/20 rounded-full blur-[150px] pointer-events-none" />
+
+      {/* Floating Back Button */}
+      <div className="absolute top-10 left-10 z-20">
+        <Link
+          href="/"
+          className="group flex items-center gap-3 text-slate-500 hover:text-white transition-all px-5 py-2.5 bg-white/[0.03] rounded-full border border-white/10 backdrop-blur-md"
         >
-          <ArrowLeft size={18} /> <span className="text-sm uppercase tracking-widest">Home</span>
+          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em]">Exit to Home</span>
         </Link>
       </div>
 
-      <div className="w-full max-w-xl animate-in fade-in zoom-in duration-700 relative z-10">
-        <div className="bg-white/5 backdrop-blur-3xl p-8 md:p-12 rounded-[3.5rem] border border-white/10 shadow-3xl shadow-black/50">
-          
-          <div className="text-center mb-10 space-y-4">
-             <div className="inline-flex items-center justify-center w-16 h-16 bg-white/5 rounded-2xl border border-white/10 mb-2">
-                <Heart fill="#F43F5E" className="text-rose-500" size={28} />
-             </div>
-             <div>
-                <h2 className="text-4xl font-black text-white tracking-tight">Create Account</h2>
-                <p className="text-slate-400 font-medium mt-2">Join TruSathi to serve or find your partner</p>
-             </div>
+      <div className="w-full max-w-2xl animate-in fade-in zoom-in duration-1000 relative z-10 py-12">
+        <div className="bg-[#0d1117]/80 backdrop-blur-2xl p-10 md:p-16 rounded-[4rem] border border-white/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)]">
+
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-slate-900 to-black rounded-3xl border border-amber-500/30 mb-6 shadow-2xl rotate-3">
+              <Handshake className="text-amber-500" size={36} strokeWidth={1.5} />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-4">
+              Begin with <span className="text-amber-500 italic">Trust.</span>
+            </h2>
+            <p className="text-slate-500 font-medium text-base max-w-xs mx-auto">
+              Join the most sincere community for meaningful connections.
+            </p>
           </div>
 
           {error && (
-            <div className="bg-rose-500/10 text-rose-400 p-4 rounded-2xl mb-8 text-sm font-bold border border-rose-500/20">
-               {error}
+            <div className="bg-red-500/10 text-red-400 p-5 rounded-3xl mb-10 text-xs font-bold border border-red-500/20 flex items-center gap-4">
+              <TriangleAlert size={18} /> {error}
             </div>
           )}
 
-          <form onSubmit={handleRegister} className="space-y-8">
-            
-            {/* Role Selection */}
-            <div className="grid grid-cols-2 gap-4">
-               <RoleButton 
-                  active={role === 'member'} 
-                  onClick={() => setRole('member')} 
-                  icon={<User size={20} />} 
-                  label="Member" 
-                  desc="Find profile"
-               />
-               <RoleButton 
-                  active={role === 'group-admin'} 
-                  onClick={() => setRole('group-admin')} 
-                  icon={<Users size={20} />} 
-                  label="Admin" 
-                  desc="Manage group"
-               />
-            </div>
+          <form onSubmit={handleRegister} className="space-y-12">
 
-            {role === 'group-admin' && (
-              <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-2xl flex gap-3 animate-in slide-in-from-top-2 duration-300">
-                <TriangleAlert className="text-indigo-400 shrink-0" size={18} />
-                <p className="text-[11px] text-indigo-200 font-medium leading-relaxed">
-                   Admin accounts are manually verified by our team for community safety before dashboard access is granted.
-                </p>
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] px-2">Select Account Type</label>
+              <div className="grid grid-cols-2 gap-6">
+                <RoleButton
+                  active={role === 'member'}
+                  onClick={() => setRole('member')}
+                  icon={<UserCircle size={24} />}
+                  label="Member"
+                  desc="Seeking Sathi"
+                />
+                <RoleButton
+                  active={role === 'group-admin'}
+                  onClick={() => setRole('group-admin')}
+                  icon={<Users size={24} />}
+                  label="Admin"
+                  desc="Group Leader"
+                />
               </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div className="space-y-6">
-                  {role === 'group-admin' && (
-                    <div className="animate-in slide-in-from-left duration-500">
-                      <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Community Group Name</label>
-                      <div className="relative group">
-                        <Building2 className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-rose-500 transition-colors" size={20} />
-                        <input
-                          type="text"
-                          className="w-full bg-white/5 border border-white/10 pl-16 pr-6 py-4 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-500 font-medium"
-                          placeholder="e.g. Agarwal Community"
-                          value={groupName}
-                          onChange={(e) => setGroupName(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Full Name</label>
-                    <input
-                      type="text"
-                      className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-500 font-medium"
-                      placeholder="Your name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
-               </div>
-
-               <div className="space-y-6">
-                  <div>
-                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Email Address</label>
-                    <input
-                      type="email"
-                      className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-500 font-medium"
-                      placeholder="name@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3 px-1">Create Password</label>
-                    <input
-                      type="password"
-                      className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-rose-500/20 placeholder:text-slate-500 font-medium"
-                      placeholder="Min. 6 chars"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      minLength={6}
-                    />
-                  </div>
-               </div>
             </div>
 
-            <div className="bg-white/5 p-6 rounded-3xl border border-white/10 flex items-start gap-3">
-              <input 
-                type="checkbox" 
-                id="terms" 
-                required 
-                className="mt-1 w-5 h-5 bg-transparent border-white/20 rounded focus:ring-rose-500"
+            <div className="space-y-8">
+              {role === 'group-admin' && (
+                <div className="animate-in slide-in-from-top-4 duration-500">
+                  <InputField
+                    icon={<Building2 size={20} />}
+                    label="Community Name"
+                    placeholder="e.g. Nabha Community Circle"
+                    value={groupName}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGroupName(e.target.value)}
+                  />
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <InputField
+                  icon={<User size={20} />}
+                  label="Full Name"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                />
+                <InputField
+                  icon={<Mail size={20} />}
+                  label="Email Address"
+                  placeholder="name@email.com"
+                  value={email}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  type="email"
+                />
+              </div>
+
+              <InputField
+                icon={<Lock size={20} />}
+                label="Password"
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                type="password"
               />
-              <label htmlFor="terms" className="text-xs text-slate-400 font-medium leading-relaxed cursor-pointer">
-                I agree to serve the community in an authentic way and accept the{' '}
-                <Link href="/terms" className="text-white hover:underline underline-offset-4">Terms & Conditions</Link>.
+            </div>
+
+            <div className="bg-white/5 p-6 rounded-[2rem] border border-white/5 flex items-start gap-4 transition-all hover:bg-white/[0.08]">
+              <input
+                type="checkbox" id="terms" required
+                className="mt-1 w-5 h-5 bg-transparent border-white/20 rounded accent-amber-500 cursor-pointer transition-all"
+              />
+              <label htmlFor="terms" className="text-[11px] text-slate-500 font-medium leading-relaxed cursor-pointer select-none">
+                I agree to maintain <span className="text-white">absolute honesty</span> and follow the
+                <Link href="/terms" className="text-amber-500 hover:text-amber-400 ml-1 font-black underline decoration-amber-500/20 underline-offset-4">Community Charter</Link>.
               </label>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-5 px-8 rounded-[2rem] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-2xl shadow-rose-900/40 transform active:scale-[0.98]"
+              className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-6 rounded-[2rem] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-[0_20px_40px_-10px_rgba(245,158,11,0.3)] transform active:scale-[0.98] uppercase tracking-[0.25em] text-xs"
             >
               {loading ? <Loader2 className="animate-spin" /> : <>Complete Registration <ArrowRight size={20} /></>}
             </button>
           </form>
 
-           <p className="mt-10 text-center text-slate-500 text-sm font-bold">
-            Joined already? <Link href="/login" className="text-white hover:text-rose-400 transition-colors ml-1">Sign In</Link>
-          </p>
+          <div className="mt-12 text-center">
+            <span className="text-slate-600 text-xs font-bold uppercase tracking-widest">Already a member?</span>
+            <Link href="/login" className="text-white hover:text-amber-500 transition-colors ml-3 text-xs font-black uppercase tracking-widest underline decoration-white/20 underline-offset-8">
+              Sign In
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-12 flex items-center justify-center gap-8 opacity-40">
+          <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+            <ShieldCheck size={14} className="text-amber-500" /> End-to-End Privacy
+          </div>
+          <div className="h-4 w-px bg-white/10" />
+          <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+            <Sparkles size={14} className="text-amber-500" /> Human Verified
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-function RoleButton({ active, onClick, icon, label, desc }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, desc: string }) {
-   return (
-      <button
-         type="button"
-         onClick={onClick}
-         className={`relative p-6 rounded-[2rem] border-2 flex flex-col items-center text-center gap-2 transition-all duration-300 ${
-            active 
-            ? 'border-rose-500 bg-rose-500/10 text-white' 
-            : 'border-white/10 bg-white/5 text-slate-500 hover:border-white/20'
-         }`}
-      >
-         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-1 ${active ? 'bg-rose-500 text-white' : 'bg-white/5 text-slate-600'}`}>
-            {icon}
-         </div>
-         <span className="text-sm font-black uppercase tracking-widest leading-none">{label}</span>
-         <span className={`text-[10px] font-bold uppercase tracking-widest opacity-40 ${active ? 'text-rose-200' : ''}`}>{desc}</span>
-         {active && (
-            <div className="absolute top-4 right-4 text-rose-500">
-               <div className="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center text-white scale-110 shadow-lg">
-                  <Check size={12} strokeWidth={4} />
-               </div>
-            </div>
-         )}
-      </button>
-   );
+// --- Types Fix for Reusable Components ---
+
+interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  icon: React.ReactNode;
+}
+
+function InputField({ label, icon, ...props }: InputFieldProps) {
+  return (
+    <div className="space-y-3">
+      <label className="block text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] px-2">{label}</label>
+      <div className="relative group">
+        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-500 transition-colors duration-300">
+          {icon}
+        </div>
+        <input
+          {...props}
+          className="w-full bg-white/[0.03] border border-white/10 pl-16 pr-6 py-5 rounded-[2rem] outline-none text-white focus:ring-2 focus:ring-amber-500/10 focus:border-amber-500/30 placeholder:text-slate-700 font-medium transition-all duration-300 hover:bg-white/[0.05]"
+        />
+      </div>
+    </div>
+  );
+}
+
+interface RoleButtonProps {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+  desc: string;
+}
+
+function RoleButton({ active, onClick, icon, label, desc }: RoleButtonProps) {
+  return (
+    <button
+      type="button" onClick={onClick}
+      className={`relative p-8 rounded-[3rem] border-2 flex flex-col items-center text-center gap-3 transition-all duration-500 ${active
+          ? 'border-amber-500/50 bg-amber-500/5 text-white shadow-[0_20px_40px_-15px_rgba(245,158,11,0.1)]'
+          : 'border-white/5 bg-white/[0.02] text-slate-600 hover:border-white/10 hover:bg-white/[0.04]'
+        }`}
+    >
+      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-1 transition-all duration-500 ${active ? 'bg-amber-500 text-slate-950 scale-110 rotate-3' : 'bg-white/5 text-slate-700'}`}>
+        {icon}
+      </div>
+      <span className="text-xs font-black uppercase tracking-widest leading-none">{label}</span>
+      <span className={`text-[9px] font-bold uppercase tracking-[0.2em] opacity-40 transition-opacity ${active ? 'opacity-100 text-amber-500/60' : ''}`}>{desc}</span>
+
+      {active && (
+        <div className="absolute top-5 right-5 animate-in zoom-in duration-300">
+          <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center text-slate-950 shadow-lg">
+            <Check size={14} strokeWidth={4} />
+          </div>
+        </div>
+      )}
+    </button>
+  );
 }
 
 export default RegisterPage;

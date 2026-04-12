@@ -4,11 +4,11 @@ import VisitorCounter from './VisitorCounter';
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-50 border-t border-slate-100 pt-24 pb-12">
+    <footer className="bg-slate-50 border-t border-slate-100 pt-10 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Motto Section - Updated for TruSathi Identity */}
-        <div className="mb-20 bg-white rounded-3xl p-8 border border-amber-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="mb-10 bg-white rounded-3xl p-8 border border-amber-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-6 text-left max-w-2xl">
             <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-amber-500 shrink-0">
               <Handshake size={32} />

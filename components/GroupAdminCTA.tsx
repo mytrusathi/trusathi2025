@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function GroupAdminCTA() {
   return (
-    <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Container - Updated to Navy/Slate Gradient */}
       <div className="bg-[linear-gradient(135deg,#020617_0%,#0f172a_50%,#1e293b_100%)] rounded-[3.5rem] p-10 md:p-24 text-center md:text-left relative overflow-hidden shadow-3xl shadow-slate-200/20 group border border-white/5">
 

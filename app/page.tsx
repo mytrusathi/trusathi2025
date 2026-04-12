@@ -50,8 +50,8 @@ export default function TrusathiUI() {
       <Hero />
 
       {/* Trust Highlights Section */}
-      <section className="relative bg-[#fcfbf7] px-4 pb-24 pt-10 md:px-8">
-        <div className="mx-auto -mt-12 max-w-7xl rounded-[2.5rem] border border-[#e7e2d8] bg-white/95 p-6 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.25)] backdrop-blur-xl md:-mt-40 md:p-8">
+      <section className="relative bg-[#fcfbf7] px-4 pb-10 pt-10 md:px-8">
+        <div className="mx-auto -mt-12 max-w-7xl rounded-[2.5rem] border border-[#e7e2d8] bg-white/95 p-6 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.25)] backdrop-blur-xl md:-mt-10 md:p-8">
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
 
             {/* Main Branding Card - Navy/Gold Gradient */}

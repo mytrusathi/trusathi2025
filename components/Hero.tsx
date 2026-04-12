@@ -17,7 +17,7 @@ export default function Hero() {
     async function fetchActualStats() {
       try {
         const [profileCount, communityCount] = await Promise.all([
-          getCountFromServer(collection(db, 'profiles')),
+          getCountFromServer(query(collection(db, 'profiles'), where('isPublic', '==', true))),
           getCountFromServer(query(collection(db, 'users'), where('role', '==', 'group-admin')))
         ]);
 
@@ -34,7 +34,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative bg-[#01040f] pt-16 pb-32 md:pt-40 md:pb-56 overflow-hidden">
+    <section className="relative bg-[#01040f] pt-16 pb-32 md:pt-40 md:pb-20 overflow-hidden">
 
       {/* Premium Ambient Background - Using Navy/Gold tones */}
       <div className="absolute top-0 inset-x-0 h-[1000px] bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.05),transparent_60%)] pointer-events-none"></div>

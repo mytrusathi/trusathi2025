@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Heart, Menu, X, User, LogOut, ChevronDown, LayoutDashboard, Settings, Handshake } from 'lucide-react'
+import { Menu, X, User, LogOut, ChevronDown, LayoutDashboard, Settings, Handshake } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -31,7 +31,7 @@ export default function Navbar() {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-      ? 'bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2 border-b border-slate-100'
+      ? 'bg-white/90 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2 border-b border-slate-100'
       : 'bg-transparent py-6'
       }`}>
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
@@ -39,22 +39,20 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-4 group">
-            {/* Golden/Navy Badge Container */}
             <div className="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center text-amber-500 shadow-[0_10px_20px_-5px_rgba(15,23,42,0.3)] group-hover:scale-105 transition-all duration-500 border border-amber-500/20">
-              {/* Handshake Icon instead of Heart */}
               <Handshake size={24} strokeWidth={1.5} className="group-hover:rotate-3 transition-transform" />
             </div>
 
-            {/* Brand Text */}
             <div className="flex flex-col leading-none">
-              <span className={`text-2xl font-bold tracking-tight transition-colors duration-300 ${scrolled ? 'text-slate-900' : 'text-white'}`}>
+              <span className={`text-2xl font-black tracking-tight transition-colors duration-300 ${scrolled ? 'text-slate-900' : 'text-white'}`}>
                 truSathi
               </span>
-              <span className={`text-[10px] font-medium tracking-[0.1em] uppercase transition-colors duration-300 ${scrolled ? 'text-amber-600' : 'text-amber-400'}`}>
+              <span className={`text-[9px] font-black tracking-[0.2em] uppercase transition-colors duration-300 ${scrolled ? 'text-amber-600' : 'text-amber-400'}`}>
                 Your Search Companion
               </span>
             </div>
           </Link>
+
           {/* Desktop Links */}
           <div className="hidden md:flex space-x-1 items-center">
             <NavLink href="/search" scrolled={scrolled}>Browse Profiles</NavLink>
@@ -68,15 +66,15 @@ export default function Navbar() {
               <div className="flex items-center gap-6">
                 <Link
                   href="/login"
-                  className={`font-black text-[11px] uppercase tracking-widest transition-colors px-4 ${scrolled ? 'text-slate-600 hover:text-indigo-600' : 'text-white/80 hover:text-white'}`}
+                  className={`font-black text-[11px] uppercase tracking-widest transition-colors px-4 ${scrolled ? 'text-slate-600 hover:text-amber-600' : 'text-white/80 hover:text-white'}`}
                 >
                   Log In
                 </Link>
                 <Link
                   href="/register"
-                  className={`px-7 py-3.5 rounded-2x border transition-all transform active:scale-95 text-[11px] font-black uppercase tracking-widest shadow-xl ${scrolled
-                    ? 'bg-slate-900 border-slate-900 text-white hover:bg-indigo-600 hover:border-indigo-600 shadow-slate-200'
-                    : 'bg-white border-white text-slate-900 hover:bg-indigo-50 shadow-indigo-500/10'
+                  className={`px-7 py-3.5 rounded-2xl transition-all transform active:scale-95 text-[11px] font-black uppercase tracking-widest shadow-xl ${scrolled
+                    ? 'bg-slate-900 text-white hover:bg-black shadow-slate-200'
+                    : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-amber-500/20'
                     }`}
                 >
                   Register Free
@@ -88,15 +86,13 @@ export default function Navbar() {
                   <NotificationBell />
                 </div>
 
-                {/* User Dropdown Group */}
                 <div className={`flex items-center gap-3 pl-4 border-l group relative ${scrolled ? 'border-slate-100' : 'border-white/10'}`}>
                   <div className="text-right hidden sm:block">
                     <p className={`text-[10px] font-black uppercase tracking-tighter opacity-60 ${scrolled ? 'text-slate-400' : 'text-white/60'}`}>Welcome,</p>
                     <p className={`text-sm font-black truncate max-w-[120px] ${scrolled ? 'text-slate-800' : 'text-white'}`}>{user.displayName?.split(' ')[0] || 'Member'}</p>
                   </div>
 
-                  {/* Trigger Button */}
-                  <button className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold overflow-hidden shadow-sm transition-transform group-hover:scale-105 ${scrolled ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-white/10 border-white/20 text-white'
+                  <button className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold overflow-hidden shadow-sm transition-transform group-hover:scale-105 ${scrolled ? 'bg-slate-50 border-slate-100 text-slate-600' : 'bg-white/10 border-white/20 text-white'
                     }`}>
                     {user.photoURL ? (
                       <Image src={user.photoURL} alt="Profile" width={40} height={40} className="w-full h-full object-cover" />
@@ -108,8 +104,8 @@ export default function Navbar() {
                   {/* Dropdown Menu */}
                   <div className="absolute right-0 top-full pt-2 w-64 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-[100]">
                     <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden py-3">
-                      <div className="px-6 py-4 border-b border-slate-50 mb-2">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Authenticated Account</p>
+                      <div className="px-6 py-4 border-b border-slate-50 mb-2 text-left">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Authenticated</p>
                         <p className="text-sm font-black text-slate-900 truncate">{user.email || user.displayName}</p>
                       </div>
 
@@ -125,7 +121,7 @@ export default function Navbar() {
 
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-rose-50 text-sm font-black text-rose-600 transition-colors"
+                        className="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-red-50 text-sm font-black text-red-600 transition-colors"
                       >
                         <LogOut size={16} /> Logout
                       </button>
@@ -170,7 +166,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="block w-full text-center py-5 rounded-[1.5rem] font-black text-white bg-indigo-600 text-xs uppercase tracking-widest shadow-xl shadow-indigo-100"
+                  className="block w-full text-center py-5 rounded-[1.5rem] font-black text-slate-950 bg-amber-500 text-xs uppercase tracking-widest shadow-xl shadow-amber-500/20"
                   onClick={closeMenu}
                 >
                   Join TruSathi
@@ -178,9 +174,9 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mb-6">
+                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mb-6 text-left">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+                    <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-amber-500">
                       <User size={20} />
                     </div>
                     <p className="font-black text-slate-800">{user.displayName}</p>
@@ -199,7 +195,7 @@ export default function Navbar() {
                     handleLogout();
                     closeMenu();
                   }}
-                  className="block w-full text-center py-4 rounded-xl font-black text-white bg-rose-500 text-sm shadow-lg shadow-rose-100"
+                  className="block w-full text-center py-4 rounded-xl font-black text-white bg-red-600 text-sm shadow-lg shadow-red-100"
                 >
                   Logout
                 </button>
@@ -217,7 +213,7 @@ function NavLink({ href, children, scrolled }: { href: string, children: React.R
     <Link
       href={href}
       className={`px-5 py-2.5 text-[11px] font-black rounded-xl transition-all font-sans uppercase tracking-[0.15em] ${scrolled
-        ? 'text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50'
+        ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50/50'
         : 'text-white/70 hover:text-white hover:bg-white/10'
         }`}
     >
@@ -228,7 +224,7 @@ function NavLink({ href, children, scrolled }: { href: string, children: React.R
 
 function DropdownLink({ href, icon, children }: { href: string, icon: React.ReactNode, children: React.ReactNode }) {
   return (
-    <Link href={href} className="flex items-center gap-3 px-6 py-3.5 hover:bg-slate-50 text-sm font-black text-slate-700 transition-colors">
+    <Link href={href} className="flex items-center gap-3 px-6 py-3.5 hover:bg-slate-50 text-sm font-black text-slate-700 transition-colors text-left">
       <span className="text-slate-400">{icon}</span>
       {children}
     </Link>
@@ -239,11 +235,11 @@ function MobileNavLink({ href, onClick, children }: { href: string, onClick: () 
   return (
     <Link
       href={href}
-      className="block text-xl font-black text-slate-800 py-3 border-b border-slate-50 flex items-center justify-between group"
+      className="block text-xl font-black text-slate-800 py-3 border-b border-slate-50 flex items-center justify-between group text-left"
       onClick={onClick}
     >
       {children}
-      <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-indigo-500 transition-colors" size={24} />
+      <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-amber-500 transition-colors" size={24} />
     </Link>
   )
 }
