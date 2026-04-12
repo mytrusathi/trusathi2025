@@ -96,15 +96,15 @@ function SearchResults() {
       {/* Search Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
         <div className="space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-rose-50 rounded-full text-rose-600 text-xs font-black uppercase tracking-wider">
-             <Sparkles size={14} /> Verified Matches
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-gold-500/10 rounded-full text-brand-gold-500 text-xs font-black uppercase tracking-wider">
+             <Sparkles size={14} /> Screened Matches
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-none">
             Browse {role === 'Bride' ? 'Brides' : 'Grooms'}
           </h1>
           <p className="text-slate-500 text-lg font-medium max-w-xl leading-relaxed">
-            Finding your partner within <span className="text-indigo-600 font-bold underline decoration-rose-200 decoration-4">{community}</span>. 
-            All profiles are manualy verified by community admins.
+            Finding your partner within <span className="text-brand-navy-900 font-bold underline decoration-brand-gold-500/30 decoration-4 underline-offset-4">{community}</span>. 
+            All profiles are manualy screened by community admins.
           </p>
         </div>
         
@@ -115,7 +115,7 @@ function SearchResults() {
                    <div className="w-full h-full bg-slate-200 animate-pulse"></div>
                 </div>
               ))}
-              <div className="w-10 h-10 rounded-full border-2 border-white bg-indigo-600 flex items-center justify-center text-white text-[10px] font-black">
+              <div className="w-10 h-10 rounded-full border-2 border-white bg-brand-navy-900 flex items-center justify-center text-white text-[10px] font-black">
                  {profiles.length}+
               </div>
            </div>
@@ -126,21 +126,21 @@ function SearchResults() {
       {/* Advanced Filters Bar */}
       <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 p-3 mb-16 flex flex-col lg:flex-row gap-3">
         <div className="flex-1 relative group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-gold-500 transition-colors" size={20} />
           <input
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="Search name, city, caste or profession..."
-            className="w-full pl-16 pr-6 py-4.5 bg-slate-50 border-none rounded-[2rem] focus:ring-2 focus:ring-indigo-500/10 outline-none transition-all font-medium text-slate-700"
+            className="w-full pl-16 pr-6 py-4.5 bg-slate-50 border-none rounded-[2rem] focus:ring-2 focus:ring-brand-gold-500/10 outline-none transition-all font-medium text-slate-700 placeholder:text-slate-400"
           />
         </div>
         
         <div className="lg:w-64 relative group">
-           <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
+           <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-navy-700 transition-colors" size={20} />
            <select
             value={cityFilter}
             onChange={(e) => setCityFilter(e.target.value)}
-            className="w-full pl-16 pr-10 py-4.5 bg-slate-50 border-none rounded-[2rem] appearance-none focus:ring-2 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 cursor-pointer"
+            className="w-full pl-16 pr-10 py-4.5 bg-slate-50 border-none rounded-[2rem] appearance-none focus:ring-2 focus:ring-brand-navy-900/10 outline-none font-bold text-slate-700 cursor-pointer"
           >
             <option value="all">All Cities</option>
             {cities.map((city) => (
@@ -154,7 +154,7 @@ function SearchResults() {
           </div>
         </div>
 
-        <button className="lg:w-48 py-4.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-[2rem] transition-all shadow-xl shadow-indigo-100 active:scale-95">
+        <button className="lg:w-48 py-4.5 bg-brand-navy-900 hover:bg-black text-white font-black rounded-[2rem] transition-all shadow-xl shadow-slate-100 active:scale-95">
            Filter Results
         </button>
       </div>
@@ -162,12 +162,12 @@ function SearchResults() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-6">
           <div className="relative">
-             <div className="w-20 h-20 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-             <div className="absolute inset-0 flex items-center justify-center text-indigo-600">
-                <Heart size={24} fill="currentColor" className="animate-pulse" />
+             <div className="w-20 h-20 border-4 border-brand-navy-100 border-t-brand-gold-500 rounded-full animate-spin"></div>
+             <div className="absolute inset-0 flex items-center justify-center text-brand-gold-500">
+                <Handshake size={24} className="animate-pulse" />
              </div>
           </div>
-          <p className="text-slate-500 font-black uppercase tracking-[0.2em] text-sm">Curation in progress...</p>
+          <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">Updating results...</p>
         </div>
       ) : filteredProfiles.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -211,10 +211,10 @@ function SearchPageContent() {
     <div className="min-h-screen flex flex-col bg-slate-50/50">
       <Navbar />
 
-      <div className="bg-indigo-900 pt-20 pb-32 px-4 relative overflow-hidden">
+      <div className="bg-brand-navy-950 pt-20 pb-32 px-4 relative overflow-hidden">
         {/* Modern abstract decorative elements */}
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-[150px]" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-rose-500/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-[100px]" />
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-gold-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-[150px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-navy-700/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-[100px]" />
         
         <div className="max-w-7xl mx-auto relative z-10 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-indigo-200 text-xs font-black uppercase tracking-[0.2em] mb-8 backdrop-blur-md">
@@ -251,9 +251,8 @@ function SearchPageContent() {
   );
 }
 
-export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center p-10"><Loader2 size={64} className="animate-spin text-white opacity-20" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-brand-navy-950 flex items-center justify-center p-10"><div className="w-16 h-16 border-4 border-white/5 border-t-brand-gold-500 rounded-full animate-spin" /></div>}>
       <SearchPageContent />
     </Suspense>
   );
