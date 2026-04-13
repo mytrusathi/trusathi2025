@@ -66,18 +66,18 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
   // Updated container styling for TruSathi theme
   const containerClassName =
     variant === 'floating'
-      ? 'bg-white p-4 rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] max-w-6xl mx-auto border border-slate-100' // translate-y-12 hata diya
-      : 'bg-white p-4 rounded-3xl shadow-xl max-w-6xl mx-auto border border-slate-100'
+      ? 'bg-card p-4 rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] dark:shadow-primary/20 max-w-6xl mx-auto border border-border'
+      : 'bg-card p-4 rounded-3xl shadow-xl shadow-primary/5 max-w-6xl mx-auto border border-border'
   return (
     <div className={containerClassName}>
       <div className={`grid grid-cols-1 ${variant === 'embedded' ? 'md:grid-cols-3 lg:grid-cols-6' : 'md:grid-cols-4'} gap-4 items-end`}>
 
         {/* Looking For */}
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Looking For</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Looking For</label>
           <div className="relative">
             <select
-              className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl appearance-none font-bold text-slate-700 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500/20 outline-none transition-all cursor-pointer"
+              className="w-full p-4 bg-muted/50 border border-border rounded-2xl appearance-none font-bold text-foreground focus:ring-4 focus:ring-accent/10 focus:border-accent/20 outline-none transition-all cursor-pointer"
               value={searchData.lookingFor}
               onChange={(e) =>
                 setSearchData({
@@ -89,16 +89,16 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
               <option>Bride</option>
               <option>Groom</option>
             </select>
-            <Users size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <Users size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           </div>
         </div>
 
         {/* Age Range */}
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Age Range</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Age Range</label>
           <div className="flex gap-2">
             <select
-              className="w-1/2 p-3 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 focus:ring-amber-500/10 cursor-pointer"
+              className="w-1/2 p-4 bg-muted/50 border border-border rounded-2xl font-bold text-foreground outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer"
               value={searchData.ageMin}
               onChange={(e) => setSearchData({ ...searchData, ageMin: e.target.value })}
             >
@@ -107,7 +107,7 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
               ))}
             </select>
             <select
-              className="w-1/2 p-3 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 focus:ring-amber-500/10 cursor-pointer"
+              className="w-1/2 p-4 bg-muted/50 border border-border rounded-2xl font-bold text-foreground outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer"
               value={searchData.ageMax}
               onChange={(e) => setSearchData({ ...searchData, ageMax: e.target.value })}
             >
@@ -120,10 +120,10 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
 
         {/* Community */}
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Community</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Community</label>
           <div className="relative">
             <select
-              className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl appearance-none font-bold text-slate-700 outline-none focus:ring-4 focus:ring-amber-500/10 cursor-pointer"
+              className="w-full p-4 bg-muted/50 border border-border rounded-2xl appearance-none font-bold text-foreground outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer"
               value={searchData.community}
               onChange={(e) => setSearchData({ ...searchData, community: e.target.value })}
             >
@@ -133,7 +133,7 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
             </select>
             <ChevronDown
               size={16}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
             />
           </div>
         </div>
@@ -142,9 +142,9 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
         {variant === 'embedded' && (
           <>
             <div className="space-y-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Occupation</label>
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Occupation</label>
               <select
-                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 focus:ring-amber-500/10 cursor-pointer"
+                className="w-full p-4 bg-muted/50 border border-border rounded-2xl font-bold text-foreground outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer"
                 value={searchData.occupation}
                 onChange={(e) => setSearchData({ ...searchData, occupation: e.target.value })}
               >
@@ -154,9 +154,9 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
               </select>
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Education</label>
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Education</label>
               <input
-                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-amber-500/10"
+                className="w-full p-4 bg-muted/50 border border-border rounded-2xl font-bold text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-4 focus:ring-accent/10"
                 placeholder="e.g. MBA"
                 value={searchData.education}
                 onChange={(e) => setSearchData({ ...searchData, education: e.target.value })}
@@ -165,15 +165,15 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
           </>
         )}
 
-        {/* Search Button - Updated to Navy/Gold theme */}
+        {/* Search Button */}
         <button
           onClick={handleSearch}
-          className="h-14 bg-slate-900 hover:bg-black text-amber-500 font-black rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-amber-500/5 transition-all active:scale-95 group"
+          className="h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-primary/10 transition-all active:scale-95 group border border-primary/20"
         >
-          <Search size={20} className="group-hover:scale-110 transition-transform" />
-          <span className="uppercase tracking-widest text-xs">Find Matches</span>
+          <Search size={20} className="group-hover:scale-110 transition-transform text-accent" />
+          <span className="uppercase tracking-widest text-[11px]">Find Matches</span>
         </button>
       </div>
     </div>
   )
-}
+}

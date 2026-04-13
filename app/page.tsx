@@ -45,61 +45,60 @@ const journeySteps = [
 
 export default function TrusathiUI() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
       <Navbar />
       <Hero />
 
-      {/* Trust Highlights Section */}
-      <section className="relative bg-[#fcfbf7] px-4 pb-10 pt-10 md:px-8">
-        <div className="mx-auto -mt-12 max-w-7xl rounded-[2.5rem] border border-[#e7e2d8] bg-white/95 p-6 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.25)] backdrop-blur-xl md:-mt-10 md:p-8">
-          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      {/* Trust Highlights Section - Clean & Vibrant */}
+      <section className="relative px-4 pb-24 pt-10 md:px-8">
+        <div className="mx-auto -mt-20 max-w-7xl rounded-[4rem] border border-border bg-card p-6 shadow-[0_40px_100px_-15px_rgba(0,0,0,0.08)] md:-mt-24 md:p-12 transition-colors">
+          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
 
-            {/* Main Branding Card - Navy/Gold Gradient */}
-            <div className="rounded-[2.5rem] bg-[linear-gradient(135deg,#020617_0%,#0f172a_50%,#1e293b_100%)] p-8 text-white md:p-12 border border-white/5 relative overflow-hidden">
-              {/* Subtle background glow */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 blur-[100px] pointer-events-none"></div>
+            {/* Main Branding Card - Elegant Red */}
+            <div className="rounded-[3rem] bg-gradient-to-br from-primary via-primary/95 to-primary p-10 text-white md:p-16 border border-white/10 relative overflow-hidden shadow-[0_30px_60px_-15px_rgba(193,18,31,0.3)]">
+              {/* Luxury ambient glow */}
+              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[120px] pointer-events-none"></div>
 
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">
-                  <CheckCircle2 size={14} /> Trust-First Companion
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.3em] text-accent-foreground backdrop-blur-md">
+                  <CheckCircle2 size={14} className="text-accent" /> Trust-First Matrimony
                 </div>
 
-                {/* Updated Legally Safe and Emotional Heading */}
-                <h2 className="mt-8 max-w-2xl text-3xl font-black tracking-tight md:text-5xl leading-[1.1]">
+                <h2 className="mt-10 max-w-2xl text-4xl font-black tracking-tighter md:text-7xl leading-[0.95] font-serif">
                   The journey to your Sathi, <br />
-                  <span className="text-amber-500 italic font-serif">guided by Trust.</span>
+                  <span className="text-white/80 italic">guided by Trust.</span>
                 </h2>
 
-                <p className="mt-6 max-w-2xl text-sm font-medium leading-7 text-slate-400 md:text-base">
-                  We believe that the journey to a life partner deserves a path guided by honesty. TruSathi is designed to make every step clear, ensuring your search is private, verified, and always respectful.
+                <p className="mt-10 max-w-2xl text-lg font-medium leading-relaxed opacity-90 md:text-xl">
+                  We believe that the search for a life partner deserves a sanctuary of honesty. TruSathi is designed to make every step clear, ensuring your search is private, authenticated, and always respectful.
                 </p>
 
-                <div className="mt-10 flex flex-wrap gap-4">
+                <div className="mt-14 flex flex-wrap gap-6">
                   <Link
                     href="/register"
-                    className="inline-flex items-center gap-2 rounded-2xl bg-amber-500 px-6 py-4 text-xs font-black uppercase tracking-[0.18em] text-slate-950 transition-all hover:bg-amber-400 active:scale-95 shadow-lg shadow-amber-500/20"
+                    className="inline-flex items-center gap-3 rounded-2xl bg-white px-10 py-5 text-xs font-black uppercase tracking-[0.2em] text-primary transition-all hover:bg-accent hover:text-white active:scale-95 shadow-2xl shadow-primary/30"
                   >
                     Start Free <ArrowRight size={14} />
                   </Link>
                   <Link
                     href="/search"
-                    className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-xs font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-white/10 active:scale-95"
+                    className="inline-flex items-center gap-3 rounded-2xl border border-white/20 bg-white/5 px-10 py-5 text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-white/10 active:scale-95"
                   >
-                    Explore Profiles
+                    See Profiles
                   </Link>
                 </div>
               </div>
             </div>
 
-            {/* Trust Signal Cards */}
-            <div className="grid gap-4">
+            {/* Trust Signal Cards - Modern & Clean */}
+            <div className="grid gap-6">
               {trustSignals.map((signal) => (
-                <div key={signal.title} className="rounded-[2rem] border border-slate-100 bg-white p-6 hover:border-amber-200 transition-all duration-300 group hover:shadow-xl hover:shadow-slate-100">
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-amber-500 group-hover:scale-110 transition-transform">
-                    <signal.icon size={22} />
+                <div key={signal.title} className="rounded-[2.5rem] border border-border bg-card p-10 hover:border-primary/30 transition-all duration-500 group hover:shadow-2xl hover:shadow-primary/10">
+                  <div className="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all shadow-sm border border-border">
+                    <signal.icon size={28} />
                   </div>
-                  <h3 className="text-lg font-black text-slate-900 tracking-tight">{signal.title}</h3>
-                  <p className="mt-2 text-sm font-medium leading-6 text-slate-500">{signal.copy}</p>
+                  <h3 className="text-2xl font-black text-foreground tracking-tight">{signal.title}</h3>
+                  <p className="mt-4 text-base font-medium leading-relaxed text-muted-foreground">{signal.copy}</p>
                 </div>
               ))}
             </div>
@@ -109,28 +108,29 @@ export default function TrusathiUI() {
 
       <WhyChoose />
 
-      {/* Member Journey Section - Cinematic Dark View */}
-      <section className="relative overflow-hidden bg-slate-950 px-4 pt-10 md:pt-12 pb-0 text-white md:px-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.08),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,1),transparent_50%)]" />
+      {/* Member Journey Section - Elegant Sober Style */}
+      <section className="relative overflow-hidden bg-muted px-4 pt-24 md:pt-40 pb-24 text-foreground md:px-8 border-y border-border">
+        {/* Soft background glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--primary)/0.03,transparent_50%),radial-gradient(circle_at_bottom_left,var(--primary)/0.02,transparent_40%)] pointer-events-none" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-16 lg:grid-cols-[0.9fr_1.1fr] items-center">
+        <div className="relative mx-auto grid max-w-7xl gap-24 lg:grid-cols-[0.85fr_1.15fr] items-center">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.25em] text-amber-500">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.3em] text-primary shadow-sm">
               <Camera size={14} /> The Journey Together
             </div>
-            <h2 className="mt-6 text-3xl font-black tracking-tighter md:text-6xl leading-none">
-              Simple. True. <br /> <span className="text-amber-500">Transparent.</span>
+            <h2 className="mt-10 text-5xl font-black tracking-tighter md:text-8xl leading-[0.9] font-serif">
+              Simple. True. <br /> <span className="text-primary italic underline decoration-primary/20 decoration-8 underline-offset-8">Transparent.</span>
             </h2>
-            <p className="mt-8 max-w-xl text-base font-medium leading-relaxed text-slate-400">
-              Your search for a life partner deserves a path that is easy to trust. From selfie-verification to direct community support, we&apos;ve removed the noise so you can focus on what&apos;s real.
+            <p className="mt-12 max-w-xl text-xl font-medium leading-relaxed opacity-80 text-muted-foreground">
+              Your search for a life partner deserves a path that is easy to trust. From direct community support to authenticated profiles, we&apos;ve removed the noise so you can focus on what&apos;s real.
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             {journeySteps.map((step, index) => (
-              <div key={step} className="group rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-8 backdrop-blur-sm hover:bg-white/[0.06] transition-all hover:-translate-y-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-500/60 group-hover:text-amber-500 transition-colors">Step {index + 1}</p>
-                <p className="mt-4 text-lg font-bold leading-snug text-slate-200 group-hover:text-white transition-colors">{step}</p>
+              <div key={step} className="group rounded-[3rem] border border-border bg-card p-12 hover:shadow-xl hover:shadow-primary/5 transition-all hover:-translate-y-2 border-l-4 border-l-primary/30">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground group-hover:text-primary transition-colors">Protocol 0{index + 1}</p>
+                <p className="mt-6 text-2xl font-black leading-tight group-hover:text-primary transition-colors tracking-tight text-foreground">{step}</p>
               </div>
             ))}
           </div>

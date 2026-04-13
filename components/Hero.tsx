@@ -34,106 +34,89 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative bg-brand-navy-950 pt-16 pb-32 md:pt-40 md:pb-20 overflow-hidden">
+    <section className="relative bg-background pt-32 pb-32 md:pt-56 md:pb-40 overflow-hidden text-left transition-colors">
 
-      {/* Premium Ambient Background - Using Navy/Gold tones */}
-      <div className="absolute top-0 inset-x-0 h-[1000px] bg-[radial-gradient(circle_at_top,rgba(var(--brand-gold-500-rgb),0.05),transparent_60%)] pointer-events-none"></div>
-
-      {/* Sophisticated Animated Orbs */}
-      <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-brand-gold-600/5 rounded-full blur-[150px] animate-pulse pointer-events-none"></div>
-      <div className="absolute bottom-[5%] left-[-10%] w-[600px] h-[600px] bg-brand-navy-700/20 rounded-full blur-[120px] animate-bounce duration-[15000ms] pointer-events-none"></div>
+      {/* Classic Ambient Effects - Slow Elegant Subtlety */}
+      <div className="absolute top-0 inset-x-0 h-[800px] bg-[radial-gradient(circle_at_top,var(--primary)/0.03,transparent_70%)] pointer-events-none animate-pulse duration-[5000ms]"></div>
+      <div className="absolute -top-[20%] -right-[10%] w-[1000px] h-[1000px] bg-primary/5 rounded-full blur-[180px] pointer-events-none animate-in fade-in slide-in-from-right-1/4 duration-[3000ms]"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center text-center">
+        <div className="flex flex-col items-center text-center max-w-5xl mx-auto">
 
-          {/* Glassmorphic Badge - Handshake Icon Integration */}
-          <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white text-[10px] md:text-xs font-black backdrop-blur-3xl mb-12 animate-in fade-in slide-in-from-top-4 duration-1000 shadow-2xl">
+          {/* Premium Trust Badge */}
+          <div className="inline-flex items-center gap-4 px-6 py-2.5 rounded-full bg-card border border-border shadow-xl shadow-primary/10 text-foreground text-[10px] md:text-xs font-black backdrop-blur-3xl mb-12 animate-in fade-in slide-in-from-top-4 duration-1000 overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             <div className="flex -space-x-2">
               {[1, 2, 3].map(i => (
-                <div key={i} className="w-6 h-6 rounded-full border-2 border-brand-navy-950 bg-brand-navy-800 flex items-center justify-center text-brand-gold-500 shadow-lg">
-                  <Handshake size={10} strokeWidth={2.5} />
+                <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-primary flex items-center justify-center text-white shadow-md">
+                  <Handshake size={14} strokeWidth={2.5} />
                 </div>
               ))}
             </div>
-            <span className="tracking-[0.3em] uppercase opacity-70">Your Search Companion</span>
-            <div className="h-4 w-px bg-white/10"></div>
-            <span className="text-brand-gold-400 flex items-center gap-2 font-black uppercase tracking-[0.3em]">
-              <Sparkles size={14} className="animate-pulse" /> 100% Free Service
+            <span className="tracking-[0.2em] uppercase text-muted-foreground">Premium Verification</span>
+            <div className="h-4 w-px bg-border/50"></div>
+            <span className="text-primary flex items-center gap-2 font-black uppercase tracking-[0.2em]">
+              <Sparkles size={14} className="animate-pulse" /> Free Platform
             </span>
           </div>
 
-          {/* Cinematic Heading - Updated Gold Underline */}
-          <h1 className="text-6xl md:text-9xl font-black text-white leading-[0.9] mb-12 max-w-7xl tracking-tighter animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100 italic">
-            Your <span className="relative inline-block not-italic">
+          {/* Noble Heading - Elegant Minimalist Text */}
+          <h1 className="text-6xl md:text-[9.5rem] font-black text-foreground leading-[0.85] mb-12 tracking-tighter animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100 italic">
+            Your <span className="relative inline-block not-italic text-primary drop-shadow-sm font-serif tracking-tight">
               True Sathi
-              <svg className="absolute -bottom-2 md:-bottom-4 left-0 w-full" viewBox="0 0 358 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 17C118.333 5.66667 241.667 1.33333 355 17" stroke="var(--brand-gold-500)" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" className="animate-draw" />
+              <svg className="absolute -bottom-2 md:-bottom-4 left-0 w-full opacity-30" viewBox="0 0 358 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 17C118.333 5.66667 241.667 1.33333 355 17" stroke="var(--primary)" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" className="animate-draw" />
               </svg>
             </span> <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-brand-gold-400 to-slate-400 not-italic">Honesty in every Bond.</span>
+            <span className="text-2xl md:text-3xl text-muted-foreground not-italic font-medium block mt-6 tracking-normal">Honesty in every Bond.</span>
           </h1>
 
-          {/* Subheading */}
-          <p className="text-lg md:text-2xl text-slate-400 mb-16 leading-relaxed max-w-4xl font-medium animate-in fade-in slide-in-from-bottom duration-1000 delay-200 px-4">
-            A dedicated platform for meaningful matches where <span className="text-white font-black underline decoration-brand-gold-500/50 decoration-4 underline-offset-8">Integrity is Key</span>. <br className="hidden md:block" />
-            Direct portal access, community-driven insights, and a 100% free experience.
+          {/* Elegant Subheading */}
+          <p className="text-xl md:text-3xl text-muted-foreground mb-16 leading-tight max-w-4xl font-medium animate-in fade-in slide-in-from-bottom duration-1000 delay-200 px-4">
+            A premium matchmaking sanctuary where <span className="text-primary font-black underline decoration-primary/20 decoration-8 underline-offset-8">Trust is the Foundation</span>. <br className="hidden md:block" />
+            Transparent profiles, verified users, and a 100% free experience.
           </p>
 
-          {/* High-Contrast Search Hub - Updated Glow Colors */}
-          <div className="w-full max-w-5xl group relative animate-in fade-in zoom-in duration-1000 delay-300">
-            <div className="absolute -inset-2 bg-gradient-to-r from-brand-gold-500/10 to-brand-navy-700/10 rounded-[4rem] blur-2xl opacity-0 group-hover:opacity-100 transition duration-1000"></div>
-
-            <div className="relative z-20">
-              <SearchBar variant="embedded" />
-            </div>
-
-            {/* Dynamic Key Benefits */}
-            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-10 text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] whitespace-nowrap">
-              <span className="flex items-center gap-2 group/tip hover:text-white transition-colors cursor-default">
-                <ShieldCheck size={14} className="text-brand-gold-500" /> Privacy First
-              </span>
-              <span className="flex items-center gap-2 group/tip hover:text-white transition-colors cursor-default">
-                <Handshake size={14} className="text-brand-gold-500" /> Trust-Driven
-              </span>
-              <span className="flex items-center gap-2 group/tip hover:text-white transition-colors cursor-default">
-                <Sparkles size={14} className="text-brand-gold-400" /> Community Managed
-              </span>
-            </div>
+          <div className="w-full max-w-6xl animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
+            <SearchBar variant="floating" />
           </div>
 
-          {/* Stats Section - Clean Navy/White Look */}
-          <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-24 items-center animate-in fade-in slide-in-from-bottom-12 duration-[2000ms] delay-500">
-            <div className="flex flex-col items-center group">
-              <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter group-hover:scale-110 transition-transform">{stats.profiles}</span>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Active Bio-Data</span>
-            </div>
-            <div className="flex flex-col items-center md:border-l border-white/5 group">
-              <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter group-hover:scale-110 transition-transform">{stats.communities}</span>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Trusted Groups</span>
-            </div>
-            <div className="flex flex-col items-center md:border-l border-white/5 group">
-              <span className="text-4xl md:text-5xl font-black text-brand-gold-500 mb-2 tracking-tighter">100%</span>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Manual Screening</span>
-            </div>
-            <div className="flex flex-col items-center md:border-l border-white/5 group">
-              <span className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter text-brand-gold-500/80">FREE</span>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Zero Fees</span>
+          <div className="relative w-full">
+            {/* Dynamic Key Benefits */}
+            <div className="hidden sm:flex absolute -bottom-10 left-1/2 -translate-x-1/2 items-center gap-10 text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] whitespace-nowrap">
+              <span className="flex items-center gap-2 group/tip hover:text-foreground transition-colors cursor-default">
+                <ShieldCheck size={14} className="text-primary/70" /> Privacy First
+              </span>
+              <span className="flex items-center gap-2 group/tip hover:text-foreground transition-colors cursor-default">
+                <Handshake size={14} className="text-primary/70" /> Trust-Driven
+              </span>
+              <span className="flex items-center gap-2 group/tip hover:text-foreground transition-colors cursor-default">
+                <Sparkles size={14} className="text-primary/70" /> Community Managed
+              </span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Custom Styles for Underline Animation */}
-      <style jsx global>{`
-        .animate-draw {
-           stroke-dasharray: 400;
-           stroke-dashoffset: 400;
-           animation: draw 2.5s cubic-bezier(0.65, 0, 0.35, 1) forwards 1.2s;
-        }
-        @keyframes draw {
-           to { stroke-dashoffset: 0; }
-        }
-      `}</style>
+        {/* Stats Section */}
+        <div className="mt-40 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-24 items-center animate-in fade-in slide-in-from-bottom-12 duration-[2000ms] delay-500">
+          <div className="flex flex-col items-center group">
+            <span className="text-4xl md:text-5xl font-black text-foreground mb-2 tracking-tighter group-hover:scale-110 transition-transform">{stats.profiles}</span>
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">Active Bio-Data</span>
+          </div>
+          <div className="flex flex-col items-center md:border-l border-border/50 group">
+            <span className="text-4xl md:text-5xl font-black text-foreground mb-2 tracking-tighter group-hover:scale-110 transition-transform">{stats.communities}</span>
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">Trusted Groups</span>
+          </div>
+          <div className="flex flex-col items-center md:border-l border-border/50 group">
+            <span className="text-4xl md:text-5xl font-black text-primary mb-2 tracking-tighter hover:scale-110 transition-transform">100%</span>
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">Manual Screening</span>
+          </div>
+          <div className="flex flex-col items-center md:border-l border-border/50 group">
+            <span className="text-4xl md:text-5xl font-black text-foreground mb-2 tracking-tighter">FREE</span>
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">Zero Fees</span>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }

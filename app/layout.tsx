@@ -21,14 +21,16 @@ export const metadata: Metadata = {
   description: "Honesty in every Bond",
 };
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-      <body className="antialiased font-sans text-slate-900 selection:bg-rose-100 selection:text-rose-900">
+    <html lang="en" className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
+      <body className="antialiased font-sans text-slate-900 selection:bg-rose-100 selection:text-rose-900 bg-page text-foreground">
         <NextTopLoader
           color="var(--brand-gold-500)"
           initialPosition={0.08}
@@ -40,9 +42,16 @@ export default function RootLayout({
           speed={200}
           shadow="0 0 10px var(--brand-gold-500),0 0 5px var(--brand-gold-500)"
         />
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
         <Analytics />
         <SpeedInsights />
       </body>

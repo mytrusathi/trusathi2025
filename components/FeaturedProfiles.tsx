@@ -40,52 +40,50 @@ export default function FeaturedProfiles() {
   }, [])
 
   return (
-    // Gap Fix: Changed pt-20 to pt-10 and added a subtle bg-white
-    <section id="featured"
-      className="bg-white pt-10 pb-20 md:pt-10  md:pb-0 relative overflow-hidden">
+    <section id="featured" className="bg-background pt-20 pb-20 md:pt-32 md:pb-32 relative overflow-hidden text-left">
 
       {/* Decorative top line */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-        {/* Header - Updated to Navy/Gold theme */}
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6">
-          <div className="text-center md:text-left space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-100 rounded-full text-amber-600 text-[10px] font-black uppercase tracking-widest shadow-sm">
-              <Sparkles size={12} /> Newly Added
+        {/* Header - Enhanced UI */}
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-8">
+          <div className="text-center md:text-left space-y-4 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-5 py-2 bg-primary/5 border border-primary/10 rounded-full text-primary text-[10px] font-black uppercase tracking-[0.25em] shadow-sm">
+              <Sparkles size={12} className="animate-pulse" /> Newly Added
             </div>
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
-              Community <span className="text-amber-500">Screened</span> Members
+            <h2 className="text-5xl md:text-8xl font-black text-foreground tracking-tighter leading-[0.9] italic font-serif">
+              Community <span className="text-primary not-italic">Screened</span> <br /> Members
             </h2>
-            <p className="text-slate-500 font-medium text-lg">
-              Fresh profiles carefully added by our trusted Community Leaders.
+            <p className="text-muted-foreground font-medium text-lg md:text-xl max-w-xl">
+              Fresh profiles carefully verified by our trusted community trust-desk for a safer search.
             </p>
           </div>
 
           <Link
             href="/search"
-            className="hidden md:flex items-center gap-2 text-slate-900 font-black uppercase tracking-widest text-[11px] hover:text-amber-600 hover:gap-4 transition-all duration-300 group"
+            className="hidden md:flex items-center gap-2 text-foreground font-black uppercase tracking-[0.2em] text-[11px] hover:text-accent hover:gap-4 transition-all duration-300 group border-b border-border/50 pb-2"
           >
-            View all profiles <ChevronRight size={18} className="text-amber-500 group-hover:translate-x-1 transition-transform" />
+            Explore all profiles <ChevronRight size={18} className="text-accent group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         {/* Profile Grid */}
         {loading ? (
-          <div className="flex justify-center py-24">
-            <Loader2 className="animate-spin text-amber-500" size={40} />
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+            <Loader2 className="animate-spin text-accent" size={48} />
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground animate-pulse">Scanning Archive...</p>
           </div>
         ) : profiles.length === 0 ? (
-          <div className="text-center py-20 bg-slate-50 rounded-[3rem] border border-dashed border-slate-200 shadow-inner">
-            <p className="text-slate-500 font-bold italic">No profiles available yet. Be the first to join our mission!</p>
+          <div className="text-center py-24 bg-muted/30 rounded-[3rem] border border-dashed border-border shadow-inner">
+            <p className="text-muted-foreground font-black uppercase tracking-widest text-xs italic">No profiles available currently</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 gap-8 md:gap-10">
+          <div className="grid md:grid-cols-3 gap-10 md:gap-12 animate-in fade-in slide-in-from-bottom-12 duration-1000">
             {profiles.map((profile) => (
-              <div key={profile.id} className="block transform hover:-translate-y-3 transition-all duration-500 group">
-                {/* Link component ko hata kar sirf div rakha hai taaki nesting error na aaye */}
-                <div className="relative group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[2rem] transition-all">
+              <div key={profile.id} className="block transform hover:-translate-y-4 transition-all duration-500 group">
+                <div className="relative group-hover:shadow-2xl group-hover:shadow-accent/5 rounded-[2.5rem] transition-all">
                   <PublicProfileCard profile={profile} />
                 </div>
               </div>
@@ -94,9 +92,9 @@ export default function FeaturedProfiles() {
         )}
 
         {/* Mobile CTA */}
-        <div className="mt-12 text-center md:hidden">
-          <Link href="/search" className="inline-flex items-center gap-2 text-slate-900 font-black uppercase tracking-widest text-xs">
-            View all profiles <ChevronRight size={18} className="text-amber-500" />
+        <div className="mt-16 text-center md:hidden">
+          <Link href="/search" className="inline-flex items-center gap-3 px-8 py-5 bg-muted border border-border rounded-2xl text-foreground font-black uppercase tracking-[0.2em] text-xs active:scale-95 transition-all">
+            See All Members <ChevronRight size={18} className="text-accent" />
           </Link>
         </div>
 
