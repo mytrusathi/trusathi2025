@@ -5,16 +5,20 @@ import { AuthProvider } from '../context/AuthContext'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import NextTopLoader from 'nextjs-toploader';
+<link rel="icon" type="image/svg+xml" href="/handshake.svg" />
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: {
-    default:"Trusathi – Community Verified Matrimony",
+    default: "truSathi | Your Search Companion",
     template: "%s | Trusathi",
   },
-  description: "Trusathi is a community-verified matrimony platform where profiles are curated by trusted group admins. Safe, authentic, and reliable matchmaking.",
+  icons: {
+    icon: '/handshake.svg',
+  },
+  description: "Honesty in every Bond",
 };
 
 export default function RootLayout({
@@ -25,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body className="antialiased font-sans text-slate-900 selection:bg-rose-100 selection:text-rose-900">
-        <NextTopLoader 
+        <NextTopLoader
           color="var(--brand-gold-500)"
           initialPosition={0.08}
           crawlSpeed={200}
@@ -40,7 +44,7 @@ export default function RootLayout({
           {children}
         </AuthProvider>
         <Analytics />
-        <SpeedInsights/>
+        <SpeedInsights />
       </body>
     </html>
   );
