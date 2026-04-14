@@ -307,15 +307,15 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
 
   return (
     <>
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-indigo-100/20 overflow-hidden animate-in fade-in slide-in-from-right-4 duration-1000">
-        <div className="bg-indigo-600 p-8 text-white relative overflow-hidden">
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-rose-100/20 overflow-hidden animate-in fade-in slide-in-from-right-4 duration-1000">
+        <div className="bg-rose-600 p-8 text-white relative overflow-hidden">
           <ShieldCheck className="absolute -top-4 -right-4 text-white/10" size={120} />
           <div className="relative z-10 space-y-2">
             <h3 className="text-xl font-black uppercase tracking-tight">Onboarding Checklist</h3>
-            <p className="text-indigo-100 text-sm font-medium">Follow these steps to reach 100% Authenticity Score.</p>
+            <p className="text-rose-100 text-sm font-medium">Follow these steps to reach 100% Authenticity Score.</p>
 
             <div className="pt-4 space-y-2">
-              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200">
+              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-rose-200">
                 <span>Progress</span>
                 <span>{progressPercent}% Complete</span>
               </div>
@@ -344,11 +344,11 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
               className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all ${
                 step.isCompleted
                   ? 'bg-emerald-50/50 border-emerald-100'
-                  : 'bg-slate-50 border-slate-50 hover:border-indigo-100'
+                  : 'bg-slate-50 border-slate-50 hover:border-rose-100'
               }`}
             >
               <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                step.isCompleted ? 'bg-emerald-500 text-white' : 'bg-white text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600'
+                step.isCompleted ? 'bg-emerald-500 text-white' : 'bg-white text-slate-400 group-hover:bg-rose-50 group-hover:text-rose-600'
               }`}>
                 {step.isCompleted ? <CheckCircle2 size={20} /> : step.icon}
               </div>
@@ -373,7 +373,7 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
                   className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                     step.isCompleted
                       ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-white text-indigo-600 border border-indigo-100 hover:bg-indigo-600 hover:text-white shadow-sm'
+                      : 'bg-white text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white shadow-sm'
                   }`}
                 >
                   {step.buttonText} <ArrowRight size={12} />
@@ -391,7 +391,7 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
                       ? 'bg-emerald-100 text-emerald-700'
                       : (step.id === 'admin' && !isMandatoryComplete)
                         ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-500 hover:text-indigo-600'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-rose-500 hover:text-rose-600'
                   } disabled:opacity-70`}
                 >
                   {(step.id === 'email' && (sendingEmail || refreshingEmail)) || (step.id === 'phone' && phoneLoading) || (step.id === 'selfie' && selfieLoading) || (step.id === 'admin' && selfieLoading)
@@ -409,7 +409,7 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
             <button
               onClick={handleEmailRefresh}
               disabled={refreshingEmail}
-              className="mb-4 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 text-xs font-black uppercase tracking-widest hover:border-indigo-200 hover:text-indigo-600 transition-all disabled:opacity-70"
+              className="mb-4 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 text-xs font-black uppercase tracking-widest hover:border-rose-200 hover:text-rose-600 transition-all disabled:opacity-70"
             >
               {refreshingEmail ? <Loader2 size={14} className="animate-spin" /> : null}
               Refresh Email Status
@@ -456,7 +456,7 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="+91XXXXXXXXXX"
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-indigo-300"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-rose-300"
                 />
               </div>
 
@@ -467,7 +467,7 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value)}
                     placeholder="Enter 6 digit OTP"
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-indigo-300"
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-rose-300"
                   />
                 </div>
               )}
@@ -477,7 +477,7 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
                   <button
                     onClick={handleSendOtp}
                     disabled={phoneLoading || !phoneNumber.trim()}
-                    className="flex-1 rounded-2xl bg-indigo-600 text-white px-4 py-3 text-xs font-black uppercase tracking-widest hover:bg-indigo-700 transition-all disabled:opacity-70"
+                    className="flex-1 rounded-2xl bg-rose-600 text-white px-4 py-3 text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all disabled:opacity-70"
                   >
                     {phoneLoading ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Send OTP'}
                   </button>

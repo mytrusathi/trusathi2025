@@ -124,71 +124,31 @@ export default function OverviewView() {
         </div>
       )}
 
-      {/* Safety Disclaimer Banner */}
-      <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-100 rounded-2xl">
-        <Shield size={16} className="text-amber-600 shrink-0" />
-        <p className="text-xs font-bold text-amber-700">
-          <strong>Safety Notice:</strong> Apni safety ki zimmedari user ki khud ki hai. Always meet in public places and authenticate identities independently.{' '}
-          <a href="/terms" className="underline hover:text-amber-900">Read our Terms</a>.
-        </p>
-      </div>
 
-      {/* Welcome Banner */}
-      <div className="relative overflow-hidden bg-white p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-2xl shadow-indigo-100/20">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
+      <div className="relative overflow-hidden bg-white p-8 md:p-12 rounded-[3.5rem] border border-slate-100 shadow-2xl shadow-rose-100/10 transition-all hover:shadow-rose-100/20">
+         <div className="absolute top-0 right-0 w-64 h-64 bg-rose-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-center md:text-left space-y-2">
-               <h2 className="text-indigo-600 font-black text-sm uppercase tracking-[0.2em]">{getTimeGreeting()}</h2>
-               <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
-                  Welcome back, {user?.displayName?.split(' ')[0] || 'Member'}!
+            <div className="text-center md:text-left space-y-3">
+               <h2 className="text-rose-600 font-black text-sm uppercase tracking-[0.2em]">{getTimeGreeting()}</h2>
+               <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                  Welcome back, <span className="text-rose-600">{user?.displayName?.split(' ')[0] || 'Member'}!</span>
                </h1>
-               <p className="text-slate-500 font-medium">Your profile is the key to finding your TruSathi. Keep it updated!</p>
+               <p className="text-slate-500 font-medium text-lg">Your profile is the key to finding your TruSathi. Keep it updated!</p>
             </div>
-            <div className="flex -space-x-4">
+            <div className="flex items-center bg-rose-50 p-2 rounded-full border border-rose-100">
                {[1,2,3].map(i => (
-                  <div key={i} className="w-16 h-16 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-slate-300">
-                     <UserCircle2 size={32} />
+                  <div key={i} className="w-14 h-14 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-slate-300 -ml-4 first:ml-0 shadow-lg">
+                     <UserCircle2 size={24} />
                   </div>
                ))}
-               <div className="w-16 h-16 rounded-full border-4 border-white bg-indigo-600 flex items-center justify-center text-white font-black text-sm">
-                  +1k
+               <div className="w-14 h-14 rounded-full border-4 border-white bg-rose-600 flex items-center justify-center text-white font-black text-xs -ml-4 shadow-lg">
+                  +1.2k
                </div>
             </div>
          </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-         <StatCard 
-            icon={<Inbox className="text-indigo-500" />} 
-            label="Received" 
-            value={stats.received} 
-            href="/dashboard/member?view=received-interests"
-            color="bg-indigo-50"
-         />
-         <StatCard 
-            icon={<Send className="text-emerald-500" />} 
-            label="Sent" 
-            value={stats.sent} 
-            href="/dashboard/member?view=sent-interests"
-            color="bg-emerald-50"
-         />
-         <StatCard 
-            icon={<Heart className="text-rose-500" />} 
-            label="Connects" 
-            value={stats.connects} 
-            href="/dashboard/member?view=connects"
-            color="bg-emerald-50"
-            isAlert={stats.connects > 0}
-         />
-         <StatCard 
-            icon={<Star className="text-amber-500" />} 
-            label="Shortlisted" 
-            value={stats.shortlisted} 
-            href="/dashboard/member?view=favorites"
-            color="bg-amber-50"
-         />
-      </div>
+      {/* Stats row removed as it moved to sidebar */}
 
       <MatchRecommendations />
 
@@ -234,45 +194,26 @@ export default function OverviewView() {
          {/* Sidebar Widgets */}
          <div className="space-y-8">
              <div className="space-y-4">
-                <h3 className="text-xl font-black text-slate-800 px-2">Authenticity Status</h3>
-                {mainProfile ? (
-                  <>
-                    <CompletenessMeter profile={mainProfile} />
-                    <AuthenticityChecklist profile={mainProfile} onProfileRefresh={fetchData} />
-                  </>
-                ) : (
-                  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl space-y-6">
-                    <div className="flex items-center gap-3 text-indigo-600">
-                      <ShieldCheck size={24} />
-                      <h4 className="font-black text-lg">Start Your Journey</h4>
-                    </div>
-                    <p className="text-slate-500 font-medium text-sm leading-relaxed">
-                      Complete your profile to unlock the Authenticity Score and start matching with verified members.
-                    </p>
-                    <Link 
-                      href="/dashboard/member?view=my-profiles" 
-                      className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all"
-                    >
-                      Step 1: Create Profile <ArrowRight size={16} />
-                    </Link>
+             <div className="bg-gradient-to-br from-rose-900 via-rose-800 to-rose-900 p-8 rounded-[3.5rem] text-white space-y-6 relative overflow-hidden group shadow-2xl shadow-rose-200">
+                <ShieldCheck className="absolute -bottom-6 -right-6 text-white/5 group-hover:scale-150 transition-transform duration-1000 rotate-12" size={180} />
+                <div className="relative z-10 space-y-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                    <Sparkles className="text-rose-100" />
                   </div>
-                )}
+                  <h4 className="text-2xl font-black leading-tight tracking-tight">Your Journey to a TruSathi starts here.</h4>
+                  <p className="text-rose-100/80 text-sm font-medium leading-relaxed">
+                    We screen every profile meticulously to ensure a safe and genuine matchmaking environment. Trust the process.
+                  </p>
+                  <Link href="/search" className="inline-flex items-center gap-3 bg-white text-rose-900 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-rose-50 transition-all shadow-xl shadow-rose-950/20">
+                    Browse Profiles <ArrowRight size={14} />
+                  </Link>
+                </div>
              </div>
-
-            <div className="bg-gradient-to-br from-indigo-900 to-indigo-800 p-8 rounded-[2.5rem] text-white space-y-4 relative overflow-hidden group">
-               <Sparkles className="absolute -top-4 -right-4 text-white/10 group-hover:scale-150 transition-transform duration-700" size={120} />
-               <h4 className="text-xl font-black leading-tight">Finding a life partner is a journey.</h4>
-               <p className="text-indigo-200 text-sm font-medium leading-relaxed">
-                  We screen every profile to make your search safe. Trust the process and keep your biodata updated.
-               </p>
-               <Link href="/search" className="inline-flex items-center gap-2 text-white font-black text-xs uppercase tracking-widest pt-2 group-hover:gap-4 transition-all">
-                  Browse Profiles <ArrowRight size={14} />
-               </Link>
-            </div>
-         </div>
-      </div>
+          </div>
+       </div>
     </div>
-  );
+  </div>
+);
 }
 
 interface StatCardProps {

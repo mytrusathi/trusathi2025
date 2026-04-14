@@ -19,6 +19,8 @@ import ChatView from '@/components/dashboard/ChatView';
 import PartnerPreferences from '@/components/dashboard/PartnerPreferences';
 import CompletenessMeter from '@/components/dashboard/CompletenessMeter';
 import OverviewView from '@/components/dashboard/OverviewView';
+import NotificationsView from '@/components/dashboard/NotificationsView';
+import AuthenticityChecklist from '@/components/dashboard/AuthenticityChecklist';
 
 function MemberDashboardContent() {
   const { user } = useAuth();
@@ -124,7 +126,7 @@ function MemberDashboardContent() {
         // Main profiles view
         if (loading) return (
           <div className="flex flex-col items-center justify-center py-24 space-y-4">
-            <Loader2 className="animate-spin text-indigo-600" size={48} />
+            <Loader2 className="animate-spin text-rose-600" size={48} />
             <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading your profiles...</p>
           </div>
         );
@@ -145,15 +147,26 @@ function MemberDashboardContent() {
         );
 
         return (
-          <div className="space-y-12">
-             {profiles.length > 0 && <CompletenessMeter profile={profiles[0]} />}
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {profiles.map(profile => (
-                 <ProfileCard key={profile.id} profile={profile} onEdit={handleEdit} onDelete={handleDelete} />
-               ))}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+             <div className="lg:col-span-3 space-y-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {profiles.map(profile => (
+                    <ProfileCard key={profile.id} profile={profile} onEdit={handleEdit} onDelete={handleDelete} />
+                  ))}
+                </div>
+             </div>
+             <div className="lg:col-span-1 space-y-8">
+                {profiles.length > 0 && (
+                  <>
+                    <CompletenessMeter profile={profiles[0]} />
+                    <AuthenticityChecklist profile={profiles[0]} onProfileRefresh={fetchProfiles} />
+                  </>
+                )}
              </div>
           </div>
         );
+      case 'notifications':
+        return <NotificationsView />;
       default:
         return <OverviewView />;
     }
@@ -165,10 +178,11 @@ function MemberDashboardContent() {
       case 'connects': return { title: 'Your Connects', desc: 'All interest requests that have been mutually accepted. Start chatting to break the ice!' };
       case 'sent-interests': return { title: 'Sent Interests', desc: 'Active requests you have sent to other candidates.' };
       case 'received-interests': return { title: 'Received Interests', desc: 'New interest requests from other members waiting for your response.' };
+      case 'notifications': return { title: 'Notifications Center', desc: 'Stay updated with your latest interests and message alerts.' };
       case 'chats': return { title: 'Messaging Center', desc: 'Real-time conversations with your matches and the super admin trust desk.' };
       case 'partner-preferences': return { title: 'Match Criteria', desc: 'Define who you are looking for.' };
-      case 'my-profiles': return { title: 'My Managed Profiles', desc: 'Create and manage biodatas for yourself or family members.' };
-      default: return { title: 'Member Overview', desc: 'Track your activity and manage your matchmaking journey.' };
+      case 'my-profiles': return { title: 'Managed Profiles', desc: 'Authentication and profile management.' };
+      default: return { title: 'Member Dashboard', desc: 'Track your activity and manage your matchmaking journey.' };
     }
   };
 
@@ -203,53 +217,25 @@ function MemberDashboardContent() {
            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
               <div className="space-y-4 text-center md:text-left w-full">
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
-                    {/* Back to Home button */}
-                    <Link
-                      href="/"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-2xl border border-white/10 transition-all text-xs font-bold uppercase tracking-widest self-start"
-                    >
-                      <Home size={14} /> Home
-                    </Link>
-                    {activeView && (
-                      <Link 
-                        href="/dashboard/member" 
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-2xl border border-white/10 transition-all hover:-translate-x-1 text-xs font-bold uppercase tracking-widest"
-                      >
-                         <ArrowLeft size={14} /> Overview
-                      </Link>
-                    )}
-                    <div className="inline-flex items-center gap-2 px-5 py-2 bg-indigo-500/10 text-indigo-300 rounded-full text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md border border-indigo-500/20">
-                       <ShieldCheck size={14} className="text-indigo-400" /> Member Center
+                    <div className="inline-flex items-center gap-2 px-5 py-2 bg-rose-500/10 text-rose-300 rounded-full text-[10px] font-black uppercase tracking-[0.3em] backdrop-blur-md border border-rose-500/20">
+                       <ShieldCheck size={14} className="text-rose-400" /> Member Center
                     </div>
                   </div>
-                  <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter drop-shadow-2xl">{header.title}</h1>
-                  <p className="text-slate-400 text-base font-medium max-w-2xl leading-relaxed">{header.desc}</p>
+                  <h1 className="text-4xl md:text-8xl font-black text-white tracking-tighter drop-shadow-2xl leading-none">{header.title}</h1>
+                  <p className="text-slate-400 text-lg font-medium max-w-2xl leading-relaxed">{header.desc}</p>
               </div>
               {!activeView && profiles.length === 0 && (
                 <button 
                   onClick={() => { setSelectedProfile(null); setShowForm(true); }}
                   className="bg-white text-slate-900 px-8 py-4 rounded-[2rem] font-black flex items-center gap-4 hover:bg-indigo-50 transition-all shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] active:scale-95 group shrink-0"
                 >
-                  <Plus size={20} className="group-hover:rotate-90 transition-transform duration-500 text-indigo-600" /> 
+                  <Plus size={20} className="group-hover:rotate-90 transition-transform duration-500 text-rose-600" /> 
                   <span className="uppercase tracking-[0.2em] text-[10px]">Create New Profile</span>
                 </button>
               )}
            </div>
 
-           {/* Navigation Tabs */}
-           <div className="max-w-6xl mx-auto px-4 -mb-10 relative z-20 overflow-x-auto custom-scrollbar">
-             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-2xl p-2 rounded-[2.5rem] border border-white/10 w-max min-w-full lg:min-w-0">
-                <TabButton icon={<LayoutDashboard size={16} />} label="Overview" active={!activeView} onClick={() => router.push('/dashboard/member')} />
-                <TabButton icon={<Users size={16} />} label="Connects" count={counts.connects} active={activeView === 'connects'} onClick={() => router.push('/dashboard/member?view=connects')} color="text-emerald-400" />
-                <TabButton icon={<Inbox size={16} />} label="Received" count={counts.received} active={activeView === 'received-interests'} onClick={() => router.push('/dashboard/member?view=received-interests')} color="text-indigo-400" />
-                <TabButton icon={<Send size={16} />} label="Sent" count={counts.sent} active={activeView === 'sent-interests'} onClick={() => router.push('/dashboard/member?view=sent-interests')} color="text-sky-400" />
-                <TabButton icon={<Star size={16} />} label="Shortlist" count={counts.favs} active={activeView === 'favorites'} onClick={() => router.push('/dashboard/member?view=favorites')} color="text-amber-400" />
-                <TabButton icon={<MessageCircle size={16} />} label="Chat" active={activeView === 'chats'} onClick={() => router.push('/dashboard/member?view=chats')} color="text-fuchsia-400" />
-                <div className="w-px h-6 bg-white/10 mx-2"></div>
-                <TabButton icon={<UserCircle2 size={16} />} label="My Bios" active={activeView === 'my-profiles'} onClick={() => router.push('/dashboard/member?view=my-profiles')} />
-             </div>
-           </div>
-        </section>
+         </section>
 
         {/* Dynamic Content Grid */}
         <div className="bg-slate-50 min-h-screen">

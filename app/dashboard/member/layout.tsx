@@ -5,12 +5,18 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { LogOut } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/app/lib/firebase';
+import NotificationBell from '@/components/dashboard/NotificationBell';
+import { UserCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import Logo from '@/components/Logo';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const MemberLayoutContent = ({ children }: Props) => {
+  const { user } = useAuth();
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -25,20 +31,33 @@ const MemberLayoutContent = ({ children }: Props) => {
       <DashboardSidebar />
       
       {/* Main Content */}
-      <main className="flex-1 md:ml-64">
-        {/* Mobile Header */}
-        <div className="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center sticky top-0 z-20">
-            <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center text-white font-bold">t</div>
-                <span className="font-bold text-lg text-slate-800">truSathi Profile</span>
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen">
+        {/* Universal TopBar */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+            <div className="md:hidden">
+                <Logo size="md" />
             </div>
-            <button onClick={handleLogout} className="text-slate-500 hover:text-red-600">
-                <LogOut size={24} />
-            </button>
-        </div>
+            
+            <div className="hidden md:flex items-center gap-2 text-slate-400 font-medium text-sm">
+               <UserCircle size={18} />
+               <span>Welcome, <span className="text-slate-900 font-bold">{user?.displayName || 'Member'}</span></span>
+            </div>
+
+            <div className="flex items-center gap-4">
+                <NotificationBell />
+                <div className="w-px h-6 bg-slate-100"></div>
+                <button 
+                  onClick={handleLogout} 
+                  className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all flex items-center gap-2 group"
+                >
+                    <LogOut size={18} className="group-hover:-translate-x-0.5 transition-transform" />
+                    <span className="hidden lg:inline text-xs font-black uppercase tracking-widest">Sign Out</span>
+                </button>
+            </div>
+        </header>
 
         {/* Content Area */}
-        <div className="min-h-screen">
+        <div className="grow">
           {children}
         </div>
       </main>

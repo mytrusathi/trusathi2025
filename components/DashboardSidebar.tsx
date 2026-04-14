@@ -11,12 +11,17 @@ import {
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { db } from '@/app/lib/firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import Logo from './Logo';
 
 interface SidebarLink {
   href: string;
-  icon: LucideIcon;
   label: string;
+  icon: any;
   active?: boolean;
+  view?: string;
+  count?: number;
 }
 
 export default function DashboardSidebar() {
@@ -24,6 +29,61 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const activeView = searchParams.get('view');
+
+  const [counts, setCounts] = React.useState({
+    sent: 0,
+    received: 0,
+    connects: 0,
+    connects_from_sent: 0,
+    connects_from_received: 0,
+    favs: 0,
+    notifications: 0
+  });
+
+  React.useEffect(() => {
+    if (!user) return;
+
+    // Listeners for counts
+    const qSent = query(collection(db, 'interests'), where('senderId', '==', user.uid));
+    const qReceived = query(collection(db, 'interests'), where('receiverId', '==', user.uid));
+    const qFavs = query(collection(db, 'favorites'), where('userId', '==', user.uid));
+    const qNotifs = query(collection(db, 'notifications'), where('recipientId', '==', user.uid), where('isRead', '==', false));
+
+    const unsubSent = onSnapshot(qSent, (snap) => {
+      const docs = snap.docs.map(d => d.data());
+      setCounts(prev => ({ 
+        ...prev, 
+        sent: docs.filter(d => d.status !== 'accepted').length,
+        connects: docs.filter(d => d.status === 'accepted').length + prev.connects - (prev.connects_from_sent || 0),
+        connects_from_sent: docs.filter(d => d.status === 'accepted').length
+      } as any));
+    });
+
+    const unsubReceived = onSnapshot(qReceived, (snap) => {
+      const docs = snap.docs.map(d => d.data());
+      setCounts(prev => ({ 
+        ...prev, 
+        received: docs.filter(d => d.status !== 'accepted').length,
+        connects: docs.filter(d => d.status === 'accepted').length + prev.connects - (prev.connects_from_received || 0),
+        connects_from_received: docs.filter(d => d.status === 'accepted').length
+      } as any));
+    });
+
+    const unsubFavs = onSnapshot(qFavs, (snap) => {
+      setCounts(prev => ({ ...prev, favs: snap.size }));
+    });
+
+    const unsubNotifs = onSnapshot(qNotifs, (snap) => {
+      setCounts(prev => ({ ...prev, notifications: snap.size }));
+    });
+
+    return () => {
+      unsubSent();
+      unsubReceived();
+      unsubFavs();
+      unsubNotifs();
+    };
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -93,22 +153,39 @@ export default function DashboardSidebar() {
         active: activeView === 'my-profiles' 
       },
       { 
+        href: '/dashboard/member?view=connects', 
+        icon: Users, 
+        label: 'Your Connects', 
+        count: counts.connects,
+        active: activeView === 'connects' 
+      },
+      { 
         href: '/dashboard/member?view=favorites', 
         icon: Heart, 
         label: 'Shortlisted', 
+        count: counts.favs,
         active: activeView === 'favorites' 
       },
       { 
         href: '/dashboard/member?view=sent-interests', 
         icon: Send, 
         label: 'Sent Interests', 
+        count: counts.sent,
         active: activeView === 'sent-interests' 
       },
       { 
         href: '/dashboard/member?view=received-interests', 
         icon: Inbox, 
         label: 'Received Interests', 
+        count: counts.received,
         active: activeView === 'received-interests' 
+      },
+      { 
+        href: '/dashboard/member?view=notifications', 
+        icon: Bell, 
+        label: 'Notifications', 
+        count: counts.notifications,
+        active: activeView === 'notifications' 
       },
       { 
         href: '/dashboard/member?view=chats', 
@@ -154,18 +231,15 @@ export default function DashboardSidebar() {
 
   return (
     <aside className="w-full md:w-64 bg-white border-r border-slate-200 md:fixed md:h-full z-10 flex flex-col">
-      <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">t</div>
-          <span className="font-bold text-xl text-slate-800 tracking-tight">truSathi</span>
-        </Link>
+      <div className="p-6 border-b border-slate-100">
+        <Logo size="md" />
       </div>
 
       <div className="px-5 py-4 border-b border-slate-100">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">User Identity</p>
         <p className="text-sm font-bold text-slate-800 truncate">{user?.displayName || 'Active Member'}</p>
         <div className="flex items-center gap-1.5 mt-1">
-           <div className={`w-1.5 h-1.5 rounded-full ${user?.role === 'member' ? 'bg-indigo-500' : 'bg-rose-500'}`}></div>
+           <div className={`w-1.5 h-1.5 rounded-full ${user?.role === 'member' ? 'bg-rose-500' : 'bg-rose-500'}`}></div>
            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user?.role || 'User'}</p>
         </div>
       </div>
@@ -181,8 +255,15 @@ export default function DashboardSidebar() {
                 : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
             }`}
           >
-            <link.icon size={18} className={link.active ? 'text-indigo-400' : ''} />
-            {link.label}
+            <link.icon size={18} className={link.active ? 'text-rose-400' : 'text-slate-400 group-hover:text-rose-500'} />
+            <span className="flex-1">{link.label}</span>
+            {!!(link as any).count && (
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                link.active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+              }`}>
+                {(link as any).count}
+              </span>
+            )}
           </Link>
         ))}
 

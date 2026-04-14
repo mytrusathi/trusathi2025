@@ -83,7 +83,7 @@ export default function CompletenessMeter({ profile }: Props) {
   const getScoreColor = () => {
     if (totalScore < 40) return { bar: 'bg-rose-500', text: 'text-rose-600', badge: 'bg-rose-50 text-rose-600 border-rose-100', label: 'Getting Started' };
     if (totalScore < 70) return { bar: 'bg-amber-500', text: 'text-amber-600', badge: 'bg-amber-50 text-amber-600 border-amber-100', label: 'Building Trust' };
-    if (totalScore < 100) return { bar: 'bg-indigo-500', text: 'text-indigo-600', badge: 'bg-indigo-50 text-indigo-600 border-indigo-100', label: 'Almost There' };
+    if (totalScore < 100) return { bar: 'bg-rose-500', text: 'text-rose-600', badge: 'bg-rose-50 text-rose-600 border-rose-100', label: 'Almost There' };
     return { bar: 'bg-emerald-500', text: 'text-emerald-600', badge: 'bg-emerald-50 text-emerald-600 border-emerald-100', label: 'Highly Authentic' };
   };
 
@@ -94,7 +94,7 @@ export default function CompletenessMeter({ profile }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ShieldCheck size={18} className="text-indigo-600" />
+          <ShieldCheck size={18} className="text-rose-600" />
           <h4 className="font-black text-slate-800 text-sm uppercase tracking-tight">Authenticity Score</h4>
         </div>
         <div className={`text-xs font-black uppercase tracking-widest px-3 py-1 rounded-lg border ${colors.badge}`}>
@@ -126,16 +126,16 @@ export default function CompletenessMeter({ profile }: Props) {
             className={`flex items-center justify-between p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer group/pill ${
               p.met
                 ? 'bg-emerald-50 border-emerald-100 text-emerald-700 hover:bg-emerald-100'
-                : 'bg-slate-50 border-slate-100 text-slate-400 hover:border-indigo-200 hover:text-indigo-600'
+                : 'bg-slate-50 border-slate-100 text-slate-400 hover:border-rose-200 hover:text-rose-600'
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className={`shrink-0 ${p.met ? 'text-emerald-600' : 'text-slate-300 group-hover/pill:text-indigo-500'}`}>
+              <div className={`shrink-0 ${p.met ? 'text-emerald-600' : 'text-slate-300 group-hover/pill:text-rose-500'}`}>
                 {p.met ? <CheckCircle2 size={14} /> : p.icon}
               </div>
               <div className="min-w-0">
                 <p className="truncate leading-tight">{p.label}</p>
-                <p className={`text-[9px] font-black uppercase ${p.met ? 'text-emerald-500' : 'text-slate-300 group-hover/pill:text-indigo-400'}`}>
+                <p className={`text-[9px] font-black uppercase ${p.met ? 'text-emerald-500' : 'text-slate-300 group-hover/pill:text-rose-400'}`}>
                   +{p.earned}/{p.points} pts
                 </p>
               </div>
@@ -150,7 +150,7 @@ export default function CompletenessMeter({ profile }: Props) {
         <Info size={13} className="text-slate-400 shrink-0 mt-0.5" />
         <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
           This score reflects <strong>information completeness only</strong>. It is not a character certificate, background check, or any form of personal guarantee.{' '}
-          <a href="/terms#section-9" className="underline hover:text-indigo-500 transition-colors">Learn more</a>.
+          <a href="/terms#section-9" className="underline hover:text-rose-500 transition-colors">Learn more</a>.
         </p>
       </div>
     </div>

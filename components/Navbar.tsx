@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NotificationBell from './NotificationBell'
 import { ThemeToggle } from './ThemeToggle';
+import Logo from './Logo';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -41,20 +42,7 @@ export default function Navbar() {
         : 'rounded-none border-transparent px-2 py-2 bg-transparent backdrop-blur-0'
         }`}>
         <div className="flex items-center justify-between">
-          <Link href="/" className="group flex items-center gap-3 active:scale-95 transition-transform" onClick={closeMenu}>
-            <div className={`relative w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-500 shadow-premium ${scrolled ? 'bg-primary text-white rotate-0' : 'bg-primary/5 text-primary rotate-[-6deg] group-hover:rotate-0'}`}>
-              <Handshake size={20} className="group-hover:scale-110 transition-transform" />
-              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent rounded-full border-2 border-background shadow-sm animate-pulse" />
-            </div>
-            <div className="flex flex-col">
-              <span className={`text-xl font-black tracking-tighter leading-none transition-colors font-serif ${scrolled ? 'text-foreground' : 'text-foreground'}`}>
-                truSathi
-              </span>
-              <span className="text-[8px] font-black uppercase tracking-[0.4em] leading-none mt-1 text-accent">
-                Your Search Companion
-              </span>
-            </div>
-          </Link>
+          <Logo size="lg" className="md:size-xl" />
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">

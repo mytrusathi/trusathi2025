@@ -1,6 +1,7 @@
 import { Handshake, Facebook, Twitter, Instagram, Mail, ShieldCheck, Sparkles, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import VisitorCounter from './VisitorCounter';
+import Logo from './Logo';
 
 export default function Footer() {
   return (
@@ -35,12 +36,9 @@ export default function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
           <div className="col-span-2 lg:col-span-1">
             {/* Logo Section */}
-            <Link href="/" className="flex items-center gap-3 mb-8 group">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-sm">
-                <Handshake size={20} />
-              </div>
-              <span className="text-2xl font-bold text-foreground tracking-tight">truSathi</span>
-            </Link>
+            <div className="mb-8">
+              <Logo size="lg" />
+            </div>
             <p className="text-muted-foreground text-base leading-relaxed mb-8 max-w-xs font-medium opacity-80">
               Connecting hearts through community trust, heritage, and complete transparency.
             </p>
