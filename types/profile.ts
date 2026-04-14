@@ -56,5 +56,7 @@ export interface Profile {
   // Authenticity Score Fields
   selfieUrl?: string;      // Live selfie uploaded during/after registration
   phoneVerified?: boolean; // Phone OTP verified
-  adminApproved?: boolean; // Manually screened by Admin
+  emailVerified?: boolean; // Email address verified
+  adminApproved?: boolean; // Manually screened by Team
+  screeningStatus?: 'pending' | 'approved' | 'rejected'; // Track review state
 }

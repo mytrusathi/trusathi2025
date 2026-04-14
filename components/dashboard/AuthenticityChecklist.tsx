@@ -13,10 +13,14 @@ import {
   confirmPhoneVerificationOtp,
   sendMemberEmailVerification,
   sendPhoneVerificationOtp,
+  syncEmailVerifiedProfiles,
 } from '@/app/lib/member-verification';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '@/app/lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { 
+  doc, updateDoc, collection, query, where, 
+  limit, getDocs, getDoc, setDoc, addDoc 
+} from 'firebase/firestore';
 import imageCompression from 'browser-image-compression';
 
 interface Step {
@@ -80,9 +84,9 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
       title: 'Authenticate Email',
       desc: 'Stay updated with important match alerts.',
       icon: <Mail size={20} />,
-      isCompleted: !!user?.emailVerified,
+      isCompleted: !!profile?.emailVerified || !!user?.emailVerified,
       isOptional: true,
-      buttonText: user?.emailVerified ? 'Authenticated' : 'Send Verification',
+      buttonText: !!profile?.emailVerified || !!user?.emailVerified ? 'Authenticated' : 'Send Verification',
     },
     {
       id: 'selfie',
@@ -94,14 +98,59 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
     },
     {
       id: 'admin',
-      title: 'Chat with Admin',
+      title: 'Submit for Review',
       desc: 'Final step for official community screening.',
-      icon: <MessageSquare size={20} />,
-      isCompleted: !!profile?.adminApproved,
-      href: '/dashboard/member?view=chats&chat=super-admin',
-      buttonText: profile?.adminApproved ? 'Approved' : 'Start Chat',
+      icon: <ShieldCheck size={20} />,
+      isCompleted: !!profile?.adminApproved || !!profile?.screeningStatus,
+      buttonText: profile?.adminApproved ? 'Verified' : (profile?.screeningStatus === 'pending' ? 'Submitted' : 'Submit to Team'),
     },
   ];
+
+  const mandatorySteps = ['profile', 'phone', 'selfie'];
+  const isMandatoryComplete = steps
+    .filter(s => mandatorySteps.includes(s.id))
+    .every(s => s.isCompleted);
+
+  const handleSubmitToAdmin = async () => {
+    if (!profile || !user) return;
+    if (!isMandatoryComplete) {
+      setError('Please complete Profile, Phone, and Selfie steps first.');
+      return;
+    }
+
+    setSelfieLoading(true);
+    setError(null);
+    setFeedback(null);
+
+    try {
+      // 1. Create Screening Request (Dedicated Collection)
+      // This avoids querying the restricted 'users' collection for the admin ID
+      const requestRef = collection(db, 'screening_requests');
+      await addDoc(requestRef, {
+        uid: user.uid,
+        userName: user.displayName || 'Member',
+        profileId: profile.id,
+        profileNo: profile.profileNo || 'Unknown',
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      });
+
+      // 2. Update Profile Status
+      if (!profile.id) throw new Error('Invalid profile ID.');
+      await updateDoc(doc(db, 'profiles', profile.id), {
+        screeningStatus: 'pending',
+        updatedAt: new Date().toISOString(),
+      });
+
+      await onProfileRefresh?.();
+      setFeedback('Your profile has been submitted for screening. Please wait 24-48 hours.');
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Unable to submit for screening.');
+    } finally {
+      setSelfieLoading(false);
+    }
+  };
 
   const completedCount = steps.filter((step) => step.isCompleted).length;
   const progressPercent = Math.round((completedCount / steps.length) * 100);
@@ -134,7 +183,13 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
 
     try {
       await runProfileRefresh();
-      setFeedback(user?.emailVerified ? 'Email is already verified.' : 'Email status refreshed.');
+      
+      if (user?.emailVerified) {
+        await syncEmailVerifiedProfiles(user.uid, true);
+        await onProfileRefresh?.();
+      }
+      
+      setFeedback(user?.emailVerified ? 'Email verified and synced successfully.' : 'Email status refreshed.');
     } catch (err) {
       console.error(err);
       setError('Unable to refresh email status right now.');
@@ -238,6 +293,15 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
 
     if (stepId === 'selfie') {
       selfieInputRef.current?.click();
+      return;
+    }
+
+    if (stepId === 'admin') {
+      if (profile?.adminApproved) {
+        window.location.href = '/dashboard/member?view=chats&chat=super-admin';
+      } else {
+        await handleSubmitToAdmin();
+      }
     }
   };
 
@@ -317,17 +381,23 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
               ) : (
                 <button
                   onClick={() => handleStepAction(step.id)}
-                  disabled={sendingEmail || refreshingEmail || phoneLoading || selfieLoading}
+                  disabled={
+                    sendingEmail || refreshingEmail || phoneLoading || selfieLoading || 
+                    (step.id === 'admin' && !isMandatoryComplete) ||
+                    (step.id === 'admin' && (profile?.screeningStatus === 'pending' || !!profile?.adminApproved))
+                  }
                   className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                     step.isCompleted
                       ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-500 hover:text-indigo-600'
+                      : (step.id === 'admin' && !isMandatoryComplete)
+                        ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-500 hover:text-indigo-600'
                   } disabled:opacity-70`}
                 >
-                  {(step.id === 'email' && (sendingEmail || refreshingEmail)) || (step.id === 'phone' && phoneLoading) || (step.id === 'selfie' && selfieLoading)
+                  {(step.id === 'email' && (sendingEmail || refreshingEmail)) || (step.id === 'phone' && phoneLoading) || (step.id === 'selfie' && selfieLoading) || (step.id === 'admin' && selfieLoading)
                     ? <Loader2 size={12} className="animate-spin" />
                     : null}
-                  {step.buttonText}
+                  {step.id === 'admin' && !isMandatoryComplete && !step.isCompleted ? 'Locked' : step.buttonText}
                 </button>
               )}
             </div>

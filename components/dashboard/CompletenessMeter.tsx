@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { Profile } from '@/types/profile';
-import { CheckCircle2, Phone, User, Camera, ShieldCheck, Info, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Phone, User, Camera, ShieldCheck, Info, ArrowRight, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Props {
@@ -29,7 +29,7 @@ export default function CompletenessMeter({ profile }: Props) {
   const filledCount = coreFields.filter(f => !!profile[f]).length;
   const profilePoints = Math.round((filledCount / coreFields.length) * 20);
 
-  // --- 4 Pillars ---
+  // --- 5 Pillars ---
   const pillars: Pillar[] = [
     {
       icon: <Phone size={16} />,
@@ -38,6 +38,16 @@ export default function CompletenessMeter({ profile }: Props) {
       earned: profile.phoneVerified ? 20 : 0,
       met: !!profile.phoneVerified,
       hint: 'Phone number registered and confirmed via OTP.',
+      view: 'overview'
+    },
+    {
+      icon: <Mail size={16} />,
+      label: 'Email Authenticated',
+      points: 10,
+      earned: profile.emailVerified ? 10 : 0,
+      met: !!profile.emailVerified,
+      hint: 'Email address verified for notifications.',
+      view: 'overview'
     },
     {
       icon: <User size={16} />,
@@ -51,19 +61,19 @@ export default function CompletenessMeter({ profile }: Props) {
     {
       icon: <Camera size={16} />,
       label: 'Selfie Uploaded',
-      points: 30,
-      earned: profile.selfieUrl ? 30 : 0,
+      points: 25,
+      earned: profile.selfieUrl ? 25 : 0,
       met: !!profile.selfieUrl,
       hint: 'A live selfie or profile photo has been uploaded.',
       view: 'my-profiles'
     },
     {
       icon: <ShieldCheck size={16} />,
-      label: 'Admin Screened',
-      points: 30,
-      earned: profile.adminApproved ? 30 : 0,
+      label: 'truSathi Team Verified',
+      points: 25,
+      earned: profile.adminApproved ? 25 : (profile.screeningStatus === 'pending' ? 12 : 0),
       met: !!profile.adminApproved,
-      hint: 'Profile has been manually reviewed and approved by a Group Admin.',
+      hint: profile.adminApproved ? 'Profile verified by truSathi Team.' : (profile.screeningStatus === 'pending' ? 'Review in progress...' : 'Submit to truSathi Team for community screening.'),
       view: 'chats'
     },
   ];
@@ -112,7 +122,7 @@ export default function CompletenessMeter({ profile }: Props) {
           <div
             key={p.label}
             title={p.hint}
-            onClick={() => p.view ? router.push(`/dashboard/member?view=${p.view}`) : alert("Authenticity logic coming soon!")}
+            onClick={() => p.view && router.push(`/dashboard/member?view=${p.view}`)}
             className={`flex items-center justify-between p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer group/pill ${
               p.met
                 ? 'bg-emerald-50 border-emerald-100 text-emerald-700 hover:bg-emerald-100'

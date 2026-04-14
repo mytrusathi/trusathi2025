@@ -140,7 +140,7 @@ export default function DashboardSidebar() {
     links.push({ 
       href: '/dashboard/team', 
       icon: Users, 
-      label: 'Admin Team', 
+      label: 'truSathi Team', 
       active: pathname === '/dashboard/team' 
     });
   }

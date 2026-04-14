@@ -49,7 +49,9 @@ const FIELD_ALIASES: Record<keyof Partial<Profile>, string[]> = {
   privacyLevel: [],
   selfieUrl: [],
   phoneVerified: [],
+  emailVerified: [],
   adminApproved: [],
+  screeningStatus: [],
 };
 
 const normalizeText = (value: string) =>

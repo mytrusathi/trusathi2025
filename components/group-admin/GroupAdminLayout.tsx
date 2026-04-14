@@ -19,7 +19,7 @@ export default function GroupAdminLayout({ children }: { children: ReactNode }) 
             <div className="flex flex-col leading-tight">
               <span className="text-sm font-semibold">Trusathi Partner Console</span>
               <span className="text-[10px] text-slate-400">
-                {user?.groupName || 'Group Admin'}
+                {user?.groupName || 'Community Partner'}
               </span>
             </div>
           </div>

@@ -5,7 +5,7 @@ import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Phone, MessageSquar
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { db } from '@/app/lib/firebase';
-import { doc, getDoc, setDoc, addDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, addDoc, collection, query, where, getDocs, deleteDoc, limit } from 'firebase/firestore';
 import { Profile } from '@/types/profile';
 import { sendNotification } from '@/app/lib/notification-service';
 
@@ -72,9 +72,17 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
         return;
       }
 
+      // Fetch Sender's Profile (to show the receiver who sent it)
+      const senderProfileQuery = query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(1));
+      const senderProfileSnap = await getDocs(senderProfileQuery);
+      const senderProfile = !senderProfileSnap.empty ? senderProfileSnap.docs[0].data() : null;
+
       await addDoc(collection(db, 'interests'), {
         senderId: user.uid,
         senderName: user.displayName || 'Anonymous User',
+        senderProfileId: !senderProfileSnap.empty ? senderProfileSnap.docs[0].id : null,
+        senderProfileName: senderProfile?.name || user.displayName || 'Anonymous User',
+        senderProfileImage: senderProfile?.imageUrl || '',
         receiverId: receiverId,
         profileId: profile.id,
         profileNo: profile.profileNo || 'Unknown',
@@ -158,10 +166,10 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
                  {interestSent 
                    ? (canSeeContact 
                       ? "Direct communication is now authorized. You can view private details below." 
-                      : `Access request has been safely dispatched to ${managerName || 'the Admin'} for verification.`) 
+                      : `Access request has been safely dispatched to ${managerName || 'the truSathi Team'} for verification.`) 
                    : (profile.revealContactOnInterest 
                       ? `Accessing this profile will reveal authenticated contact details immediately.` 
-                      : `A formal interest notifies ${managerName || 'the Admin'} to facilitate a secure introduction.`)}
+                      : `A formal interest notifies ${managerName || 'the truSathi Team'} to facilitate a secure introduction.`)}
               </p>
             </div>
 
@@ -228,7 +236,7 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
                      <div className="space-y-2">
                         <h5 className="font-black text-xl uppercase tracking-tight">Verification in Progress</h5>
                         <p className="text-sm font-medium leading-relaxed text-white/60 max-w-xs">
-                           Waiting for {managerName || 'the Admin'} to approve your profile access. High-priority connections usually take 1-4 hours.
+                           Waiting for {managerName || 'the truSathi Team'} to approve your profile access. High-priority connections usually take 1-4 hours.
                         </p>
                      </div>
                   </div>

@@ -19,7 +19,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import {
   Loader2, MessageCircle, Send, User, ArrowLeft,
-  MoreVertical, Phone, CheckCircle2, Clock, ShieldCheck, Crown,
+  MoreVertical, CheckCircle2, Clock, ShieldCheck, Crown,
 } from 'lucide-react';
 import { sendNotification } from '@/app/lib/notification-service';
 import Image from 'next/image';
@@ -126,7 +126,7 @@ export default function ChatView() {
             connected.unshift({
               id: `super-admin-${superAdminDoc.id}`,
               otherId: superAdminDoc.id,
-              otherName: superAdminDoc.data().displayName || 'Super Admin',
+              otherName: superAdminDoc.data().displayName || 'truSathi Team',
               otherImage: '',
               profileNo: 'Trust Desk',
               kind: 'super-admin',
@@ -248,7 +248,7 @@ export default function ChatView() {
         senderId: user.uid,
         senderName: user.displayName || 'A Member',
         type: 'message',
-        title: selectedChat.kind === 'super-admin' ? 'New Admin Chat Message' : 'New Message',
+        title: selectedChat.kind === 'super-admin' ? 'New Team Message' : 'New Message',
         message: text.length > 50 ? `${text.substring(0, 47)}...` : text,
         link: selectedChat.kind === 'super-admin'
           ? '/dashboard/super-admin'
@@ -283,47 +283,60 @@ export default function ChatView() {
   }
 
   return (
-    <div className="bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] overflow-hidden flex h-[750px] animate-in slide-in-from-bottom-8 duration-1000">
-      <div className={`w-full md:w-96 border-r border-slate-100/50 flex flex-col bg-white/50 backdrop-blur-md ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
-        <div className="p-8 border-b border-slate-100/50">
-          <h3 className="text-2xl font-black text-slate-900 tracking-tight">Messages</h3>
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Direct contacts and trust desk</p>
+    <div className="bg-white/40 backdrop-blur-3xl rounded-[3.5rem] border border-white/40 shadow-[0_40px_80px_-16px_rgba(0,0,0,0.12)] overflow-hidden flex h-[780px] animate-in slide-in-from-bottom-8 duration-1000 relative">
+      {/* Background Decorative Blobs */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-10">
+         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full"></div>
+         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-fuchsia-500/5 blur-[120px] rounded-full"></div>
+      </div>
+
+      <div className={`w-full md:w-96 border-r border-slate-200/30 flex flex-col bg-white/40 backdrop-blur-3xl ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
+        <div className="p-10 border-b border-slate-200/30">
+          <h3 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Messaging</h3>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Secure Channels Active</p>
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+        
+        <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
           {connections.map((connection) => (
             <button
               key={connection.otherId}
               onClick={() => setSelectedChat(connection)}
-              className={`w-full flex items-center gap-4 p-5 rounded-[2rem] transition-all duration-300 ${
+              className={`w-full flex items-center gap-5 p-5 rounded-[2.5rem] transition-all duration-500 group ${
                 selectedChat?.otherId === connection.otherId
-                  ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-200 scale-[1.02]'
-                  : 'hover:bg-indigo-50/50 text-slate-700 hover:translate-x-1'
+                  ? 'bg-indigo-600 text-white shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] scale-[1.02] z-10'
+                  : 'hover:bg-white/80 text-slate-700 hover:shadow-lg hover:shadow-indigo-500/5'
               }`}
             >
-              <div className={`relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 border-2 ${selectedChat?.otherId === connection.otherId ? 'border-indigo-400' : 'border-white shadow-sm'}`}>
+              <div className={`relative w-16 h-16 rounded-[1.5rem] overflow-hidden shrink-0 border-4 transition-transform duration-500 group-hover:scale-110 ${
+                selectedChat?.otherId === connection.otherId ? 'border-indigo-400/50' : 'border-white shadow-xl'
+              }`}>
                 {connection.otherImage ? (
                   <Image src={connection.otherImage} alt={connection.otherName} fill className="object-cover" />
                 ) : (
                   <div className={`w-full h-full flex items-center justify-center font-black ${
-                    connection.kind === 'super-admin' ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-400'
+                    connection.kind === 'super-admin' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-400'
                   }`}>
-                    {connection.kind === 'super-admin' ? <Crown size={24} /> : <User size={24} />}
+                    {connection.kind === 'super-admin' ? <Crown size={28} /> : <User size={28} />}
                   </div>
                 )}
               </div>
+              
               <div className="text-left min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <p className="font-black text-sm truncate">{connection.otherName}</p>
-                  <span className={`text-[8px] font-black tracking-widest uppercase ${
-                    selectedChat?.otherId === connection.otherId ? 'text-indigo-200' : 'text-slate-300'
-                  }`}>
-                    {connection.kind === 'super-admin' ? 'Trust Desk' : lastMessages[connection.otherId] ? 'Active' : ''}
-                  </span>
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <p className="font-black text-[15px] truncate tracking-tight">{connection.otherName}</p>
+                  {connection.kind === 'super-admin' && (
+                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                      selectedChat?.otherId === connection.otherId ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-700'
+                    }`}>Admin</span>
+                  )}
                 </div>
-                <p className={`text-xs truncate font-medium ${
-                  selectedChat?.otherId === connection.otherId ? 'text-indigo-100 opacity-80' : 'text-slate-400'
+                <p className={`text-xs truncate font-semibold leading-tight ${
+                  selectedChat?.otherId === connection.otherId ? 'text-indigo-100/70' : 'text-slate-400'
                 }`}>
-                  {lastMessages[connection.otherId] || (connection.kind === 'super-admin' ? 'Ask for authenticity review...' : 'Start a conversation...')}
+                  {lastMessages[connection.otherId] || (connection.kind === 'super-admin' ? 'Trust review channel...' : 'Start syncing...')}
                 </p>
               </div>
             </button>
@@ -331,55 +344,64 @@ export default function ChatView() {
         </div>
       </div>
 
-      <div className={`flex-1 flex flex-col bg-slate-50/20 ${selectedChat ? 'flex' : 'hidden md:flex'}`}>
+      <div className={`flex-1 flex flex-col bg-slate-50/10 backdrop-blur-sm ${selectedChat ? 'flex' : 'hidden md:flex'}`}>
         {selectedChat ? (
           <>
-            <div className="px-8 py-6 border-b border-slate-100/50 bg-white/80 backdrop-blur-xl flex items-center justify-between sticky top-0 z-10">
-              <div className="flex items-center gap-5">
-                <button onClick={() => setSelectedChat(null)} className="md:hidden p-2 -ml-2 text-slate-400 hover:text-indigo-600">
-                  <ArrowLeft size={24} />
+            <div className="px-10 py-8 border-b border-slate-200/30 bg-white/60 backdrop-blur-3xl flex items-center justify-between sticky top-0 z-10">
+              <div className="flex items-center gap-6">
+                <button onClick={() => setSelectedChat(null)} className="md:hidden p-3 -ml-3 text-slate-400 hover:text-indigo-600 transition-colors">
+                  <ArrowLeft size={28} />
                 </button>
-                <div className="relative">
-                  <div className={`w-12 h-12 rounded-2xl border-2 border-white shadow-sm overflow-hidden flex items-center justify-center font-black text-xl shrink-0 ${
-                    selectedChat.kind === 'super-admin' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-100 text-indigo-600'
+                <div className="relative group">
+                  <div className={`w-14 h-14 rounded-[1.5rem] border-4 border-white shadow-2xl overflow-hidden flex items-center justify-center font-black text-2xl shrink-0 transition-transform duration-500 group-hover:scale-110 ${
+                    selectedChat.kind === 'super-admin' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'
                   }`}>
                     {selectedChat.otherImage ? (
                       <Image src={selectedChat.otherImage} alt={selectedChat.otherName} fill className="object-cover" />
                     ) : selectedChat.kind === 'super-admin' ? (
-                      <Crown size={22} />
+                      <Crown size={26} />
                     ) : (
                       selectedChat.otherName.charAt(0)
                     )}
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></div>
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white rounded-full shadow-lg"></div>
                 </div>
                 <div>
-                  <h4 className="font-black text-slate-900 tracking-tight leading-tight mb-1">{selectedChat.otherName}</h4>
-                  <div className="flex items-center gap-2">
-                    {selectedChat.kind === 'super-admin' ? <Crown size={12} className="text-amber-500" /> : <ShieldCheck size={12} className="text-indigo-500" />}
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      {selectedChat.profileNo} {selectedChat.kind === 'super-admin' ? '• Authenticity Review Desk' : '• Authenticated'}
-                    </p>
+                  <h4 className="font-black text-slate-900 text-2xl tracking-tighter leading-none mb-1.5">{selectedChat.otherName}</h4>
+                  <div className="flex items-center gap-2.5">
+                    {selectedChat.kind === 'super-admin' ? (
+                      <div className="px-2.5 py-1 bg-amber-500/10 rounded-lg flex items-center gap-1.5 border border-amber-500/20">
+                         <Crown size={12} className="text-amber-500" />
+                         <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest">Trust Desk</span>
+                      </div>
+                    ) : (
+                      <div className="px-2.5 py-1 bg-indigo-500/10 rounded-lg flex items-center gap-1.5 border border-indigo-500/20">
+                         <ShieldCheck size={12} className="text-indigo-500" />
+                         <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Authenticated</span>
+                      </div>
+                    )}
+                    <div className="w-1 h-1 rounded-full bg-slate-300"></div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{selectedChat.profileNo}</p>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button className="p-3 text-slate-400 hover:bg-slate-50 rounded-2xl transition-colors"><Phone size={20} /></button>
-                <button className="p-3 text-slate-400 hover:bg-slate-50 rounded-2xl transition-colors"><MoreVertical size={20} /></button>
-              </div>
+              <button className="w-12 h-12 flex items-center justify-center text-slate-400 hover:bg-white hover:text-indigo-600 rounded-2xl transition-all border border-transparent hover:border-slate-100 hover:shadow-xl"><MoreVertical size={24} /></button>
             </div>
 
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar scroll-smooth">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar scroll-smooth">
               {messages.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-50">
-                  <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center text-slate-300">
-                    {selectedChat.kind === 'super-admin' ? <Crown size={30} /> : <MessageCircle size={32} />}
+                <div className="flex flex-col items-center justify-center h-full text-center space-y-6 opacity-30">
+                  <div className="w-24 h-24 rounded-[2.5rem] bg-white shadow-inner flex items-center justify-center text-slate-300 border border-slate-50">
+                    {selectedChat.kind === 'super-admin' ? <Crown size={48} strokeWidth={1} /> : <MessageCircle size={48} strokeWidth={1} />}
                   </div>
-                  <p className="text-sm font-bold text-slate-500 italic">
-                    {selectedChat.kind === 'super-admin'
-                      ? 'Introduce yourself and ask for authenticity approval.'
-                      : 'No message history yet. Type something to break the ice!'}
-                  </p>
+                  <div className="space-y-2">
+                    <h5 className="text-xl font-black text-slate-400 uppercase tracking-widest">Private Channel</h5>
+                    <p className="text-sm font-bold text-slate-400 italic max-w-xs mx-auto">
+                      {selectedChat.kind === 'super-admin'
+                        ? 'Submit your profile for screening or ask for expert assistance.'
+                        : 'Your conversation is end-to-end encrypted and visible only to you.'}
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -388,19 +410,19 @@ export default function ChatView() {
                 const nextIsMe = messages[index + 1]?.senderId === message.senderId;
 
                 return (
-                  <div key={message.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
-                    <div className={`group relative max-w-[70%] lg:max-w-[60%] p-4 lg:p-5 shadow-sm transition-all ${
+                  <div key={message.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+                    <div className={`group relative max-w-[85%] lg:max-w-[70%] p-5 lg:p-6 transition-all shadow-xl hover:shadow-2xl ${
                       isMe
-                        ? `bg-indigo-600 text-white rounded-[2rem] ${nextIsMe ? 'rounded-br-lg' : 'rounded-br-none'} shadow-xl shadow-indigo-100`
-                        : `bg-white text-slate-700 rounded-[2rem] ${nextIsMe ? 'rounded-bl-lg' : 'rounded-bl-none'} border border-slate-100`
+                        ? `bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-[2.5rem] ${nextIsMe ? 'rounded-br-xl' : 'rounded-br-none'} shadow-indigo-500/20`
+                        : `bg-white/80 backdrop-blur-xl text-slate-700 rounded-[2.5rem] ${nextIsMe ? 'rounded-bl-xl' : 'rounded-bl-none'} border border-white/60`
                     }`}>
-                      <p className="text-sm lg:text-base font-semibold leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                      <div className={`text-[9px] font-black mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-60 transition-opacity ${
+                      <p className="text-[15px] lg:text-base font-bold leading-relaxed whitespace-pre-wrap tracking-tight">{message.text}</p>
+                      <div className={`text-[9px] font-black mt-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-60 transition-all duration-300 ${
                         isMe ? 'justify-end text-indigo-50' : 'text-slate-400'
                       }`}>
                         <Clock size={10} />
-                        {message.createdAt?.toDate ? message.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Sending...'}
-                        {isMe && <CheckCircle2 size={10} className="ml-1" />}
+                        {message.createdAt?.toDate ? message.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Syncing...'}
+                        {isMe && <CheckCircle2 size={10} className="ml-1 opacity-100" />}
                       </div>
                     </div>
                   </div>
@@ -408,38 +430,41 @@ export default function ChatView() {
               })}
             </div>
 
-            <div className="p-8 bg-white/80 backdrop-blur-xl border-t border-slate-100/50">
+            <div className="p-10 bg-white/40 backdrop-blur-3xl border-t border-slate-200/30">
               <form onSubmit={handleSend} className="relative group">
-                <div className="absolute inset-0 bg-indigo-500/5 rounded-[2rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
-                <div className="relative flex items-center gap-4 bg-slate-50 rounded-[2rem] p-2 pl-6 pr-2 border border-slate-100 focus-within:border-indigo-500/30 focus-within:bg-white transition-all">
+                <div className="absolute inset-[-4px] bg-gradient-to-r from-indigo-500/20 to-fuchsia-500/20 rounded-[3rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000"></div>
+                <div className="relative flex items-center gap-5 bg-white/80 backdrop-blur-xl rounded-[3rem] p-3 pl-8 pr-3 border border-white shadow-2xl shadow-indigo-500/5 focus-within:border-indigo-500/30 transition-all">
                   <input
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={selectedChat.kind === 'super-admin' ? 'Message the super admin...' : `Message ${selectedChat.otherName}...`}
-                    className="flex-1 bg-transparent py-4 text-slate-700 font-bold text-sm outline-none placeholder:text-slate-400"
+                    placeholder={selectedChat.kind === 'super-admin' ? 'Type your request to truSathi Team...' : `Message ${selectedChat.otherName}...`}
+                    className="flex-1 bg-transparent py-5 text-slate-800 font-bold text-base outline-none placeholder:text-slate-400 tracking-tight"
                   />
                   <button
                     type="submit"
                     disabled={!newMessage.trim()}
-                    className="w-12 h-12 bg-indigo-600 text-white rounded-[1.5rem] flex items-center justify-center hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-90 disabled:opacity-30 disabled:grayscale disabled:scale-95"
+                    className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white rounded-[2rem] flex items-center justify-center hover:shadow-[0_20px_40px_-10px_rgba(79,70,229,0.5)] transition-all active:scale-90 disabled:opacity-20 disabled:grayscale disabled:scale-95 group/btn"
                   >
-                    <Send size={20} />
+                    <Send size={24} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                   </button>
                 </div>
               </form>
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center p-20 animate-in fade-in zoom-in duration-1000">
-            <div className="relative mb-10">
-              <div className="w-32 h-32 bg-indigo-50 rounded-[3rem] absolute -top-4 -left-4 animate-pulse"></div>
-              <div className="w-32 h-32 bg-white rounded-[3rem] shadow-2xl flex items-center justify-center text-indigo-100 relative z-10 border border-slate-50">
-                <MessageCircle size={64} strokeWidth={1} className="text-indigo-600" />
+          <div className="flex-1 flex flex-col items-center justify-center p-20 animate-in fade-in duration-1000 relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 blur-[100px] rounded-full"></div>
+            <div className="relative mb-12 transform hover:scale-110 transition-transform duration-700">
+              <div className="w-40 h-40 bg-white rounded-[4rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] flex items-center justify-center text-indigo-100 relative z-10 border border-slate-50/50">
+                <MessageCircle size={80} strokeWidth={1} className="text-indigo-600" />
+              </div>
+              <div className="absolute -top-4 -right-4 w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/30 animate-bounce">
+                <ShieldCheck size={24} />
               </div>
             </div>
-            <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Your Safe Workspace</h3>
-            <p className="text-slate-500 max-w-sm font-medium text-lg leading-relaxed text-center">
-              Select a candidate or open the trust desk to continue your authenticity review.
+            <h3 className="text-4xl font-black text-slate-900 mb-6 tracking-tight text-center">Encrypted Workspace</h3>
+            <p className="text-slate-500 max-w-sm font-semibold text-xl leading-relaxed text-center opacity-70">
+              Select a connection or contact the trust desk to start a secure conversation.
             </p>
           </div>
         )}
@@ -447,17 +472,17 @@ export default function ChatView() {
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 5px;
+          width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(0,0,0,0.05);
+          background: rgba(0,0,0,0.04);
           border-radius: 10px;
         }
         .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-          background: rgba(0,0,0,0.1);
+          background: rgba(0,0,0,0.08);
         }
       `}</style>
     </div>

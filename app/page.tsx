@@ -8,7 +8,9 @@ import {
   MessageSquareText,
   ShieldCheck,
   Smartphone,
-  Handshake
+  Handshake,
+  Sparkles,
+  ChevronRight
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
@@ -20,85 +22,106 @@ import Footer from '../components/Footer';
 // Features section updated for better Trust and Privacy
 const trustSignals = [
   {
-    title: 'Privacy-First Approach',
-    copy: 'You have full control over your visibility. We ensure your personal data and photos are shared only with those you trust.',
+    title: 'Privacy by Choice',
+    copy: 'Manage your digital presence with ease. You have full control over who accesses your personal information.',
     icon: ShieldCheck,
   },
   {
-    title: 'Community Screening',
-    copy: 'Each connection sits inside a moderated ecosystem instead of an anonymous swipe feed.',
+    title: 'Moderated Network',
+    copy: 'We move away from anonymous culture by maintaining a community-focused platform for serious matchmaking.',
     icon: Handshake,
   },
   {
-    title: 'Direct Trust-Desk',
-    copy: 'A direct trust-desk chat gives families a clear place to verify authenticity before moving ahead.',
+    title: 'Assisted Verification',
+    copy: 'A dedicated desk to help you navigate the platform and connect with verified-intent members.',
     icon: MessageSquareText,
   },
 ];
 
 const journeySteps = [
-  'Create a detailed biodata and keep it complete.',
-  'Verify phone, email, and a live selfie for trust.',
-  'Shortlist profiles and send interests securely.',
-  'Connect through our community trust desk when needed.',
+  "Create Profile",
+  "Get Verified",
+  "Discover Matches",
+  "Start Connecting"
 ];
 
 export default function TrusathiUI() {
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 view-transition">
       <Navbar />
       <Hero />
 
-      {/* Trust Highlights Section - Clean & Vibrant */}
-      <section className="relative px-4 pb-24 pt-10 md:px-8">
-        <div className="mx-auto -mt-20 max-w-7xl rounded-[4rem] border border-border bg-card p-6 shadow-[0_40px_100px_-15px_rgba(0,0,0,0.08)] md:-mt-24 md:p-12 transition-colors">
-          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+      {/* Trust Highlights Section */}
+      <section id="trust" className="relative px-4 pb-20 pt-16 md:px-8 bg-background scroll-mt-32">
+        <div className="mx-auto -mt-16 max-w-6xl rounded-[3rem] border border-border/50 bg-card p-6 shadow-premium md:-mt-24 md:p-12 relative overflow-hidden">
 
-            {/* Main Branding Card - Elegant Red */}
-            <div className="rounded-[3rem] bg-gradient-to-br from-primary via-primary/95 to-primary p-10 text-white md:p-16 border border-white/10 relative overflow-hidden shadow-[0_30px_60px_-15px_rgba(193,18,31,0.3)]">
-              {/* Luxury ambient glow */}
-              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[120px] pointer-events-none"></div>
+          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-center">
+
+            {/* Main Branding Card */}
+            <div className="rounded-[2.5rem] bg-primary p-8 text-white md:p-14 relative overflow-hidden shadow-lg border border-white/5 group">
 
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.3em] text-accent-foreground backdrop-blur-md">
-                  <CheckCircle2 size={14} className="text-accent" /> Trust-First Matrimony
+                {/* Badge: Simple and Clear */}
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-[10px] font-bold uppercase tracking-wider text-white/90 backdrop-blur-md mb-6">
+                  <CheckCircle2 size={14} className="text-accent" /> Community Verified Portal
                 </div>
 
-                <h2 className="mt-10 max-w-2xl text-4xl font-black tracking-tighter md:text-7xl leading-[0.95] font-serif">
-                  The journey to your Sathi, <br />
-                  <span className="text-white/80 italic">guided by Trust.</span>
+                {/* Heading: Size reduced from 5.5rem to 3.5rem/4rem for better fit */}
+                <h2 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
+                  The Journey to <br />
+                  <span className="text-white underline decoration-accent/30 decoration-4 underline-offset-4">Your True Sathi</span>, <br />
+                  <span className="text-white/70 italic font-serif">Simplified by Trust.</span>
                 </h2>
 
-                <p className="mt-10 max-w-2xl text-lg font-medium leading-relaxed opacity-90 md:text-xl">
-                  We believe that the search for a life partner deserves a sanctuary of honesty. TruSathi is designed to make every step clear, ensuring your search is private, authenticated, and always respectful.
+                {/* Body Text: Removed "Sacred/Sanctuary" for liability/simplicity */}
+                <p className="max-w-lg text-base md:text-lg font-medium leading-relaxed opacity-90 mb-10">
+                  A secure space where every profile is hand-reviewed. TruSathi brings the reliability of community circles to your fingertips, keeping your privacy first.
                 </p>
 
-                <div className="mt-14 flex flex-wrap gap-6">
+                {/* Buttons: Clean and Action-Oriented */}
+                <div className="flex flex-wrap gap-4">
                   <Link
                     href="/register"
-                    className="inline-flex items-center gap-3 rounded-2xl bg-white px-10 py-5 text-xs font-black uppercase tracking-[0.2em] text-primary transition-all hover:bg-accent hover:text-white active:scale-95 shadow-2xl shadow-primary/30"
+                    className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-xs font-bold uppercase tracking-wider text-primary transition-all hover:bg-accent hover:text-white active:scale-95 shadow-md"
                   >
-                    Start Free <ArrowRight size={14} />
+                    Start Your Search <ArrowRight size={14} />
                   </Link>
                   <Link
                     href="/search"
-                    className="inline-flex items-center gap-3 rounded-2xl border border-white/20 bg-white/5 px-10 py-5 text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-white/10 active:scale-95"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-8 py-4 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-white/10 active:scale-95 backdrop-blur-sm"
                   >
-                    See Profiles
+                    Browse Profiles
                   </Link>
                 </div>
               </div>
             </div>
 
-            {/* Trust Signal Cards - Modern & Clean */}
-            <div className="grid gap-6">
-              {trustSignals.map((signal) => (
-                <div key={signal.title} className="rounded-[2.5rem] border border-border bg-card p-10 hover:border-primary/30 transition-all duration-500 group hover:shadow-2xl hover:shadow-primary/10">
-                  <div className="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all shadow-sm border border-border">
-                    <signal.icon size={28} />
+
+            {/* Trust Signal Cards - Compact & Clean */}
+            <div className="grid gap-4 md:gap-6">
+              {trustSignals.map((signal, idx) => (
+                <div
+                  key={signal.title}
+                  className="p-6 rounded-3xl border border-border/40 bg-card/50 hover:bg-card hover:shadow-md transition-all duration-300 animate-in fade-in slide-in-from-right-8"
+                  style={{ transitionDelay: `${idx * 100}ms` }}
+                >
+                  <div className="flex items-center gap-6">
+                    {/* Icon: Size reduced from h-16/w-16 to h-12/w-12 */}
+                    <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary shadow-sm border border-border/20">
+                      <signal.icon size={22} />
+                    </div>
+
+                    <div>
+                      {/* Title: Reduced from 3xl to text-lg/xl and removed italic/serif for better readability */}
+                      <h3 className="text-lg font-bold text-foreground tracking-tight leading-tight mb-1">
+                        {signal.title}
+                      </h3>
+                      {/* Copy: Slightly smaller text for better hierarchy */}
+                      <p className="text-sm font-medium leading-normal text-muted-foreground">
+                        {signal.copy}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-black text-foreground tracking-tight">{signal.title}</h3>
-                  <p className="mt-4 text-base font-medium leading-relaxed text-muted-foreground">{signal.copy}</p>
                 </div>
               ))}
             </div>
@@ -108,29 +131,49 @@ export default function TrusathiUI() {
 
       <WhyChoose />
 
-      {/* Member Journey Section - Elegant Sober Style */}
-      <section className="relative overflow-hidden bg-muted px-4 pt-24 md:pt-40 pb-24 text-foreground md:px-8 border-y border-border">
+      {/* Member Journey Section - Modern & Clean */}
+      <section id="journey" className="relative overflow-hidden bg-secondary px-6 py-10 md:py-20 text-foreground border-y border-border/30 scroll-mt-0">
         {/* Soft background glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--primary)/0.03,transparent_50%),radial-gradient(circle_at_bottom_left,var(--primary)/0.02,transparent_40%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--primary)/0.03,transparent_50%)] pointer-events-none" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-24 lg:grid-cols-[0.85fr_1.15fr] items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.3em] text-primary shadow-sm">
-              <Camera size={14} /> The Journey Together
+        <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] items-center">
+
+          {/* Left Side: Content */}
+          <div className="animate-in fade-in slide-in-from-left duration-1000">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-background border border-border/40 text-primary text-[10px] font-bold uppercase tracking-wider shadow-sm">
+              <Camera size={14} className="text-accent" /> The Simple Process
             </div>
-            <h2 className="mt-10 text-5xl font-black tracking-tighter md:text-8xl leading-[0.9] font-serif">
-              Simple. True. <br /> <span className="text-primary italic underline decoration-primary/20 decoration-8 underline-offset-8">Transparent.</span>
+
+            {/* Reduced from 8rem to 4xl/6xl */}
+            <h2 className="mt-8 text-4xl md:text-6xl font-black tracking-tight leading-tight">
+              Honest. <br /> Elegant. <br />
+              <span className="text-primary underline decoration-primary/10 underline-offset-8">Reliable.</span>
             </h2>
-            <p className="mt-12 max-w-xl text-xl font-medium leading-relaxed opacity-80 text-muted-foreground">
-              Your search for a life partner deserves a path that is easy to trust. From direct community support to authenticated profiles, we&apos;ve removed the noise so you can focus on what&apos;s real.
+
+            <p className="mt-8 max-w-lg text-lg font-medium leading-relaxed text-muted-foreground border-l-4 border-primary/20 pl-6">
+              We’ve simplified the search for a life partner into a peaceful, transparent experience. No clutter, just genuine community connections.
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
+          {/* Right Side: Step Cards (Fixed Padding and Text) */}
+          <div className="grid gap-4 sm:grid-cols-2">
             {journeySteps.map((step, index) => (
-              <div key={step} className="group rounded-[3rem] border border-border bg-card p-12 hover:shadow-xl hover:shadow-primary/5 transition-all hover:-translate-y-2 border-l-4 border-l-primary/30">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground group-hover:text-primary transition-colors">Protocol 0{index + 1}</p>
-                <p className="mt-6 text-2xl font-black leading-tight group-hover:text-primary transition-colors tracking-tight text-foreground">{step}</p>
+              <div
+                key={step}
+                className="p-8 rounded-3xl bg-background border border-border/50 group hover:shadow-xl hover:border-primary/30 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8"
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Step 0{index + 1}</p>
+                  <div className="w-8 h-8 rounded-full border border-border/20 flex items-center justify-center text-xs font-bold text-muted-foreground group-hover:bg-primary group-hover:text-white transition-colors">
+                    {index + 1}
+                  </div>
+                </div>
+
+                {/* Title: Reduced from 3xl to xl/2xl to prevent overflow */}
+                <p className="text-xl md:text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                  {step}
+                </p>
               </div>
             ))}
           </div>

@@ -66,8 +66,8 @@ export default function SearchBar({ initialFilters, variant = 'floating' }: Sear
   // Updated container styling for TruSathi theme
   const containerClassName =
     variant === 'floating'
-      ? 'bg-card p-4 rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] dark:shadow-primary/20 max-w-6xl mx-auto border border-border'
-      : 'bg-card p-4 rounded-3xl shadow-xl shadow-primary/5 max-w-6xl mx-auto border border-border'
+      ? 'bg-card p-6 md:p-8 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] dark:shadow-primary/20 max-w-6xl mx-auto border border-border'
+      : 'bg-card p-6 md:p-8 rounded-[3rem] shadow-xl shadow-primary/5 max-w-6xl mx-auto border border-border'
   return (
     <div className={containerClassName}>
       <div className={`grid grid-cols-1 ${variant === 'embedded' ? 'md:grid-cols-3 lg:grid-cols-6' : 'md:grid-cols-4'} gap-4 items-end`}>

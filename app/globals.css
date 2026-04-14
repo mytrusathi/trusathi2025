@@ -1,82 +1,66 @@
 @import "tailwindcss";
 
 :root {
-  /* Premium Simple Matrimonial (Warm White, Heart Red, Deep Slate) */
-  --background: #FDFBF7; /* Warm Soft Pearl */
-  --foreground: #1C1917; /* Stone 900 - Soft Black */
-  
+  /* Premium Imperial Matrimonial (Warm Silk, Imperial Red, Gold Accents) */
+  --background: #FCF9F5; /* Warm Silk Pearl */
+  --foreground: #1A1A1A; /* Luxe Black */
+
   --card: #FFFFFF;
-  --card-foreground: #1C1917;
-  
+  --card-foreground: #1A1A1A;
+
   --popover: #FFFFFF;
-  --popover-foreground: #1C1917;
-  
-  --primary: #C1121F; /* Heart Red / Deep Crimson */
+  --popover-foreground: #1A1A1A;
+
+  --primary: #A4161A; /* Imperial Red - Deep & Sophisticated */
   --primary-foreground: #FFFFFF;
-  
-  --secondary: #F5F3F0; /* Soft Warm Gray */
-  --secondary-foreground: #1C1917;
-  
-  --muted: #F5F3F0;
-  --muted-foreground: #78716C; /* Stone 500 */
-  
-  --accent: #E5E5E5; /* Subtle Neutral Accent instead of bright pink */
-  --accent-foreground: #1C1917;
-  
-  --destructive: #991B1B;
+
+  --secondary: #F8F5F2; /* Soft Cream */
+  --secondary-foreground: #1A1A1A;
+
+  --muted: #F2EEE9;
+  --muted-foreground: #706B66;
+
+  --accent: #D4AF37; /* Champagne Gold Accent */
+  --accent-foreground: #FDFBF7;
+
+  --destructive: #7B1113;
   --destructive-foreground: #FFFFFF;
-  
-  --border: #E7E5E4; /* Stone 200 */
-  --input: #E7E5E4;
-  --ring: #C1121F;
-  
-  --radius: 1.5rem;
+
+  --border: #E8E2DA; /* Warm Stone Border */
+  --input: #E8E2DA;
+  --ring: #A4161A;
+
+  --radius: 1.25rem;
 
   /* Brand Colors */
-  --brand-primary: #C1121F;
-  --brand-accent: #E5E5E5;
-  --brand-navy: #1C1917;
+  --brand-primary: #A4161A;
+  --brand-accent: #D4AF37;
+  --brand-navy: #1A1A1A;
 
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(193, 18, 31, 0.08); /* Faint red tint */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(164, 22, 26, 0.1);
+
+  /* Elevation Shadows */
+  --shadow-premium: 0 20px 50px rgba(26, 26, 26, 0.05);
+  --shadow-lift: 0 30px 60px -12px rgba(164, 22, 26, 0.08);
 }
 
-/* Enforcing Single Theme - Disabling Dark Mode Overrides for consistency */
+/* Unified Theme - Consistency is Premium */
 .dark {
-  --background: #FDFBF7;
-  --foreground: #1C1917;
-  --card: #FFFFFF;
-  --card-foreground: #1C1917;
-  --popover: #FFFFFF;
-  --popover-foreground: #1C1917;
-  --primary: #C1121F;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F5F3F0;
-  --secondary-foreground: #1C1917;
-  --muted: #F5F3F0;
-  --muted-foreground: #78716C;
-  --accent: #E5E5E5;
-  --accent-foreground: #1C1917;
-  --destructive: #991B1B;
-  --destructive-foreground: #FFFFFF;
-  --border: #E7E5E4;
-  --input: #E7E5E4;
-  --ring: #C1121F;
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(193, 18, 31, 0.08);
-}
-
-@layer utilities {
-  .animate-draw {
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-    animation: draw 2s ease-out forwards;
-  }
-
-  @keyframes draw {
-    from { stroke-dashoffset: 1000; }
-    to { stroke-dashoffset: 0; }
-  }
+  --background: #121212;
+  --foreground: #F5F5F5;
+  --card: #1E1E1E;
+  --card-foreground: #F5F5F5;
+  --primary: #E5383B; /* Lighter red for dark mode visibility */
+  --primary-foreground: #121212;
+  --secondary: #2A2A2A;
+  --muted: #2A2A2A;
+  --muted-foreground: #999999;
+  --accent: #D4AF37;
+  --border: #333333;
+  --input: #333333;
+  --glass-bg: rgba(30, 30, 30, 0.7);
+  --glass-border: rgba(229, 56, 59, 0.15);
 }
 
 @theme inline {
@@ -104,85 +88,100 @@
   --radius-2xl: calc(var(--radius) * 1.5);
   --radius-3xl: calc(var(--radius) * 2);
 
-  --font-sans: "Outfit", "Inter", "Segoe UI", Roboto, sans-serif;
-  
-  /* Brand Aliases */
-  --color-brand-navy: var(--brand-navy);
-  --color-brand-gold: var(--brand-gold);
-  --color-brand-rose: var(--brand-rose);
-  
-  --color-bg-page: var(--background);
-  --color-bg-muted: var(--muted);
-  --color-ui-border: var(--border);
+  --font-sans: "Outfit", "Inter", system-ui, sans-serif;
+  --font-serif: "Playfair Display", "Georgia", serif; /* Adding a serif option for luxury feel */
+
+  --shadow-premium: var(--shadow-premium);
+  --shadow-lift: var(--shadow-lift);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  scroll-behavior: smooth;
-}
-
-/* Premium Glassmorphism */
-.glass-effect {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-}
-
-/* Page Transitions */
-.view-transition {
-  animation: fadeIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Print Enhancements for Bio Data */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-  
+@layer base {
   body {
-    background: white !important;
-    padding: 0 !important;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
   }
 
-  .print-only {
-    display: block !important;
+  .premium-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-premium);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  /* Force background colors in print */
+  .premium-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lift);
+    border-color: var(--primary);
+  }
+
+  .animate-mesh {
+    background: radial-gradient(circle at 50% 50%, var(--primary)/0.05 0%, transparent 50%),
+                radial-gradient(circle at 100% 0%, var(--accent)/0.05 0%, transparent 40%),
+                radial-gradient(circle at 0% 100%, var(--primary)/0.03 0%, transparent 40%);
+    background-size: 200% 200%;
+    animation: mesh 20s ease infinite;
+  }
+
+  @keyframes mesh {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .animate-draw {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 2s ease-out forwards;
+  }
+
+  @keyframes draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  .text-luxury {
+    background: linear-gradient(135deg, var(--primary) 0%, #E5383B 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .view-transition {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; padding: 0 !important; }
+  .print-only { display: block !important; }
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 }
 
-.print-only {
-  display: none;
-}
-
-/* Advanced Loading Animations */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateX(100%); opacity: 0; }
-}
-
-@keyframes draw {
-  from { stroke-dashoffset: 1000; }
-  to { stroke-dashoffset: 0; }
-}
-
-.animate-draw {
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: draw 2s ease-out forwards;
-}
-
+.print-only { display: none; }

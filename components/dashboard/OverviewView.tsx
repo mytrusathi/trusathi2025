@@ -21,6 +21,7 @@ export default function OverviewView() {
   const [stats, setStats] = useState({
     sent: 0,
     received: 0,
+    connects: 0,
     shortlisted: 0,
     unreadNotifs: 0
   });
@@ -44,10 +45,19 @@ export default function OverviewView() {
         getDocs(query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(1))),
       ]);
 
+      const sentInterests = sentSnap.docs.map(doc => doc.data());
+      const receivedInterests = receivedSnap.docs.map(doc => doc.data());
+
+      const activeSent = sentInterests.filter(i => i.status !== 'accepted').length;
+      const activeReceived = receivedInterests.filter(i => i.status !== 'accepted').length;
+      const connects = sentInterests.filter(i => i.status === 'accepted').length + 
+                       receivedInterests.filter(i => i.status === 'accepted').length;
+
       setStats(prev => ({
         ...prev,
-        sent: sentSnap.size,
-        received: receivedSnap.size,
+        sent: activeSent,
+        received: activeReceived,
+        connects: connects,
         shortlisted: favSnap.size,
       }));
 
@@ -165,18 +175,18 @@ export default function OverviewView() {
          />
          <StatCard 
             icon={<Heart className="text-rose-500" />} 
+            label="Connects" 
+            value={stats.connects} 
+            href="/dashboard/member?view=connects"
+            color="bg-emerald-50"
+            isAlert={stats.connects > 0}
+         />
+         <StatCard 
+            icon={<Star className="text-amber-500" />} 
             label="Shortlisted" 
             value={stats.shortlisted} 
             href="/dashboard/member?view=favorites"
-            color="bg-rose-50"
-         />
-         <StatCard 
-            icon={<Bell className="text-amber-500" />} 
-            label="New Alerts" 
-            value={stats.unreadNotifs} 
-            href="#"
             color="bg-amber-50"
-            isAlert={stats.unreadNotifs > 0}
          />
       </div>
 
@@ -223,13 +233,31 @@ export default function OverviewView() {
 
          {/* Sidebar Widgets */}
          <div className="space-y-8">
-            {mainProfile && (
-               <div className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-800 px-2">Authenticity Status</h3>
-                  <CompletenessMeter profile={mainProfile} />
-                  <AuthenticityChecklist profile={mainProfile} onProfileRefresh={fetchData} />
-               </div>
-            )}
+             <div className="space-y-4">
+                <h3 className="text-xl font-black text-slate-800 px-2">Authenticity Status</h3>
+                {mainProfile ? (
+                  <>
+                    <CompletenessMeter profile={mainProfile} />
+                    <AuthenticityChecklist profile={mainProfile} onProfileRefresh={fetchData} />
+                  </>
+                ) : (
+                  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl space-y-6">
+                    <div className="flex items-center gap-3 text-indigo-600">
+                      <ShieldCheck size={24} />
+                      <h4 className="font-black text-lg">Start Your Journey</h4>
+                    </div>
+                    <p className="text-slate-500 font-medium text-sm leading-relaxed">
+                      Complete your profile to unlock the Authenticity Score and start matching with verified members.
+                    </p>
+                    <Link 
+                      href="/dashboard/member?view=my-profiles" 
+                      className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all"
+                    >
+                      Step 1: Create Profile <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                )}
+             </div>
 
             <div className="bg-gradient-to-br from-indigo-900 to-indigo-800 p-8 rounded-[2.5rem] text-white space-y-4 relative overflow-hidden group">
                <Sparkles className="absolute -top-4 -right-4 text-white/10 group-hover:scale-150 transition-transform duration-700" size={120} />

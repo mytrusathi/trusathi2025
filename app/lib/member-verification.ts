@@ -89,3 +89,15 @@ export const syncPhoneVerifiedProfiles = async (uid: string, phoneVerified: bool
 
   await batch.commit();
 };
+
+export const syncEmailVerifiedProfiles = async (uid: string, emailVerified: boolean) => {
+  const profilesQuery = query(collection(db, 'profiles'), where('createdBy', '==', uid));
+  const profilesSnapshot = await getDocs(profilesQuery);
+  const batch = writeBatch(db);
+
+  profilesSnapshot.forEach((profileDoc) => {
+    batch.update(profileDoc.ref, { emailVerified });
+  });
+
+  await batch.commit();
+};

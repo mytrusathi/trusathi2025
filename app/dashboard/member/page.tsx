@@ -7,8 +7,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Profile } from '@/types/profile';
 import ProfileCard from '@/components/group-admin/ProfileCard';
 import ProfileForm from '@/components/group-admin/ProfileForm';
-import { Loader2, Plus, UserCircle2, ShieldCheck, Home, ArrowLeft } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { Loader2, Plus, UserCircle2, ShieldCheck, Home, ArrowLeft, Send, Inbox, Heart, Star, LayoutDashboard, Users, MessageCircle } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PasswordChangeModal from '@/components/PasswordChangeModal';
 
@@ -22,6 +22,7 @@ import OverviewView from '@/components/dashboard/OverviewView';
 
 function MemberDashboardContent() {
   const { user } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const activeView = searchParams.get('view');
   
@@ -29,6 +30,36 @@ function MemberDashboardContent() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  
+  const [counts, setCounts] = useState({
+    connects: 0,
+    received: 0,
+    sent: 0,
+    favs: 0
+  });
+
+  const fetchCounts = useCallback(async () => {
+    if (!user) return;
+    try {
+      const [sentSnap, receivedSnap, favSnap] = await Promise.all([
+        getDocs(query(collection(db, 'interests'), where('senderId', '==', user.uid))),
+        getDocs(query(collection(db, 'interests'), where('receiverId', '==', user.uid))),
+        getDocs(query(collection(db, 'favorites'), where('userId', '==', user.uid)))
+      ]);
+
+      const sent = sentSnap.docs.map(d => d.data());
+      const received = receivedSnap.docs.map(d => d.data());
+
+      setCounts({
+        sent: sent.filter(i => i.status !== 'accepted').length,
+        received: received.filter(i => i.status !== 'accepted').length,
+        connects: sent.filter(i => i.status === 'accepted').length + received.filter(i => i.status === 'accepted').length,
+        favs: favSnap.size
+      });
+    } catch (err) {
+      console.error("Counts fetch error:", err);
+    }
+  }, [user]);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;
@@ -50,7 +81,8 @@ function MemberDashboardContent() {
 
   useEffect(() => {
     fetchProfiles();
-  }, [fetchProfiles]);
+    fetchCounts();
+  }, [fetchProfiles, fetchCounts]);
 
   const handleEdit = (profile: Profile) => {
     setSelectedProfile(profile);
@@ -78,6 +110,8 @@ function MemberDashboardContent() {
     switch (activeView) {
       case 'favorites':
         return <FavoritesView />;
+      case 'connects':
+        return <InterestsView type="connects" />;
       case 'sent-interests':
         return <InterestsView type="sent" />;
       case 'received-interests':
@@ -128,8 +162,9 @@ function MemberDashboardContent() {
   const getHeaderInfo = () => {
     switch(activeView) {
       case 'favorites': return { title: 'Shortlisted Profiles', desc: 'Profiles you want to keep in your final review list.' };
-      case 'sent-interests': return { title: 'Sent Interests', desc: 'Requests you have sent to other candidates.' };
-      case 'received-interests': return { title: 'Received Interests', desc: 'Inquiry and interest requests from others.' };
+      case 'connects': return { title: 'Your Connects', desc: 'All interest requests that have been mutually accepted. Start chatting to break the ice!' };
+      case 'sent-interests': return { title: 'Sent Interests', desc: 'Active requests you have sent to other candidates.' };
+      case 'received-interests': return { title: 'Received Interests', desc: 'New interest requests from other members waiting for your response.' };
       case 'chats': return { title: 'Messaging Center', desc: 'Real-time conversations with your matches and the super admin trust desk.' };
       case 'partner-preferences': return { title: 'Match Criteria', desc: 'Define who you are looking for.' };
       case 'my-profiles': return { title: 'My Managed Profiles', desc: 'Create and manage biodatas for yourself or family members.' };
@@ -200,6 +235,20 @@ function MemberDashboardContent() {
                 </button>
               )}
            </div>
+
+           {/* Navigation Tabs */}
+           <div className="max-w-6xl mx-auto px-4 -mb-10 relative z-20 overflow-x-auto custom-scrollbar">
+             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-2xl p-2 rounded-[2.5rem] border border-white/10 w-max min-w-full lg:min-w-0">
+                <TabButton icon={<LayoutDashboard size={16} />} label="Overview" active={!activeView} onClick={() => router.push('/dashboard/member')} />
+                <TabButton icon={<Users size={16} />} label="Connects" count={counts.connects} active={activeView === 'connects'} onClick={() => router.push('/dashboard/member?view=connects')} color="text-emerald-400" />
+                <TabButton icon={<Inbox size={16} />} label="Received" count={counts.received} active={activeView === 'received-interests'} onClick={() => router.push('/dashboard/member?view=received-interests')} color="text-indigo-400" />
+                <TabButton icon={<Send size={16} />} label="Sent" count={counts.sent} active={activeView === 'sent-interests'} onClick={() => router.push('/dashboard/member?view=sent-interests')} color="text-sky-400" />
+                <TabButton icon={<Star size={16} />} label="Shortlist" count={counts.favs} active={activeView === 'favorites'} onClick={() => router.push('/dashboard/member?view=favorites')} color="text-amber-400" />
+                <TabButton icon={<MessageCircle size={16} />} label="Chat" active={activeView === 'chats'} onClick={() => router.push('/dashboard/member?view=chats')} color="text-fuchsia-400" />
+                <div className="w-px h-6 bg-white/10 mx-2"></div>
+                <TabButton icon={<UserCircle2 size={16} />} label="My Bios" active={activeView === 'my-profiles'} onClick={() => router.push('/dashboard/member?view=my-profiles')} />
+             </div>
+           </div>
         </section>
 
         {/* Dynamic Content Grid */}
@@ -212,6 +261,29 @@ function MemberDashboardContent() {
 
       {searchParams.get('view') === 'change-password' && <PasswordChangeModal closeHref="/dashboard/member" />}
     </div>
+  );
+}
+
+function TabButton({ icon, label, count, active, onClick, color }: { icon: React.ReactNode, label: string, count?: number, active: boolean, onClick: () => void, color?: string }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`flex items-center gap-2.5 px-6 py-3.5 rounded-full font-black text-[11px] uppercase tracking-widest transition-all whitespace-nowrap ${
+        active 
+        ? "bg-white text-slate-900 shadow-xl" 
+        : "text-white/60 hover:text-white hover:bg-white/5"
+      }`}
+    >
+      <span className={active ? (color || "text-indigo-600") : "opacity-50"}>{icon}</span>
+      {label}
+      {typeof count === 'number' && (
+        <span className={`px-2 py-0.5 rounded-full text-[9px] ${
+          active ? "bg-slate-100 text-slate-900" : "bg-white/10 text-white/60"
+        }`}>
+          {count}
+        </span>
+      )}
+    </button>
   );
 }
 
