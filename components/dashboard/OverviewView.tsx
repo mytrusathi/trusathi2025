@@ -156,7 +156,7 @@ export default function OverviewView() {
          {/* Profile Focus */}
          <div className="lg:col-span-2 space-y-6">
             <h3 className="text-xl font-black text-slate-800 flex items-center gap-2 px-2">
-               <LayoutDashboard size={20} className="text-indigo-600" /> Quick Actions
+               <LayoutDashboard size={20} className="text-rose-600" /> Quick Actions
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -227,7 +227,7 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, href, color, isAlert }: StatCardProps) {
    return (
-      <Link href={href} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-100/40 transition-all group">
+      <Link href={href} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-100/40 transition-all group">
          <div className="flex items-center justify-between mb-4">
             <div className={`w-12 h-12 ${color} rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-6`}>
                {icon}
@@ -250,7 +250,7 @@ interface ActionBoxProps {
 
 function ActionBox({ icon, title, desc, href, accent }: ActionBoxProps) {
    return (
-      <Link href={href} className="p-6 bg-white rounded-3xl border border-slate-100 hover:border-indigo-100 transition-all flex items-start gap-4 group">
+      <Link href={href} className="p-6 bg-white rounded-3xl border border-slate-100 hover:border-rose-100 transition-all flex items-start gap-4 group">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${accent} group-hover:scale-110 transition-transform`}>
              {icon}
           </div>
