@@ -187,20 +187,30 @@ export default function ChatView() {
   }, [messages]);
 
   useEffect(() => {
-    if (!user || connections.length === 0) return;
+    if (!user) return;
 
-    const unsubscribes = connections.map((connection) => {
-      const convId = [user.uid, connection.otherId].sort().join('_');
-      return onSnapshot(doc(db, 'conversations', convId), (snap) => {
-        if (snap.exists()) {
-          const data = snap.data() as ConversationDoc;
-          setLastMessages((prev) => ({ ...prev, [connection.otherId]: data.lastMessage || '' }));
+    // SINGLE listener for all conversations where user is a participant
+    const q = query(
+      collection(db, 'conversations'),
+      where('participants', 'array-contains', user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snap) => {
+      const messages: Record<string, string> = {};
+      snap.docs.forEach(d => {
+        const data = d.data() as ConversationDoc;
+        const otherId = data.participants.find(p => p !== user.uid);
+        if (otherId) {
+          messages[otherId] = data.lastMessage || '';
         }
       });
+      setLastMessages(messages);
+    }, (err) => {
+      console.error("Conversations sync error:", err);
     });
 
-    return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
-  }, [connections, user]);
+    return () => unsubscribe();
+  }, [user]);
 
   useEffect(() => {
     if (!connections.length || selectedChat) return;

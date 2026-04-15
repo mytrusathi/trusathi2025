@@ -21,6 +21,7 @@ import CompletenessMeter from '@/components/dashboard/CompletenessMeter';
 import OverviewView from '@/components/dashboard/OverviewView';
 import NotificationsView from '@/components/dashboard/NotificationsView';
 import AuthenticityChecklist from '@/components/dashboard/AuthenticityChecklist';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 function MemberDashboardContent() {
   const { user } = useAuth();
@@ -277,7 +278,9 @@ export default function MemberDashboard() {
   return (
     <ProtectedRoute allowedRoles={['member', 'group-admin', 'super-admin']}>
       <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center"><Loader2 size={48} className="animate-spin text-white opacity-20" /></div>}>
-        <MemberDashboardContent />
+        <ErrorBoundary>
+          <MemberDashboardContent />
+        </ErrorBoundary>
       </Suspense>
     </ProtectedRoute>
   );
