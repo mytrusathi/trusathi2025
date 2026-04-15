@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Menu, X, User, LogOut, ChevronDown, LayoutDashboard, Settings, Handshake, Sparkles } from 'lucide-react'
+import { Menu, X, User, LogOut, ChevronDown, LayoutDashboard, Settings, Handshake, Sparkles, KeyRound } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -74,30 +74,24 @@ export default function Navbar() {
                 <div className="flex items-center gap-4">
                   <NotificationBell />
 
-                  <div className="flex items-center gap-3 pl-4 border-l border-border/50 group relative cursor-pointer">
-                    <div className="text-right hidden sm:block">
-                      <p className="text-[8px] font-black uppercase tracking-wider text-accent leading-none mb-1">Authenticated</p>
-                      <p className="text-xs font-black truncate max-w-[100px] text-foreground leading-none">{user.displayName?.split(' ')[0] || 'Member'}</p>
-                    </div>
-
-                    <div className="w-10 h-10 rounded-full border-2 border-border/50 p-0.5 group-hover:border-primary transition-all overflow-hidden bg-secondary shadow-sm">
+                  <div className="flex items-center gap-2 pl-4 border-l border-border/50 group relative cursor-pointer">
+                    <div className="w-10 h-10 rounded-full border-2 border-border/50 p-0.5 group-hover:border-rose-400 transition-all overflow-hidden bg-secondary shadow-sm">
                       {user.photoURL ? (
                         <Image src={user.photoURL} alt="P" width={40} height={40} className="w-full h-full object-cover rounded-full" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                          <User size={18} />
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-rose-50 text-rose-500 font-bold uppercase">
+                          {user.displayName?.charAt(0) || 'U'}
                         </div>
                       )}
                     </div>
 
-                    {/* Enhanced Dropdown */}
                     <div className="absolute right-0 top-full pt-4 w-64 opacity-0 translate-y-3 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-500 z-[100]">
-                      <div className="bg-card rounded-[2rem] shadow-lift border border-border/50 overflow-hidden py-3 backdrop-blur-2xl">
-                        <div className="px-6 py-4 border-b border-border/30 mb-2">
-                          <p className="text-[9px] font-black text-accent uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                            <Sparkles size={10} /> Account
+                      <div className="bg-white rounded-[2rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden py-3">
+                        <div className="px-6 py-4 border-b border-slate-50 mb-2">
+                          <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                            <Sparkles size={10} /> Member Account
                           </p>
-                          <p className="text-sm font-black text-foreground truncate">{user.email || user.displayName}</p>
+                          <p className="text-sm font-black text-slate-900 truncate">{user.displayName || user.email}</p>
                         </div>
 
                         <DropdownLink href={user.role === 'member' ? '/dashboard/member' : '/dashboard/group-admin'} icon={<LayoutDashboard size={16} />}>
@@ -108,17 +102,20 @@ export default function Navbar() {
                           Account Settings
                         </DropdownLink>
 
-                        <div className="h-px bg-border/30 my-2 mx-6"></div>
-
-                        <button
-                          onClick={handleLogout}
-                          className="w-full flex items-center gap-3 px-6 py-4 hover:bg-destructive/5 text-sm font-black text-destructive transition-colors text-left"
-                        >
-                          <LogOut size={16} /> Secure Logout
-                        </button>
+                        <DropdownLink href={`${user.role === 'member' ? '/dashboard/member' : '/dashboard/group-admin'}?view=change-password`} icon={<KeyRound size={16} />}>
+                           Change Password
+                        </DropdownLink>
                       </div>
                     </div>
                   </div>
+
+                  <button
+                    onClick={handleLogout}
+                    className="p-2.5 rounded-2xl bg-rose-600 text-white hover:bg-rose-700 transition-all shadow-lg shadow-rose-200 active:scale-95 group flex items-center gap-2 px-5"
+                  >
+                    <LogOut size={16} />
+                    <span className="text-[10px] font-black uppercase tracking-widest hidden lg:block">Sign Out</span>
+                  </button>
                 </div>
               )}
             </div>

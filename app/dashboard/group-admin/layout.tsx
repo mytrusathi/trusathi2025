@@ -2,6 +2,7 @@
 import React, { Suspense } from 'react';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Logo from '@/components/Logo';
 import { LogOut } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/app/lib/firebase';
@@ -28,10 +29,7 @@ const GroupAdminLayoutContent = ({ children }: Props) => {
       <main className="flex-1 md:ml-64">
         {/* Mobile Header */}
         <div className="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center sticky top-0 z-20">
-            <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center text-white font-bold">t</div>
-                <span className="font-bold text-lg text-slate-800">truSathi Admin</span>
-            </div>
+            <Logo size="md" />
             <button onClick={handleLogout} className="text-slate-500 hover:text-red-600">
                 <LogOut size={24} />
             </button>

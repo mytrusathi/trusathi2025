@@ -15,11 +15,12 @@ import {
   getDoc,
   updateDoc,
   limit,
+  deleteDoc,
 } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import {
   Loader2, MessageCircle, Send, User, ArrowLeft,
-  MoreVertical, CheckCircle2, Clock, ShieldCheck, Crown,
+  MoreVertical, CheckCircle2, Clock, ShieldCheck, Crown, X,
 } from 'lucide-react';
 import { sendNotification } from '@/app/lib/notification-service';
 import Image from 'next/image';
@@ -282,20 +283,86 @@ export default function ChatView() {
     );
   }
 
-  return (
-    <div className="bg-white/40 backdrop-blur-3xl rounded-[3.5rem] border border-white/40 shadow-[0_40px_80px_-16px_rgba(0,0,0,0.12)] overflow-hidden flex h-[780px] animate-in slide-in-from-bottom-8 duration-1000 relative">
-      {/* Background Decorative Blobs */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-10">
-         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full"></div>
-         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-fuchsia-500/5 blur-[120px] rounded-full"></div>
-      </div>
+  // Helper to group messages by date
+  const groupMessagesByDate = (msgList: Message[]) => {
+    const groups: Record<string, Message[]> = {};
+    msgList.forEach((m) => {
+      const date = m.createdAt?.toDate ? m.createdAt.toDate().toLocaleDateString() : 'Today';
+      const label = isToday(m.createdAt?.toDate?.()) ? 'Today' : 
+                    isYesterday(m.createdAt?.toDate?.()) ? 'Yesterday' : date;
+      if (!groups[label]) groups[label] = [];
+      groups[label].push(m);
+    });
+    return groups;
+  };
 
-      <div className={`w-full md:w-96 border-r border-slate-200/30 flex flex-col bg-white/40 backdrop-blur-3xl ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
-        <div className="p-10 border-b border-slate-200/30">
-          <h3 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Messaging</h3>
+  const isToday = (date?: Date) => {
+    if (!date) return true;
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+  };
+
+  const isYesterday = (date?: Date) => {
+    if (!date) return false;
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return date.getDate() === yesterday.getDate() &&
+      date.getMonth() === yesterday.getMonth() &&
+      date.getFullYear() === yesterday.getFullYear();
+  };
+
+  const handleClearChat = async () => {
+    if (!selectedChat || !user || !confirm("Clear all messages in this conversation?")) return;
+    const convId = [user.uid, selectedChat.otherId].sort().join('_');
+    try {
+      const msgs = await getDocs(collection(db, `conversations/${convId}/messages`));
+      await Promise.all(msgs.docs.map(d => deleteDoc(d.ref)));
+      await updateDoc(doc(db, 'conversations', convId), {
+        lastMessage: '',
+        lastMessageAt: serverTimestamp()
+      });
+      setMessages([]);
+    } catch (err) {
+      console.error("Clear chat error:", err);
+    }
+  };
+
+  const messageGroups = groupMessagesByDate(messages);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-32 space-y-4">
+        <Loader2 className="animate-spin text-rose-600" size={40} />
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Opening secure channels...</p>
+      </div>
+    );
+  }
+
+  if (connections.length === 0) {
+    return (
+      <div className="text-center py-32 bg-white rounded-[4rem] border border-dashed border-slate-200 animate-in fade-in zoom-in duration-700">
+        <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-300">
+          <MessageCircle size={48} strokeWidth={1} />
+        </div>
+        <h3 className="text-3xl font-black text-slate-900 mb-3">No Conversations Yet</h3>
+        <p className="text-slate-500 max-w-sm mx-auto font-medium text-lg px-6">
+          Once an interest is accepted, conversations will appear here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-[3.5rem] border border-slate-100 shadow-[0_40px_80px_-16px_rgba(0,0,0,0.08)] overflow-hidden flex h-[780px] animate-in slide-in-from-bottom-8 duration-1000 relative">
+      {/* Sidebar List */}
+      <div className={`w-full md:w-96 border-r border-slate-100 flex flex-col bg-slate-50/30 ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
+        <div className="p-8 border-b border-slate-100 bg-white">
+          <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-1">Messages</h3>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Secure Channels Active</p>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">End-to-End Encrypted</p>
           </div>
         </div>
         
@@ -304,167 +371,177 @@ export default function ChatView() {
             <button
               key={connection.otherId}
               onClick={() => setSelectedChat(connection)}
-              className={`w-full flex items-center gap-5 p-5 rounded-[2.5rem] transition-all duration-500 group ${
+              className={`w-full flex items-center gap-4 p-4 rounded-3xl transition-all duration-300 group ${
                 selectedChat?.otherId === connection.otherId
-                  ? 'bg-indigo-600 text-white shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] scale-[1.02] z-10'
-                  : 'hover:bg-white/80 text-slate-700 hover:shadow-lg hover:shadow-indigo-500/5'
+                  ? 'bg-white shadow-xl shadow-slate-200/50 ring-1 ring-slate-100'
+                  : 'hover:bg-white/60 text-slate-700'
               }`}
             >
-              <div className={`relative w-16 h-16 rounded-[1.5rem] overflow-hidden shrink-0 border-4 transition-transform duration-500 group-hover:scale-110 ${
-                selectedChat?.otherId === connection.otherId ? 'border-indigo-400/50' : 'border-white shadow-xl'
-              }`}>
-                {connection.otherImage ? (
-                  <Image src={connection.otherImage} alt={connection.otherName} fill className="object-cover" />
-                ) : (
-                  <div className={`w-full h-full flex items-center justify-center font-black ${
-                    connection.kind === 'super-admin' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-400'
-                  }`}>
-                    {connection.kind === 'super-admin' ? <Crown size={28} /> : <User size={28} />}
-                  </div>
+              <div className="relative shrink-0">
+                <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 transition-transform duration-500 group-hover:scale-105 ${
+                  selectedChat?.otherId === connection.otherId ? 'border-rose-200 shadow-md' : 'border-white shadow-sm'
+                }`}>
+                  {connection.otherImage ? (
+                    <Image src={connection.otherImage} alt={connection.otherName} fill className="object-cover" />
+                  ) : (
+                    <div className={`w-full h-full flex items-center justify-center font-black ${
+                      connection.kind === 'super-admin' ? 'bg-amber-100 text-amber-600' : 'bg-rose-50 text-rose-500'
+                    }`}>
+                      {connection.kind === 'super-admin' ? <Crown size={24} /> : connection.otherName.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                {selectedChat?.otherId === connection.otherId && (
+                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full shadow-sm"></div>
                 )}
               </div>
               
               <div className="text-left min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <p className="font-black text-[15px] truncate tracking-tight">{connection.otherName}</p>
-                  {connection.kind === 'super-admin' && (
-                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
-                      selectedChat?.otherId === connection.otherId ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-700'
-                    }`}>Admin</span>
-                  )}
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <p className="font-black text-sm truncate tracking-tight text-slate-900">{connection.otherName}</p>
+                  <p className="text-[9px] font-bold text-slate-400 whitespace-nowrap uppercase">
+                    {/* Simplified time for last message */}
+                    12:45 PM
+                  </p>
                 </div>
-                <p className={`text-xs truncate font-semibold leading-tight ${
-                  selectedChat?.otherId === connection.otherId ? 'text-indigo-100/70' : 'text-slate-400'
-                }`}>
-                  {lastMessages[connection.otherId] || (connection.kind === 'super-admin' ? 'Trust review channel...' : 'Start syncing...')}
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                   <p className="text-[11px] truncate font-medium text-slate-500 line-clamp-1">
+                     {lastMessages[connection.otherId] || 'Start a conversation...'}
+                   </p>
+                   {/* Unread indicator simulation */}
+                   {Math.random() > 0.8 && connection.otherId !== selectedChat?.otherId && (
+                      <span className="w-5 h-5 bg-rose-600 text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-lg shadow-rose-200">2</span>
+                   )}
+                </div>
               </div>
             </button>
           ))}
         </div>
       </div>
 
-      <div className={`flex-1 flex flex-col bg-slate-50/10 backdrop-blur-sm ${selectedChat ? 'flex' : 'hidden md:flex'}`}>
+      {/* Main Chat Area */}
+      <div className={`flex-1 flex flex-col bg-[#efeae2] relative ${selectedChat ? 'flex' : 'hidden md:flex'}`}>
+        {/* WhatsApp Background Pattern Overlay */}
+        <div className="absolute inset-0 opacity-[0.06] pointer-events-none bg-[url('https://w0.peakpx.com/wallpaper/580/650/wallpaper-whatsapp-background-dark-pattern.jpg')] bg-repeat"></div>
+
         {selectedChat ? (
           <>
-            <div className="px-10 py-8 border-b border-slate-200/30 bg-white/60 backdrop-blur-3xl flex items-center justify-between sticky top-0 z-10">
-              <div className="flex items-center gap-6">
-                <button onClick={() => setSelectedChat(null)} className="md:hidden p-3 -ml-3 text-slate-400 hover:text-indigo-600 transition-colors">
-                  <ArrowLeft size={28} />
+            <div className="px-8 py-4 border-b border-slate-100 bg-white/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-20">
+              <div className="flex items-center gap-4">
+                <button onClick={() => setSelectedChat(null)} className="md:hidden p-2 text-slate-400 hover:text-rose-600 transition-colors">
+                  <ArrowLeft size={24} />
                 </button>
-                <div className="relative group">
-                  <div className={`w-14 h-14 rounded-[1.5rem] border-4 border-white shadow-2xl overflow-hidden flex items-center justify-center font-black text-2xl shrink-0 transition-transform duration-500 group-hover:scale-110 ${
-                    selectedChat.kind === 'super-admin' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'
+                <div className="relative">
+                  <div className={`w-12 h-12 rounded-xl border border-slate-100 shadow-sm overflow-hidden flex items-center justify-center font-black text-lg shrink-0 ${
+                    selectedChat.kind === 'super-admin' ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-500'
                   }`}>
                     {selectedChat.otherImage ? (
                       <Image src={selectedChat.otherImage} alt={selectedChat.otherName} fill className="object-cover" />
                     ) : selectedChat.kind === 'super-admin' ? (
-                      <Crown size={26} />
+                      <Crown size={22} />
                     ) : (
                       selectedChat.otherName.charAt(0)
                     )}
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white rounded-full shadow-lg"></div>
                 </div>
                 <div>
-                  <h4 className="font-black text-slate-900 text-2xl tracking-tighter leading-none mb-1.5">{selectedChat.otherName}</h4>
-                  <div className="flex items-center gap-2.5">
-                    {selectedChat.kind === 'super-admin' ? (
-                      <div className="px-2.5 py-1 bg-amber-500/10 rounded-lg flex items-center gap-1.5 border border-amber-500/20">
-                         <Crown size={12} className="text-amber-500" />
-                         <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest">Trust Desk</span>
-                      </div>
-                    ) : (
-                      <div className="px-2.5 py-1 bg-indigo-500/10 rounded-lg flex items-center gap-1.5 border border-indigo-500/20">
-                         <ShieldCheck size={12} className="text-indigo-500" />
-                         <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Authenticated</span>
-                      </div>
-                    )}
-                    <div className="w-1 h-1 rounded-full bg-slate-300"></div>
+                  <h4 className="font-black text-slate-900 text-lg tracking-tight leading-none mb-1">{selectedChat.otherName}</h4>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{selectedChat.profileNo}</p>
                   </div>
                 </div>
               </div>
-              <button className="w-12 h-12 flex items-center justify-center text-slate-400 hover:bg-white hover:text-indigo-600 rounded-2xl transition-all border border-transparent hover:border-slate-100 hover:shadow-xl"><MoreVertical size={24} /></button>
-            </div>
-
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar scroll-smooth">
-              {messages.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-full text-center space-y-6 opacity-30">
-                  <div className="w-24 h-24 rounded-[2.5rem] bg-white shadow-inner flex items-center justify-center text-slate-300 border border-slate-50">
-                    {selectedChat.kind === 'super-admin' ? <Crown size={48} strokeWidth={1} /> : <MessageCircle size={48} strokeWidth={1} />}
-                  </div>
-                  <div className="space-y-2">
-                    <h5 className="text-xl font-black text-slate-400 uppercase tracking-widest">Private Channel</h5>
-                    <p className="text-sm font-bold text-slate-400 italic max-w-xs mx-auto">
-                      {selectedChat.kind === 'super-admin'
-                        ? 'Submit your profile for screening or ask for expert assistance.'
-                        : 'Your conversation is end-to-end encrypted and visible only to you.'}
-                    </p>
-                  </div>
+              <div className="relative group/menu">
+                <button className="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-rose-600 rounded-xl transition-all"><MoreVertical size={20} /></button>
+                <div className="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/menu:opacity-100 group-hover/menu:translate-y-0 group-hover/menu:pointer-events-auto transition-all duration-300 z-50">
+                   <div className="bg-white rounded-2xl shadow-xl border border-slate-100 py-2 w-48 overflow-hidden">
+                      <button onClick={handleClearChat} className="w-full text-left px-5 py-3 text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-3">
+                         <X size={14} /> Clear Chat
+                      </button>
+                   </div>
                 </div>
-              )}
-
-              {messages.map((message, index) => {
-                const isMe = message.senderId === user?.uid;
-                const nextIsMe = messages[index + 1]?.senderId === message.senderId;
-
-                return (
-                  <div key={message.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-                    <div className={`group relative max-w-[85%] lg:max-w-[70%] p-5 lg:p-6 transition-all shadow-xl hover:shadow-2xl ${
-                      isMe
-                        ? `bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-[2.5rem] ${nextIsMe ? 'rounded-br-xl' : 'rounded-br-none'} shadow-indigo-500/20`
-                        : `bg-white/80 backdrop-blur-xl text-slate-700 rounded-[2.5rem] ${nextIsMe ? 'rounded-bl-xl' : 'rounded-bl-none'} border border-white/60`
-                    }`}>
-                      <p className="text-[15px] lg:text-base font-bold leading-relaxed whitespace-pre-wrap tracking-tight">{message.text}</p>
-                      <div className={`text-[9px] font-black mt-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-60 transition-all duration-300 ${
-                        isMe ? 'justify-end text-indigo-50' : 'text-slate-400'
-                      }`}>
-                        <Clock size={10} />
-                        {message.createdAt?.toDate ? message.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Syncing...'}
-                        {isMe && <CheckCircle2 size={10} className="ml-1 opacity-100" />}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              </div>
             </div>
 
-            <div className="p-10 bg-white/40 backdrop-blur-3xl border-t border-slate-200/30">
-              <form onSubmit={handleSend} className="relative group">
-                <div className="absolute inset-[-4px] bg-gradient-to-r from-indigo-500/20 to-fuchsia-500/20 rounded-[3rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000"></div>
-                <div className="relative flex items-center gap-5 bg-white/80 backdrop-blur-xl rounded-[3rem] p-3 pl-8 pr-3 border border-white shadow-2xl shadow-indigo-500/5 focus-within:border-indigo-500/30 transition-all">
-                  <input
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={selectedChat.kind === 'super-admin' ? 'Type your request to truSathi Team...' : `Message ${selectedChat.otherName}...`}
-                    className="flex-1 bg-transparent py-5 text-slate-800 font-bold text-base outline-none placeholder:text-slate-400 tracking-tight"
-                  />
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 md:p-10 space-y-6 custom-scrollbar relative">
+              {Object.entries(messageGroups).map(([date, msgs]) => (
+                <div key={date} className="space-y-6">
+                  <div className="flex justify-center my-8">
+                    <span className="px-4 py-1.5 bg-white/90 backdrop-blur-sm rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest shadow-sm border border-slate-200/50">
+                      {date}
+                    </span>
+                  </div>
+                  {msgs.map((message, index) => {
+                    const isMe = message.senderId === user?.uid;
+                    return (
+                      <div key={message.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+                        <div className={`relative max-w-[85%] lg:max-w-[70%] p-3.5 px-4 shadow-md ${
+                          isMe
+                            ? 'bg-[#dcf8c6] text-slate-800 rounded-2xl rounded-tr-none'
+                            : 'bg-white text-slate-800 rounded-2xl rounded-tl-none'
+                        }`}>
+                          <p className="text-[14px] font-medium leading-relaxed whitespace-pre-wrap tracking-normal">{message.text}</p>
+                          <div className={`flex items-center justify-end gap-1 mt-1 ${isMe ? 'text-slate-500' : 'text-slate-400'}`}>
+                             <span className="text-[9px] font-bold opacity-60">
+                                {message.createdAt?.toDate ? message.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}
+                             </span>
+                             {isMe && (
+                                <div className="flex items-center ml-0.5">
+                                   <CheckCircle2 size={12} className="text-sky-500" />
+                                   <CheckCircle2 size={12} className="text-sky-500 -ml-1.5" />
+                                </div>
+                             )}
+                          </div>
+                          {/* Triangle tail simulation */}
+                          {isMe ? (
+                             <div className="absolute top-0 right-[-8px] w-0 h-0 border-l-[10px] border-l-[#dcf8c6] border-b-[10px] border-b-transparent"></div>
+                          ) : (
+                             <div className="absolute top-0 left-[-8px] w-0 h-0 border-r-[10px] border-r-white border-b-[10px] border-b-transparent"></div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+
+            <div className="p-6 bg-slate-50/95 backdrop-blur-md border-t border-slate-200/50 z-20">
+              <form onSubmit={handleSend} className="max-w-4xl mx-auto">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 relative">
+                    <input
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type a message..."
+                      className="w-full bg-white px-6 py-4 rounded-3xl text-slate-800 font-medium text-sm outline-none shadow-sm focus:shadow-md transition-all border border-slate-200 focus:border-rose-200"
+                    />
+                  </div>
                   <button
                     type="submit"
                     disabled={!newMessage.trim()}
-                    className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white rounded-[2rem] flex items-center justify-center hover:shadow-[0_20px_40px_-10px_rgba(79,70,229,0.5)] transition-all active:scale-90 disabled:opacity-20 disabled:grayscale disabled:scale-95 group/btn"
+                    className="w-14 h-14 bg-rose-600 text-white rounded-2xl flex items-center justify-center hover:bg-rose-700 hover:shadow-lg shadow-rose-200 transition-all active:scale-90 disabled:opacity-40"
                   >
-                    <Send size={24} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                    <Send size={24} />
                   </button>
                 </div>
               </form>
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center p-20 animate-in fade-in duration-1000 relative">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 blur-[100px] rounded-full"></div>
-            <div className="relative mb-12 transform hover:scale-110 transition-transform duration-700">
-              <div className="w-40 h-40 bg-white rounded-[4rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] flex items-center justify-center text-indigo-100 relative z-10 border border-slate-50/50">
-                <MessageCircle size={80} strokeWidth={1} className="text-indigo-600" />
+          <div className="flex-1 flex flex-col items-center justify-center p-20 animate-in fade-in duration-1000">
+            <div className="relative mb-12 transform hover:scale-105 transition-transform duration-700">
+              <div className="w-32 h-32 bg-white rounded-[3rem] shadow-xl flex items-center justify-center text-rose-50 border border-slate-50">
+                <MessageCircle size={64} strokeWidth={1} className="text-rose-600" />
               </div>
-              <div className="absolute -top-4 -right-4 w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/30 animate-bounce">
-                <ShieldCheck size={24} />
+              <div className="absolute -top-3 -right-3 w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg animate-bounce">
+                <ShieldCheck size={20} />
               </div>
             </div>
-            <h3 className="text-4xl font-black text-slate-900 mb-6 tracking-tight text-center">Encrypted Workspace</h3>
-            <p className="text-slate-500 max-w-sm font-semibold text-xl leading-relaxed text-center opacity-70">
-              Select a connection or contact the trust desk to start a secure conversation.
+            <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Private Workspace</h3>
+            <p className="text-slate-500 max-w-sm font-medium text-lg text-center opacity-70">
+              Your conversations are secure and encrypted. Select a chat to begin.
             </p>
           </div>
         )}
@@ -472,17 +549,14 @@ export default function ChatView() {
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
+          width: 5px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(0,0,0,0.04);
+          background: rgba(0,0,0,0.05);
           border-radius: 10px;
-        }
-        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-          background: rgba(0,0,0,0.08);
         }
       `}</style>
     </div>

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { db } from '@/app/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
-import { Loader2, Heart, Save, Sparkles, ChevronDown } from 'lucide-react';
+import { Loader2, Heart, Save, Sparkles, ChevronDown, Users } from 'lucide-react';
 
 interface Preferences {
   ageMin: string;
@@ -95,64 +95,68 @@ export default function PartnerPreferences() {
 
       <form onSubmit={handleSave} className="bg-white p-10 md:p-16 rounded-[4rem] border border-slate-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] space-y-14 relative group">
          
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
             {/* Age Range */}
             <div className="space-y-6">
                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
-                  <Heart size={14} className="text-indigo-500" /> Desired Age Range
+                  <Heart size={14} className="text-rose-500" /> Desired Age Range
                </label>
                <div className="flex items-center gap-4">
                   <div className="relative flex-1 group">
                     <select 
                       value={prefs.ageMin} 
                       onChange={(e) => setPrefs({...prefs, ageMin: e.target.value})}
-                      className="w-full p-5 bg-slate-50 border-2 border-transparent hover:border-indigo-100 rounded-3xl font-black text-slate-800 transition-all outline-none appearance-none"
+                      className="w-full p-5 bg-slate-50 border-2 border-slate-100/50 hover:border-rose-200 hover:bg-white rounded-3xl font-black text-slate-800 transition-all outline-none appearance-none cursor-pointer shadow-sm hover:shadow-md"
                     >
                        {AGE_OPTIONS.map(a => <option key={`min-${a}`} value={a}>{a} Years</option>)}
                     </select>
-                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-indigo-500" size={18} />
+                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-rose-500 transition-colors" size={18} />
                   </div>
                   <span className="text-slate-300 font-black text-[10px]">TO</span>
                   <div className="relative flex-1 group">
                     <select 
                       value={prefs.ageMax} 
                       onChange={(e) => setPrefs({...prefs, ageMax: e.target.value})}
-                      className="w-full p-5 bg-slate-50 border-2 border-transparent hover:border-indigo-100 rounded-3xl font-black text-slate-800 transition-all outline-none appearance-none"
+                      className="w-full p-5 bg-slate-50 border-2 border-slate-100/50 hover:border-rose-200 hover:bg-white rounded-3xl font-black text-slate-800 transition-all outline-none appearance-none cursor-pointer shadow-sm hover:shadow-md"
                     >
                        {AGE_OPTIONS.map(a => <option key={`max-${a}`} value={a}>{a} Years</option>)}
                     </select>
-                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-indigo-500" size={18} />
+                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-rose-500 transition-colors" size={18} />
                   </div>
                </div>
             </div>
 
             {/* Marital Status */}
             <div className="space-y-6">
-               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Relationship Status</label>
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
+                  <Users size={14} className="text-rose-500" /> Relationship Status
+               </label>
                <div className="relative group">
                  <select 
                     value={prefs.maritalStatus} 
                     onChange={(e) => setPrefs({...prefs, maritalStatus: e.target.value})}
-                    className="w-full p-5 bg-slate-50 border-2 border-transparent hover:border-indigo-100 rounded-3xl font-black text-slate-800 transition-all outline-none appearance-none"
+                    className="w-full p-5 bg-slate-50 border-2 border-slate-100/50 hover:border-rose-200 hover:bg-white rounded-3xl font-black text-slate-800 transition-all outline-none appearance-none cursor-pointer shadow-sm hover:shadow-md"
                  >
                     {MARITAL_STATUS.map(s => <option key={s} value={s}>{s}</option>)}
                  </select>
-                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-indigo-500" size={18} />
+                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-rose-500 transition-colors" size={18} />
                </div>
             </div>
 
             {/* Community */}
             <div className="space-y-6">
-               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Community / Belief System</label>
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
+                  <Sparkles size={14} className="text-rose-500" /> Community / Belief System
+               </label>
                <div className="relative group">
                  <select 
                     value={prefs.community} 
                     onChange={(e) => setPrefs({...prefs, community: e.target.value})}
-                    className="w-full p-5 bg-slate-50 border-2 border-transparent hover:border-indigo-100 rounded-3xl font-black text-slate-800 transition-all outline-none appearance-none"
+                    className="w-full p-5 bg-slate-50 border-2 border-slate-100/50 hover:border-rose-200 hover:bg-white rounded-3xl font-black text-slate-800 transition-all outline-none appearance-none cursor-pointer shadow-sm hover:shadow-md"
                  >
                     {COMMUNITIES.map(c => <option key={c} value={c}>{c}</option>)}
                  </select>
-                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-indigo-500" size={18} />
+                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-rose-500 transition-colors" size={18} />
                </div>
             </div>
 
@@ -164,10 +168,10 @@ export default function PartnerPreferences() {
                   value={prefs.education}
                   onChange={(e) => setPrefs({...prefs, education: e.target.value})}
                   placeholder="e.g. Postgraduate, Any"
-                  className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-indigo-200 focus:bg-white rounded-3xl font-black text-slate-800 transition-all outline-none placeholder:text-slate-300"
+                  className="w-full p-5 bg-slate-50 border-2 border-slate-100/50 focus:border-rose-200 focus:bg-white rounded-3xl font-black text-slate-800 transition-all outline-none placeholder:text-slate-300 shadow-sm focus:shadow-md"
                />
             </div>
-         </div>
+          </div>
 
          <div className="pt-8 border-t border-slate-100 space-y-4">
             {toast && (

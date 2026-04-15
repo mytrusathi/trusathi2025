@@ -25,58 +25,90 @@ export default function MatchRecommendations() {
     const fetchMatches = async () => {
       if (!user) return;
       try {
+        console.log("DEBUG: Starting fetchMatches for UID:", user.uid);
+        
         // 1. Fetch User's Preferences
-        const prefSnap = await getDoc(doc(db, 'partner_preferences', user.uid));
+        let prefs: Preferences | null = null;
+        try {
+          const prefSnap = await getDoc(doc(db, 'partner_preferences', user.uid));
+          if (prefSnap.exists()) {
+            prefs = prefSnap.data() as Preferences;
+            setHasPrefs(true);
+            console.log("DEBUG: Prefs found:", prefs);
+          } else {
+            console.log("DEBUG: No prefs found");
+            setHasPrefs(false);
+          }
+        } catch (prefErr) {
+          console.error("DEBUG: prefSnap fetch error:", prefErr);
+        }
         
         // 2. Fetch User's Gender to show opposite gender
-        const userProfileSnap = await getDocs(query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(1)));
-        const userGender = userProfileSnap.docs[0]?.data()?.gender || 'male';
-        const targetGender = userGender === 'male' ? 'female' : 'male';
-
-        if (prefSnap.exists()) {
-          setHasPrefs(true);
-          const prefs = prefSnap.data() as Preferences;
-          
-          // 3. Simple matching query (Firebase doesn't support complex range + multiple where easily without composite indexes)
-          // So we fetch by gender and public status, then filter client-side
-          const q = query(
+        let targetGender = 'female';
+        try {
+          const userProfileSnap = await getDocs(query(
             collection(db, 'profiles'), 
-            where('isPublic', '==', true),
-            where('gender', '==', targetGender),
-            limit(100)
-          );
-          
-          const snap = await getDocs(q);
-          const filtered = snap.docs
-            .map(d => ({ ...d.data(), id: d.id } as Profile))
-            .filter(p => {
-              // Client Side Filtering
-              const birthDate = new Date(p.dob);
-              const age = new Date().getFullYear() - birthDate.getFullYear();
-              
-              const matchesAge = age >= parseInt(prefs.ageMin) && age <= parseInt(prefs.ageMax);
-              const matchesCommunity = prefs.community === 'Any' || p.religion === prefs.community;
-              const matchesMarital = prefs.maritalStatus === 'Any' || p.maritalStatus === prefs.maritalStatus;
-              
-              return matchesAge && matchesCommunity && matchesMarital && p.createdBy !== user.uid;
-            })
-            .slice(0, 6); // Top 6 matches
+            where('createdBy', '==', user.uid), 
+            limit(1)
+          ));
+          const userGender = userProfileSnap.docs[0]?.data()?.gender || 'male';
+          targetGender = userGender === 'male' ? 'female' : 'male';
+          console.log("DEBUG: User gender:", userGender, "Target gender:", targetGender);
+        } catch (profileErr) {
+          console.error("DEBUG: userProfileSnap fetch error:", profileErr);
+        }
 
-          setRecommendations(filtered);
+        if (prefs) {
+          console.log("DEBUG: Fetching recommended matches...");
+          try {
+            const q = query(
+              collection(db, 'profiles'), 
+              where('isPublic', '==', true),
+              where('gender', '==', targetGender),
+              limit(100)
+            );
+            
+            const snap = await getDocs(q);
+            console.log("DEBUG: Matches snap size:", snap.size);
+            
+            const filtered = snap.docs
+              .map(d => ({ ...d.data(), id: d.id } as Profile))
+              .filter(p => {
+                const birthDate = new Date(p.dob);
+                const age = new Date().getFullYear() - birthDate.getFullYear();
+                const matchesAge = age >= parseInt(prefs!.ageMin) && age <= parseInt(prefs!.ageMax);
+                const matchesCommunity = prefs!.community === 'Any' || p.religion === prefs!.community;
+                const matchesMarital = prefs!.maritalStatus === 'Any' || p.maritalStatus === prefs!.maritalStatus;
+                return matchesAge && matchesCommunity && matchesMarital && p.createdBy !== user.uid;
+              })
+              .slice(0, 6);
+
+            setRecommendations(filtered);
+          } catch (matchErr) {
+            console.error("DEBUG: Final match query error:", matchErr);
+          }
         } else {
-          setHasPrefs(false);
-          // Fallback: Just show latest opposite gender profiles
-          const q = query(
-            collection(db, 'profiles'), 
-            where('isPublic', '==', true),
-            where('gender', '==', targetGender),
-            limit(6)
-          );
-          const snap = await getDocs(q);
-          setRecommendations(snap.docs.map(d => ({ ...d.data(), id: d.id } as Profile)));
+          console.log("DEBUG: Fetching fallback matches...");
+          try {
+            const q = query(
+              collection(db, 'profiles'), 
+              where('isPublic', '==', true),
+              where('gender', '==', targetGender),
+              limit(12)
+            );
+            const snap = await getDocs(q);
+            console.log("DEBUG: Fallback snap size:", snap.size);
+            const fallbackMatches = snap.docs
+              .map(d => ({ ...d.data(), id: d.id } as Profile))
+              .filter(p => p.createdBy !== user.uid)
+              .slice(0, 6);
+            setRecommendations(fallbackMatches);
+          } catch (fallbackErr) {
+            console.error("DEBUG: Fallback query error:", fallbackErr);
+          }
         }
       } catch (err) {
-        console.error("Match error:", err);
+        console.error("DEBUG: Generic MatchRecommendations error:", err);
       } finally {
         setLoading(false);
       }
@@ -87,7 +119,7 @@ export default function MatchRecommendations() {
 
   if (loading) return (
     <div className="bg-white rounded-[2.5rem] p-12 border border-slate-100 flex flex-col items-center justify-center space-y-4 shadow-sm animate-pulse">
-       <Loader2 className="animate-spin text-indigo-600" size={32} />
+       <Loader2 className="animate-spin text-rose-600" size={32} />
        <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Finding matches...</p>
     </div>
   );
@@ -107,10 +139,10 @@ export default function MatchRecommendations() {
            </div>
         </div>
         <Link 
-          href="/search" 
-          className="flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-widest hover:gap-3 transition-all"
+          href="/dashboard/member?view=partner-preferences" 
+          className="flex items-center gap-2 text-rose-600 font-black text-xs uppercase tracking-widest hover:gap-3 transition-all"
         >
-          View All <ArrowRight size={14} />
+          Refine Search <ArrowRight size={14} />
         </Link>
       </div>
 
@@ -130,7 +162,7 @@ export default function MatchRecommendations() {
               <p className="text-slate-500 text-sm max-w-sm mx-auto">Try broadening your partner preferences to see more recommendations.</p>
            </div>
            <Link 
-             href="/dashboard/member?view=preferences"
+             href="/dashboard/member?view=partner-preferences"
              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all"
            >
               <SlidersHorizontal size={16} /> Update Preferences

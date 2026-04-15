@@ -103,37 +103,37 @@ export default function DashboardSidebar() {
     links.push(
       { 
         href: '/dashboard/group-admin', 
-        icon: LayoutDashboard, 
+        icon: <LayoutDashboard size={18} className="text-rose-500 group-hover:rotate-12 transition-transform" />, 
         label: 'Managed Profiles', 
         active: pathname === '/dashboard/group-admin' && !activeView 
       },
       { 
         href: '/dashboard/group-admin?view=community-link', 
-        icon: Globe, 
+        icon: <Globe size={18} className="text-sky-500 group-hover:rotate-12 transition-transform" />, 
         label: 'Community Link', 
         active: activeView === 'community-link' 
       },
       { 
         href: '/dashboard/group-admin?view=sent-interests', 
-        icon: Send, 
+        icon: <Send size={18} className="text-emerald-500 group-hover:-translate-y-1 transition-transform" />, 
         label: 'Sent Interests', 
         active: activeView === 'sent-interests' 
       },
       { 
         href: '/dashboard/group-admin?view=received-interests', 
-        icon: Inbox, 
+        icon: <Inbox size={18} className="text-amber-500 group-hover:translate-x-1 transition-transform" />, 
         label: 'Received Interests', 
         active: activeView === 'received-interests' 
       },
       { 
         href: '/dashboard/group-admin?view=chats', 
-        icon: MessageCircle, 
+        icon: <MessageCircle size={18} className="text-violet-500 group-hover:scale-110 transition-transform" />, 
         label: 'Messages', 
         active: activeView === 'chats' 
       },
       { 
         href: '/dashboard/group-admin?view=notifications', 
-        icon: Bell, 
+        icon: <Bell size={18} className="text-rose-400 animate-pulse" />, 
         label: 'Notifications', 
         active: activeView === 'notifications' 
       }
@@ -142,92 +142,75 @@ export default function DashboardSidebar() {
     links.push(
       { 
         href: '/dashboard/member', 
-        icon: LayoutDashboard, 
+        icon: <LayoutDashboard size={18} className="text-rose-500 group-hover:rotate-12 transition-transform" />, 
         label: 'Overview', 
         active: pathname === '/dashboard/member' && !activeView 
       },
       { 
         href: '/dashboard/member?view=my-profiles', 
-        icon: User, 
-        label: 'My Profiles', 
+        icon: <User size={18} className="text-sky-500 group-hover:scale-110 transition-transform" />, 
+        label: 'My Profile', 
         active: activeView === 'my-profiles' 
       },
       { 
         href: '/dashboard/member?view=connects', 
-        icon: Users, 
+        icon: <Users size={18} className="text-violet-500 group-hover:translate-x-1 transition-transform" />, 
         label: 'Your Connects', 
         count: counts.connects,
         active: activeView === 'connects' 
       },
       { 
         href: '/dashboard/member?view=favorites', 
-        icon: Heart, 
+        icon: <Heart size={18} className="text-rose-400 group-hover:scale-125 transition-transform" />, 
         label: 'Shortlisted', 
         count: counts.favs,
         active: activeView === 'favorites' 
       },
       { 
         href: '/dashboard/member?view=sent-interests', 
-        icon: Send, 
+        icon: <Send size={18} className="text-emerald-500 group-hover:-translate-y-1 transition-transform" />, 
         label: 'Sent Interests', 
         count: counts.sent,
         active: activeView === 'sent-interests' 
       },
       { 
         href: '/dashboard/member?view=received-interests', 
-        icon: Inbox, 
+        icon: <Inbox size={18} className="text-amber-500 group-hover:translate-x-1 transition-transform" />, 
         label: 'Received Interests', 
         count: counts.received,
         active: activeView === 'received-interests' 
       },
       { 
         href: '/dashboard/member?view=notifications', 
-        icon: Bell, 
+        icon: <Bell size={18} className="text-indigo-500 animate-[bounce_2s_infinite]" />, 
         label: 'Notifications', 
         count: counts.notifications,
         active: activeView === 'notifications' 
       },
       { 
         href: '/dashboard/member?view=chats', 
-        icon: MessageCircle, 
+        icon: <MessageCircle size={18} className="text-fuchsia-500 group-hover:rotate-6 transition-transform" />, 
         label: 'Messages', 
         active: activeView === 'chats' 
       },
       { 
         href: '/dashboard/member?view=partner-preferences', 
-        icon: SlidersHorizontal, 
+        icon: <SlidersHorizontal size={18} className="text-slate-600 group-hover:rotate-90 transition-transform" />, 
         label: 'Partner Preferences', 
         active: activeView === 'partner-preferences' 
       }
     );
   }
 
-  // Common Links
-  links.push(
-    { 
-      href: '/dashboard/settings', 
-      icon: Settings, 
-      label: 'Settings', 
-      active: pathname === '/dashboard/settings' 
-    }
-  );
-
   // Team option ONLY for admins
   if (isRole('group-admin') || isRole('super-admin')) {
     links.push({ 
       href: '/dashboard/team', 
-      icon: Users, 
+      icon: <Users size={18} className="text-indigo-600" />, 
       label: 'truSathi Team', 
       active: pathname === '/dashboard/team' 
     });
   }
-
-  links.push({ 
-    href: `${pathname}?view=change-password`, 
-    icon: KeyRound, 
-    label: 'Change Password', 
-    active: activeView === 'change-password' 
-  });
 
   return (
     <aside className="w-full md:w-64 bg-white border-r border-slate-200 md:fixed md:h-full z-10 flex flex-col">
@@ -255,7 +238,7 @@ export default function DashboardSidebar() {
                 : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
             }`}
           >
-            <link.icon size={18} className={link.active ? 'text-rose-400' : 'text-slate-400 group-hover:text-rose-500'} />
+            {link.icon}
             <span className="flex-1">{link.label}</span>
             {!!(link as any).count && (
               <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
@@ -277,23 +260,6 @@ export default function DashboardSidebar() {
            </Link>
         </div>
       </nav>
-
-      <div className="p-4 border-t border-slate-100 space-y-1">
-         <Link
-           href="/"
-           className="w-full flex items-center gap-3 px-4 py-3.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all font-bold text-sm"
-         >
-           <Home size={18} />
-           Back to Home
-         </Link>
-         <button 
-           onClick={handleLogout}
-           className="w-full flex items-center gap-3 px-4 py-3.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all font-bold text-sm"
-         >
-           <LogOut size={18} />
-           Sign Out
-         </button>
-      </div>
     </aside>
   );
 }
