@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Heart, Star, MessageSquare, LayoutDashboard, ArrowRight,
-  ShieldCheck, Sparkles, UserCircle2, Settings, AlertCircle
+  ShieldCheck, Sparkles, UserCircle2, Settings, AlertCircle,
+  Users, CheckCircle2, Clock
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/app/lib/firebase';
@@ -12,8 +13,13 @@ import Link from 'next/link';
 import MatchRecommendations from './MatchRecommendations';
 import { Profile } from '@/types/profile';
 import { ReactNode } from 'react';
+import { StatCardSkeleton, MatchGridSkeleton } from './Skeleton';
 
-export default function OverviewView() {
+interface OverviewViewProps {
+  userProfile: Profile | null;
+}
+
+export default function OverviewView({ userProfile }: OverviewViewProps) {
   const { user } = useAuth();
   const [stats, setStats] = useState({
     sent: 0,
@@ -29,16 +35,17 @@ export default function OverviewView() {
     if (!user) return;
 
     try {
+      // 1. Audit user document existence (for safety)
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists()) {
         setUserDocMissing(true);
       }
 
-      const [sentSnap, receivedSnap, favSnap, profileSnap] = await Promise.all([
+      // 2. Fetch stats efficiently with Promise.all
+      const [sentSnap, receivedSnap, favSnap] = await Promise.all([
         getDocs(query(collection(db, 'interests'), where('senderId', '==', user.uid))),
         getDocs(query(collection(db, 'interests'), where('receiverId', '==', user.uid))),
         getDocs(query(collection(db, 'favorites'), where('userId', '==', user.uid))),
-        getDocs(query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(1))),
       ]);
 
       const sentInterests = sentSnap.docs.map(doc => doc.data());
@@ -49,157 +56,170 @@ export default function OverviewView() {
       const connects = sentInterests.filter(i => i.status === 'accepted').length + 
                        receivedInterests.filter(i => i.status === 'accepted').length;
 
-      setStats(prev => ({
-        ...prev,
+      setStats({
         sent: activeSent,
         received: activeReceived,
         connects: connects,
         shortlisted: favSnap.size,
-      }));
+        unreadNotifs: 0 // Handled by NotificationBell
+      });
     } catch (err) {
-      console.error("Stats fetch error:", err);
+      console.error("Dashboard data fetch error:", err);
     } finally {
       setLoading(false);
     }
   }, [user]);
 
   useEffect(() => {
-    if (!user) return;
-
     fetchData();
+  }, [fetchData]);
 
-    const notifQuery = query(
-      collection(db, 'notifications'), 
-      where('recipientId', '==', user.uid),
-      where('isRead', '==', false)
+  if (loading) {
+    return (
+      <div className="space-y-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[1,2,3,4].map(i => <StatCardSkeleton key={i} />)}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="lg:col-span-2">
+            <MatchGridSkeleton />
+          </div>
+          <div className="space-y-8">
+             <div className="h-64 bg-white rounded-[3rem] animate-pulse border border-slate-100 shadow-sm" />
+             <div className="h-48 bg-slate-900 rounded-[2.5rem] animate-pulse shadow-2xl shadow-rose-100" />
+          </div>
+        </div>
+      </div>
     );
-    const unsubscribeNotifs = onSnapshot(notifQuery, (snap) => {
-      setStats(prev => ({ ...prev, unreadNotifs: snap.size }));
-    });
-
-    return () => unsubscribeNotifs();
-  }, [fetchData, user]);
-
-  const getTimeGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
-    return "Good Evening";
-  };
-
-  if (loading) return (
-     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
-        {[1,2,3,4].map(i => <div key={i} className="h-32 bg-slate-100 rounded-[2rem]"></div>)}
-     </div>
-  );
+  }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {userDocMissing && (
-        <div className="bg-rose-50 border border-rose-100 p-6 rounded-[2rem] flex items-center gap-4 text-rose-700">
-          <AlertCircle size={24} />
-          <div>
-            <p className="font-black uppercase text-xs tracking-widest">Registration Incomplete</p>
-            <p className="text-sm font-medium">Please update your profile details.</p>
-          </div>
+        <div className="bg-amber-50 border border-amber-200 p-6 rounded-3xl flex items-start gap-4">
+           <AlertCircle className="text-amber-500 shrink-0 mt-1" size={20} />
+           <div className="space-y-1">
+              <p className="text-amber-900 font-bold text-sm uppercase tracking-tight">Technical Profile Incomplete</p>
+              <p className="text-amber-700 text-xs font-medium leading-relaxed">
+                Your base account information is not fully synchronized. Please contact support if you experience navigation issues.
+              </p>
+           </div>
         </div>
       )}
 
-      <div className="relative overflow-hidden bg-white p-8 md:p-12 rounded-[3.5rem] border border-slate-100 shadow-2xl">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-rose-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
-         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-center md:text-left space-y-4">
-               <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter leading-tight">
-                  {getTimeGreeting()}, <span className="text-rose-600">{user?.displayName?.split(' ')[0] || 'Member'}!</span>
-               </h1>
-               <p className="text-slate-500 font-medium text-lg leading-relaxed">Your profile is the key to finding your TruSathi.</p>
-            </div>
-            <div className="flex items-center bg-rose-50/50 p-2.5 rounded-[2rem] border border-rose-100">
-               {[1,2,3].map(i => (
-                  <div key={i} className="w-14 h-14 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-slate-300 -ml-4 first:ml-0 shadow-lg">
-                     <UserCircle2 size={24} />
-                  </div>
-               ))}
-               <div className="w-14 h-14 rounded-full border-4 border-white bg-rose-600 flex items-center justify-center text-white font-black text-xs -ml-4 shadow-lg">
-                  +1.2k
-               </div>
-            </div>
-         </div>
+      {/* Hero Quick Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <StatCard 
+          icon={<Sparkles size={20} />} 
+          label="Your Connects" 
+          value={stats.connects} 
+          color="bg-emerald-50 text-emerald-600"
+          link="/dashboard/member?view=connects"
+        />
+        <StatCard 
+          icon={<Heart size={20} />} 
+          label="Interests Received" 
+          value={stats.received} 
+          color="bg-rose-50 text-rose-600"
+          link="/dashboard/member?view=received-interests"
+        />
+        <StatCard 
+          icon={<Star size={20} />} 
+          label="Shortlisted" 
+          value={stats.shortlisted} 
+          color="bg-amber-50 text-amber-600"
+          link="/dashboard/member?view=favorites"
+        />
+        <StatCard 
+          icon={<MessageSquare size={20} />} 
+          label="Pending Sent" 
+          value={stats.sent} 
+          color="bg-indigo-50 text-indigo-600"
+          link="/dashboard/member?view=sent-interests"
+        />
       </div>
 
-      <MatchRecommendations />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="lg:col-span-2 space-y-10">
+           <MatchRecommendations userProfile={userProfile} />
+        </div>
+        
+        <div className="space-y-8">
+           <ActionBox 
+             icon={<LayoutDashboard size={20} className="text-rose-600" />}
+             title="Quick Actions"
+             desc="Manage your search experience efficiently."
+           >
+             <div className="grid grid-cols-1 gap-2">
+                <QuickLink icon={<CheckCircle2 size={14}/>} label="My Preference" href="/dashboard/member?view=partner-preferences" />
+                <QuickLink icon={<Clock size={14}/>} label="View Interests" href="/dashboard/member?view=received-interests" />
+                <QuickLink icon={<Star size={14}/>} label="Saved Profiles" href="/dashboard/member?view=favorites" />
+                <QuickLink icon={<Users size={14}/>} label="Profile Stats" href="/dashboard/member?view=my-profiles" />
+             </div>
+           </ActionBox>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-         <div className="lg:col-span-2 space-y-6">
-            <h3 className="text-xl font-black text-slate-800 flex items-center gap-2 px-2">
-               <LayoutDashboard size={20} className="text-rose-600" /> Quick Actions
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <ActionBox 
-                  icon={<MessageSquare size={24} />} 
-                  title="Messaging Center" 
-                  desc="Chat with your accepted connections"
-                  href="/dashboard/member?view=chats"
-                  accent="text-indigo-600 bg-indigo-50"
-               />
-               <ActionBox 
-                  icon={<Star size={24} />} 
-                  title="Match Criteria" 
-                  desc="Update who you are looking for"
-                  href="/dashboard/member?view=partner-preferences"
-                  accent="text-amber-600 bg-amber-50"
-               />
-               <ActionBox 
-                  icon={<ShieldCheck size={24} />} 
-                  title="Authenticate Profile" 
-                  desc="Ensure your details are accurate"
-                  href="/dashboard/member?view=my-profiles"
-                  accent="text-emerald-600 bg-emerald-50"
-               />
-               <ActionBox 
-                  icon={<Settings size={24} />} 
-                  title="Account Settings" 
-                  desc="Privacy and security controls"
-                  href="/dashboard/settings"
-                  accent="text-slate-600 bg-slate-100"
-               />
-            </div>
-         </div>
-
-         <div className="space-y-4">
-            <div className="bg-gradient-to-br from-rose-900 via-rose-800 to-rose-900 p-8 rounded-[3.5rem] text-white space-y-6 relative overflow-hidden group shadow-2xl">
-               <ShieldCheck className="absolute -bottom-6 -right-6 text-white/5 group-hover:scale-150 transition-transform duration-1000 rotate-12" size={180} />
-               <div className="relative z-10 space-y-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                    <Sparkles className="text-rose-100" />
-                  </div>
-                  <h4 className="text-2xl font-black leading-tight tracking-tight">Your Journey starts here.</h4>
-                  <p className="text-rose-100/80 text-sm font-medium leading-relaxed">
-                    We screen every profile meticulously to ensure safety.
-                  </p>
-                  <Link href="/search" className="inline-flex items-center gap-3 bg-white text-rose-900 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-rose-50 transition-all shadow-xl">
-                    Browse Profiles <ArrowRight size={14} />
-                  </Link>
-               </div>
-            </div>
-         </div>
+           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl">
+              <ShieldCheck className="absolute -bottom-4 -right-4 text-white/5 group-hover:scale-110 transition-transform duration-700" size={160} />
+              <div className="relative z-10 space-y-4">
+                 <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                    <ShieldCheck size={24} className="text-rose-400" />
+                 </div>
+                 <div className="space-y-1">
+                    <h4 className="text-xl font-black uppercase tracking-tight">Trust Verification</h4>
+                    <p className="text-slate-400 text-xs font-medium leading-relaxed">Verified profiles attract 3x more genuine interest. Screened by the truSathi team.</p>
+                 </div>
+                 <Link href="/dashboard/member?view=my-profiles" className="inline-flex items-center gap-2 text-rose-400 font-black text-[10px] uppercase tracking-widest hover:gap-3 transition-all pt-2">
+                    Start Verification <ArrowRight size={14} />
+                 </Link>
+              </div>
+           </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function ActionBox({ icon, title, desc, href, accent }: { icon: ReactNode, title: string, desc: string, href: string, accent: string }) {
-   return (
-      <Link href={href} className="p-6 bg-white rounded-3xl border border-slate-100 hover:border-rose-100 transition-all flex items-start gap-4 group">
-          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${accent} group-hover:scale-110 transition-transform`}>
-             {icon}
-          </div>
-          <div>
-             <h4 className="font-black text-slate-800 text-sm mb-0.5">{title}</h4>
-             <p className="text-xs text-slate-500 font-medium leading-relaxed">{desc}</p>
-          </div>
-      </Link>
-   );
+function StatCard({ icon, label, value, color, link }: { icon: ReactNode, label: string, value: number, color: string, link: string }) {
+  return (
+    <Link href={link} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-[0_20px_40px_-16px_rgba(0,0,0,0.03)] hover:shadow-[0_40px_80px_-16px_rgba(0,0,0,0.08)] transition-all duration-500 group flex flex-col justify-between h-full hover:-translate-y-1">
+      <div className={`w-12 h-12 ${color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-sm font-black`}>
+        {icon}
+      </div>
+      <div>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+        <p className="text-3xl font-black text-slate-900 tracking-tight">{value}</p>
+      </div>
+    </Link>
+  );
+}
+
+function ActionBox({ icon, title, desc, children }: { icon: ReactNode, title: string, desc: string, children: ReactNode }) {
+  return (
+    <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0">
+           {icon}
+        </div>
+        <div>
+           <h4 className="font-black text-slate-900 text-lg tracking-tight uppercase leading-none mb-1">{title}</h4>
+           <p className="text-[10px] text-slate-400 font-bold leading-tight uppercase tracking-widest">{desc}</p>
+        </div>
+      </div>
+      <div className="pt-2">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function QuickLink({ icon, label, href }: { icon: ReactNode, label: string, href: string }) {
+  return (
+    <Link href={href} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:border-rose-100 hover:bg-rose-50/30 transition-all group">
+      <div className="flex items-center gap-3">
+        <span className="text-slate-300 group-hover:text-rose-500 transition-colors">{icon}</span>
+        <span className="text-xs font-black text-slate-700 uppercase tracking-widest">{label}</span>
+      </div>
+      <ArrowRight size={14} className="text-slate-300 group-hover:text-rose-500 transition-all -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 font-black" />
+    </Link>
+  );
 }

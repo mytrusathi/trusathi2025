@@ -99,6 +99,15 @@ export default function DashboardSidebar() {
   const links: SidebarLink[] = [];
 
   // Role-specific primary links
+  if (isRole('super-admin')) {
+    links.push({ 
+      href: '/dashboard/super-admin', 
+      icon: <Globe size={18} className="text-primary group-hover:rotate-12 transition-transform" />, 
+      label: 'Master Console', 
+      active: pathname === '/dashboard/super-admin'
+    });
+  }
+
   if (isRole('group-admin') || isRole('super-admin')) {
     links.push(
       { 

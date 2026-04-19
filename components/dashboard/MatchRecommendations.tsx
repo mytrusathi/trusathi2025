@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { db } from '@/app/lib/firebase';
 import { collection, query, where, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { Profile } from '@/types/profile';
 import PublicProfileCard from '../PublicProfileCard';
-import { Loader2, Sparkles, ArrowRight, Heart, SlidersHorizontal } from 'lucide-react';
+import { Loader2, Sparkles, ArrowRight, Heart, SlidersHorizontal, UserCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface Preferences {
@@ -15,7 +15,11 @@ interface Preferences {
   maritalStatus: string;
 }
 
-export default function MatchRecommendations() {
+interface MatchRecommendationsProps {
+  userProfile: Profile | null;
+}
+
+export default function MatchRecommendations({ userProfile }: MatchRecommendationsProps) {
   const { user } = useAuth();
   const [recommendations, setRecommendations] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,8 +29,6 @@ export default function MatchRecommendations() {
     const fetchMatches = async () => {
       if (!user) return;
       try {
-        console.log("DEBUG: Starting fetchMatches for UID:", user.uid);
-        
         // 1. Fetch User's Preferences
         let prefs: Preferences | null = null;
         try {
@@ -34,113 +36,109 @@ export default function MatchRecommendations() {
           if (prefSnap.exists()) {
             prefs = prefSnap.data() as Preferences;
             setHasPrefs(true);
-            console.log("DEBUG: Prefs found:", prefs);
           } else {
-            console.log("DEBUG: No prefs found");
             setHasPrefs(false);
           }
         } catch (prefErr) {
-          console.error("DEBUG: prefSnap fetch error:", prefErr);
+          console.error("Preferences fetch error:", prefErr);
         }
         
-        // 2. Fetch User's Gender to show opposite gender
-        let targetGender = 'female';
-        try {
-          const userProfileSnap = await getDocs(query(
-            collection(db, 'profiles'), 
-            where('createdBy', '==', user.uid), 
-            limit(1)
-          ));
-          const userGender = userProfileSnap.docs[0]?.data()?.gender || 'male';
-          targetGender = userGender === 'male' ? 'female' : 'male';
-          console.log("DEBUG: User gender:", userGender, "Target gender:", targetGender);
-        } catch (profileErr) {
-          console.error("DEBUG: userProfileSnap fetch error:", profileErr);
-        }
+        // 2. Determine target gender from Prop
+        const targetGender = (userProfile?.gender === 'male') ? 'female' : 'male';
 
         if (prefs) {
-          console.log("DEBUG: Fetching recommended matches...");
-          try {
-            const q = query(
-              collection(db, 'profiles'), 
-              where('isPublic', '==', true),
-              where('gender', '==', targetGender),
-              limit(100)
-            );
-            
-            const snap = await getDocs(q);
-            console.log("DEBUG: Matches snap size:", snap.size);
-            
-            const filtered = snap.docs
-              .map(d => ({ ...d.data(), id: d.id } as Profile))
-              .filter(p => {
-                const birthDate = new Date(p.dob);
-                const age = new Date().getFullYear() - birthDate.getFullYear();
-                const matchesAge = age >= parseInt(prefs!.ageMin) && age <= parseInt(prefs!.ageMax);
-                const matchesCommunity = prefs!.community === 'Any' || p.religion === prefs!.community;
-                const matchesMarital = prefs!.maritalStatus === 'Any' || p.maritalStatus === prefs!.maritalStatus;
-                return matchesAge && matchesCommunity && matchesMarital && p.createdBy !== user.uid;
-              })
-              .slice(0, 6);
+          const q = query(
+            collection(db, 'profiles'), 
+            where('isPublic', '==', true),
+            where('gender', '==', targetGender),
+            limit(100)
+          );
+          
+          const snap = await getDocs(q);
+          const filtered = snap.docs
+            .map(d => ({ ...d.data(), id: d.id } as Profile))
+            .filter(p => {
+              const birthDate = new Date(p.dob);
+              const age = new Date().getFullYear() - birthDate.getFullYear();
+              const matchesAge = age >= parseInt(prefs!.ageMin) && age <= parseInt(prefs!.ageMax);
+              const matchesCommunity = prefs!.community === 'Any' || p.religion === prefs!.community;
+              const matchesMarital = prefs!.maritalStatus === 'Any' || p.maritalStatus === prefs!.maritalStatus;
+              return matchesAge && matchesCommunity && matchesMarital && p.createdBy !== user.uid;
+            })
+            .slice(0, 6);
 
-            setRecommendations(filtered);
-          } catch (matchErr) {
-            console.error("DEBUG: Final match query error:", matchErr);
-          }
+          setRecommendations(filtered);
         } else {
-          console.log("DEBUG: Fetching fallback matches...");
-          try {
-            const q = query(
-              collection(db, 'profiles'), 
-              where('isPublic', '==', true),
-              where('gender', '==', targetGender),
-              limit(12)
-            );
-            const snap = await getDocs(q);
-            console.log("DEBUG: Fallback snap size:", snap.size);
-            const fallbackMatches = snap.docs
-              .map(d => ({ ...d.data(), id: d.id } as Profile))
-              .filter(p => p.createdBy !== user.uid)
-              .slice(0, 6);
-            setRecommendations(fallbackMatches);
-          } catch (fallbackErr) {
-            console.error("DEBUG: Fallback query error:", fallbackErr);
-          }
+          // Fallback matches
+          const q = query(
+            collection(db, 'profiles'), 
+            where('isPublic', '==', true),
+            where('gender', '==', targetGender),
+            limit(12)
+          );
+          const snap = await getDocs(q);
+          const fallbackMatches = snap.docs
+            .map(d => ({ ...d.data(), id: d.id } as Profile))
+            .filter(p => p.createdBy !== user.uid)
+            .slice(0, 6);
+          setRecommendations(fallbackMatches);
         }
       } catch (err) {
-        console.error("DEBUG: Generic MatchRecommendations error:", err);
+        console.error("MatchRecommendations error:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchMatches();
-  }, [user]);
+  }, [user, userProfile]);
 
   if (loading) return (
-    <div className="bg-white rounded-[2.5rem] p-12 border border-slate-100 flex flex-col items-center justify-center space-y-4 shadow-sm animate-pulse">
-       <Loader2 className="animate-spin text-rose-600" size={32} />
-       <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Finding matches...</p>
+    <div className="bg-white rounded-[2.5rem] p-12 border border-slate-100 flex flex-col items-center justify-center space-y-4 shadow-sm">
+       <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center animate-bounce">
+          <Sparkles className="text-rose-600" size={24} />
+       </div>
+       <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Filtering matches for you...</p>
     </div>
   );
 
+  if (!userProfile) {
+    return (
+      <div className="bg-white rounded-[3rem] p-12 border border-dashed border-slate-200 text-center space-y-6">
+         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
+            <UserCircle2 size={32} strokeWidth={1} />
+         </div>
+         <div className="space-y-2">
+            <h4 className="font-bold text-slate-800">Complete your profile</h4>
+            <p className="text-slate-500 text-sm max-w-sm mx-auto">Create your own biodata first to see personalized matchmaking suggestions.</p>
+         </div>
+         <Link 
+           href="/dashboard/member?view=my-profiles"
+           className="inline-flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-slate-200"
+         >
+           Get Started
+         </Link>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
            <div className="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center shadow-inner">
               <Sparkles size={20} />
            </div>
            <div>
-              <h3 className="font-black text-slate-900 text-lg tracking-tight">Suggested for You</h3>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              <h3 className="font-black text-slate-900 text-lg tracking-tight uppercase">Suggested for You</h3>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
                  {hasPrefs ? 'Based on your preferences' : 'Latest Profiles'}
               </p>
            </div>
         </div>
         <Link 
           href="/dashboard/member?view=partner-preferences" 
-          className="flex items-center gap-2 text-rose-600 font-black text-xs uppercase tracking-widest hover:gap-3 transition-all"
+          className="flex items-center gap-2 text-rose-600 font-black text-[10px] uppercase tracking-widest hover:gap-3 transition-all"
         >
           Refine Search <ArrowRight size={14} />
         </Link>
@@ -163,9 +161,9 @@ export default function MatchRecommendations() {
            </div>
            <Link 
              href="/dashboard/member?view=partner-preferences"
-             className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all"
+             className="inline-flex items-center gap-2 px-6 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-slate-200"
            >
-              <SlidersHorizontal size={16} /> Update Preferences
+              Update Preferences
            </Link>
         </div>
       )}

@@ -12,15 +12,17 @@ import CommunityLinkModal from '@/components/CommunityLinkModal';
 import InterestsView from '@/components/dashboard/InterestsView';
 import ChatView from '@/components/dashboard/ChatView';
 import NotificationsView from '@/components/dashboard/NotificationsView';
+import { AlertCircle, PartyPopper, ShieldAlert } from 'lucide-react';
 
 function GroupAdminDashboardContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const view = searchParams.get('view');
-  
+  const isNewlyRegistered = searchParams.get('registered') === 'success';
   const showPasswordModal = view === 'change-password';
   const showCommunityLinkModal = view === 'community-link';
   const [copied, setCopied] = useState(false);
+  const [showWelcomeAlert, setShowWelcomeAlert] = useState(isNewlyRegistered);
 
   // Priority: Use the saved slug for the link, fallback to UID only if no slug exists
   const displayIdentifier = user?.slug || user?.uid;
@@ -126,6 +128,49 @@ function GroupAdminDashboardContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      {/* Registration Success Alert */}
+      {showWelcomeAlert && (
+        <div className="bg-emerald-500 text-white p-6 rounded-[2rem] shadow-xl shadow-emerald-500/20 flex items-center justify-between gap-6 animate-in slide-in-from-top-10 duration-700 animate-out fade-out fill-mode-forwards relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+          <div className="flex items-center gap-5 relative z-10">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+              <PartyPopper size={24} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black uppercase tracking-tight">Registration Successful!</h3>
+              <p className="text-emerald-50/90 text-sm font-medium">Welcome to TruSathi. Your community dashboard is ready.</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setShowWelcomeAlert(false)}
+            className="px-6 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-black uppercase tracking-widest transition-all backdrop-blur-md"
+          >
+            Acknowledge
+          </button>
+        </div>
+      )}
+
+      {/* Approval Pending Banner */}
+      {user?.isApproved === false && (
+        <div className="bg-amber-50 border border-amber-200 p-6 rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="flex items-center gap-5">
+            <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center">
+              <ShieldAlert size={28} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-amber-900">Verification Pending</h3>
+              <p className="text-amber-700 text-sm font-medium leading-relaxed">
+                Your account is currently being reviewed by our team. <br className="hidden md:block" />
+                You can browse the dashboard, but <span className="font-bold underline">profile creation</span> is restricted until verified.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 px-4 py-2 bg-amber-100 text-amber-700 rounded-xl text-xs font-black uppercase tracking-widest">
+            <AlertCircle size={14} /> Processing Review
+          </div>
+        </div>
+      )}
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
         <div className="space-y-1">
@@ -142,9 +187,16 @@ function GroupAdminDashboardContent() {
             {user?.displayName || user?.email || 'Admin'} {user?.groupName ? `| ${user.groupName}` : ''}
           </p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-bold border border-green-100">
-          <Check size={16} /> Verified Admin
-        </div>
+        
+        {user?.isApproved !== false ? (
+          <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-bold border border-green-100">
+            <Check size={16} /> Verified Admin
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-500 rounded-full text-sm font-bold border border-slate-100 italic">
+            <AlertCircle size={16} /> Verification Pending
+          </div>
+        )}
       </div>
 
       {renderView()}

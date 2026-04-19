@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../context/AuthContext'
-import { ArrowLeft, Handshake, Mail, Lock, Loader2, ArrowRight, Sparkles, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, Mail, Lock, Loader2, ArrowRight, Sparkles, ShieldCheck, Handshake } from 'lucide-react'
+import PageLoader from '@/components/PageLoader'
 import ForgotPasswordModal from '@/components/ForgotPasswordModal'
 
 export default function LoginPage() {
@@ -23,11 +24,7 @@ export default function LoginPage() {
       if (role === 'super-admin') {
         router.replace('/dashboard/super-admin')
       } else if (role === 'group-admin') {
-        if (user.isApproved === false) {
-          router.replace('/pending-approval')
-        } else {
-          router.replace('/dashboard/group-admin')
-        }
+        router.replace('/dashboard/group-admin')
       } else if (role === 'member') {
         router.replace('/dashboard/member')
       }
@@ -47,17 +44,7 @@ export default function LoginPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-6 text-foreground">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
-          <div className="absolute inset-0 flex items-center justify-center text-primary">
-            <Handshake size={24} className="animate-pulse" />
-          </div>
-        </div>
-        <p className="font-black uppercase tracking-[0.3em] text-[10px] text-muted-foreground">Securing Connection...</p>
-      </div>
-    )
+    return <PageLoader message="Securing Connection..." />;
   }
 
   return (

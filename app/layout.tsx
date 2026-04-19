@@ -32,7 +32,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
       <body className="antialiased font-sans text-slate-900 selection:bg-rose-100 selection:text-rose-900 bg-page text-foreground">
         <NextTopLoader
-          color="var(--brand-gold-500)"
+          color="var(--primary)"
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}
@@ -40,7 +40,7 @@ export default function RootLayout({
           showSpinner={false}
           easing="ease"
           speed={200}
-          shadow="0 0 10px var(--brand-gold-500),0 0 5px var(--brand-gold-500)"
+          shadow="0 0 10px var(--primary),0 0 5px var(--primary)"
         />
         <ThemeProvider
           attribute="class"

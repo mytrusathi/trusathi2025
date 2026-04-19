@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import PageLoader from './PageLoader';
 
 interface Props {
   children: React.ReactNode;
@@ -29,12 +29,6 @@ const ProtectedRoute = ({ children, requireAdmin, requireSuperAdmin, allowedRole
         return;
       }
 
-      // 2. Guard for Pending Admins
-      if (user.role === 'group-admin' && user.isApproved === false) {
-         router.replace('/pending-approval');
-         return;
-      }
-
       // 3. Check Specific Flags
       if (requireSuperAdmin && user.role !== 'super-admin') {
         router.push('/dashboard/member');
@@ -55,28 +49,17 @@ const ProtectedRoute = ({ children, requireAdmin, requireSuperAdmin, allowedRole
   }, [user, loading, router, requireAdmin, requireSuperAdmin, hasAllowedRole]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-2">
-           <Loader2 className="w-8 h-8 animate-spin text-rose-600" />
-           <p className="text-slate-500 text-sm font-medium">Authenticating access...</p>
-        </div>
-      </div>
-    );
+    return <PageLoader message="Authenticating access..." />;
   }
 
   // Prevents the "Incomplete Dashboard" flash while redirecting.
   if (!user) return null;
   
-  if (user.role === 'group-admin' && user.isApproved === false) {
-     return null; // The useEffect redirect to /pending-approval takes care of this
-  }
   
   // Strict Render Guards
   if (requireSuperAdmin && user.role !== 'super-admin') return null;
   if (requireAdmin && user.role !== 'group-admin' && user.role !== 'super-admin') return null;
   if (!hasAllowedRole) return null;
-
   return <>{children}</>;
 };
 

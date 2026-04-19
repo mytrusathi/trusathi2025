@@ -44,6 +44,7 @@ const RegisterPage = () => {
         uid: user.uid,
         email: user.email,
         displayName: name,
+        groupName: role === 'group-admin' ? groupName : null,
         role: role,
         isApproved: isApproved,
         slug: role === 'group-admin' ? generatedSlug : null,
@@ -51,7 +52,7 @@ const RegisterPage = () => {
       });
 
       if (role === 'group-admin') {
-        router.push('/pending-approval');
+        router.push('/dashboard/group-admin?registered=success');
       } else {
         router.push('/register/success');
       }

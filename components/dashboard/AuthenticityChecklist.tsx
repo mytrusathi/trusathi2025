@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {
   CheckCircle2, ArrowRight, UserCircle,
-  Phone, Mail, Camera, MessageSquare, ShieldCheck,
+  Phone, Mail, Camera, ShieldCheck,
   AlertCircle, Loader2, X,
 } from 'lucide-react';
-import { Profile } from '@/types/profile';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { useAuthenticity } from '@/hooks/useAuthenticity';
 import {
   confirmPhoneVerificationOtp,
   sendMemberEmailVerification,
@@ -18,29 +18,20 @@ import {
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '@/app/lib/firebase';
 import { 
-  doc, updateDoc, collection, query, where, 
-  limit, getDocs, getDoc, setDoc, addDoc 
+  doc, updateDoc, collection, 
+  setDoc, addDoc 
 } from 'firebase/firestore';
 import imageCompression from 'browser-image-compression';
 
-interface Step {
-  id: string;
-  title: string;
-  desc: string;
-  icon: React.ReactNode;
-  isCompleted: boolean;
-  isOptional?: boolean;
-  href?: string;
-  buttonText: string;
-}
-
 interface Props {
-  profile: Profile | null;
+  profile: any | null;
   onProfileRefresh?: () => Promise<void> | void;
 }
 
 export default function AuthenticityChecklist({ profile, onProfileRefresh }: Props) {
   const { user, refreshUser } = useAuth();
+  const { pillars, totalScore, isMandatoryComplete } = useAuthenticity(profile, user);
+  
   const [sendingEmail, setSendingEmail] = useState(false);
   const [refreshingEmail, setRefreshingEmail] = useState(false);
   const [phoneModalOpen, setPhoneModalOpen] = useState(false);
@@ -53,63 +44,32 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
   const [error, setError] = useState<string | null>(null);
   const selfieInputRef = useRef<HTMLInputElement>(null);
 
-  const coreFields: (keyof Profile)[] = [
-    'name', 'gender', 'dob', 'city', 'religion', 'caste',
-    'education', 'profession', 'income', 'fatherName',
-    'imageUrl', 'about', 'contact',
-  ];
-  const filledCount = profile ? coreFields.filter((field) => !!profile[field]).length : 0;
-  const isProfileComplete = filledCount >= coreFields.length;
+  // Map hook pillars to local display requirements
+  const steps = useMemo(() => {
+    return pillars.map(p => {
+      let icon = p.id === 'profile' ? <UserCircle size={20}/> :
+                 p.id === 'phone' ? <Phone size={20}/> :
+                 p.id === 'email' ? <Mail size={20}/> :
+                 p.id === 'selfie' ? <Camera size={20}/> : <ShieldCheck size={20}/>;
+      
+      let buttonText = p.isMet ? 'Completed' : 'Complete';
+      if (p.id === 'profile') buttonText = p.isMet ? 'View Profile' : 'Edit Profile';
+      if (p.id === 'phone') buttonText = p.isMet ? 'Confirmed' : 'Verify Now';
+      if (p.id === 'email') buttonText = p.isMet ? 'Verified' : 'Verify Email';
+      if (p.id === 'selfie') buttonText = p.isMet ? 'Retake Selfie' : 'Upload Selfie';
+      if (p.id === 'admin') buttonText = profile?.adminApproved ? 'Verified' : (profile?.screeningStatus === 'pending' ? 'Submitted' : 'Submit Now');
 
-  const steps: Step[] = [
-    {
-      id: 'profile',
-      title: 'Complete Profile',
-      desc: 'Fill in all details to help people find you.',
-      icon: <UserCircle size={20} />,
-      isCompleted: isProfileComplete,
-      href: '/dashboard/member?view=my-profiles',
-      buttonText: isProfileComplete ? 'View Details' : 'Edit Profile',
-    },
-    {
-      id: 'phone',
-      title: 'Confirm Phone Number',
-      desc: 'Confirm your phone via OTP to prevent fraud.',
-      icon: <Phone size={20} />,
-      isCompleted: !!profile?.phoneVerified || !!user?.phoneNumber,
-      buttonText: profile?.phoneVerified || user?.phoneNumber ? 'Confirmed' : 'Confirm Now',
-    },
-    {
-      id: 'email',
-      title: 'Authenticate Email',
-      desc: 'Stay updated with important match alerts.',
-      icon: <Mail size={20} />,
-      isCompleted: !!profile?.emailVerified || !!user?.emailVerified,
-      isOptional: true,
-      buttonText: !!profile?.emailVerified || !!user?.emailVerified ? 'Authenticated' : 'Send Verification',
-    },
-    {
-      id: 'selfie',
-      title: 'Upload Live Selfie',
-      desc: 'A live shot proves you are real.',
-      icon: <Camera size={20} />,
-      isCompleted: !!profile?.selfieUrl,
-      buttonText: profile?.selfieUrl ? 'Retake Selfie' : 'Upload Selfie',
-    },
-    {
-      id: 'admin',
-      title: 'Submit for Review',
-      desc: 'Final step for official community screening.',
-      icon: <ShieldCheck size={20} />,
-      isCompleted: !!profile?.adminApproved || !!profile?.screeningStatus,
-      buttonText: profile?.adminApproved ? 'Verified' : (profile?.screeningStatus === 'pending' ? 'Submitted' : 'Submit to Team'),
-    },
-  ];
-
-  const mandatorySteps = ['profile', 'phone', 'selfie'];
-  const isMandatoryComplete = steps
-    .filter(s => mandatorySteps.includes(s.id))
-    .every(s => s.isCompleted);
+      return {
+        ...p,
+        title: p.label,
+        desc: p.hint,
+        icon,
+        buttonText,
+        isCompleted: p.isMet,
+        isOptional: p.id === 'email'
+      };
+    });
+  }, [pillars, profile]);
 
   const handleSubmitToAdmin = async () => {
     if (!profile || !user) return;
@@ -123,10 +83,8 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
     setFeedback(null);
 
     try {
-      // 1. Create Screening Request (Dedicated Collection)
-      // This avoids querying the restricted 'users' collection for the admin ID
-      const requestRef = collection(db, 'screening_requests');
-      await addDoc(requestRef, {
+      const requestRef = doc(db, 'screening_requests', user.uid);
+      await setDoc(requestRef, {
         uid: user.uid,
         userName: user.displayName || 'Member',
         profileId: profile.id,
@@ -135,15 +93,13 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
         createdAt: new Date().toISOString(),
       });
 
-      // 2. Update Profile Status
-      if (!profile.id) throw new Error('Invalid profile ID.');
       await updateDoc(doc(db, 'profiles', profile.id), {
         screeningStatus: 'pending',
         updatedAt: new Date().toISOString(),
       });
 
       await onProfileRefresh?.();
-      setFeedback('Your profile has been submitted for screening. Please wait 24-48 hours.');
+      setFeedback('Your profile has been submitted for screening. Review takes 24-48 hours.');
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Unable to submit for screening.');
@@ -152,25 +108,14 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
     }
   };
 
-  const completedCount = steps.filter((step) => step.isCompleted).length;
-  const progressPercent = Math.round((completedCount / steps.length) * 100);
-
-  const runProfileRefresh = async () => {
-    await refreshUser();
-    await onProfileRefresh?.();
-  };
-
   const handleEmailVerification = async () => {
     setSendingEmail(true);
     setError(null);
-    setFeedback(null);
-
     try {
       await sendMemberEmailVerification();
-      setFeedback('Verification email sent. Open your inbox, verify, then tap refresh.');
-    } catch (err: unknown) {
-      console.error(err);
-      setError('Unable to send verification email right now.');
+      setFeedback('Verification email sent. Please check your inbox.');
+    } catch (err) {
+      setError('Failed to send verification email.');
     } finally {
       setSendingEmail(false);
     }
@@ -178,21 +123,15 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
 
   const handleEmailRefresh = async () => {
     setRefreshingEmail(true);
-    setError(null);
-    setFeedback(null);
-
     try {
-      await runProfileRefresh();
-      
+      await refreshUser();
       if (user?.emailVerified) {
         await syncEmailVerifiedProfiles(user.uid, true);
         await onProfileRefresh?.();
       }
-      
-      setFeedback(user?.emailVerified ? 'Email verified and synced successfully.' : 'Email status refreshed.');
+      setFeedback(user?.emailVerified ? 'Email successfully verified!' : 'Email status refreshed.');
     } catch (err) {
-      console.error(err);
-      setError('Unable to refresh email status right now.');
+      setError('Status refresh failed.');
     } finally {
       setRefreshingEmail(false);
     }
@@ -200,16 +139,12 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
 
   const handleSendOtp = async () => {
     setPhoneLoading(true);
-    setError(null);
-    setFeedback(null);
-
     try {
-      const nextVerificationId = await sendPhoneVerificationOtp(phoneNumber);
-      setVerificationId(nextVerificationId);
-      setFeedback('OTP sent successfully. Enter the code to complete verification.');
-    } catch (err: unknown) {
-      console.error(err);
-      setError('Unable to send OTP. Please check the phone number format and try again.');
+      const nextId = await sendPhoneVerificationOtp(phoneNumber);
+      setVerificationId(nextId);
+      setFeedback('OTP sent.');
+    } catch (err) {
+      setError('OTP send failed.');
     } finally {
       setPhoneLoading(false);
     }
@@ -217,24 +152,17 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
 
   const handleVerifyOtp = async () => {
     setPhoneLoading(true);
-    setError(null);
-    setFeedback(null);
-
     try {
       await confirmPhoneVerificationOtp(verificationId, otpCode);
-
       if (profile?.id && phoneNumber && phoneNumber !== profile.contact) {
         await updateDoc(doc(db, 'profiles', profile.id), { contact: phoneNumber });
       }
-
-      await runProfileRefresh();
+      await refreshUser();
+      await onProfileRefresh?.();
       setPhoneModalOpen(false);
-      setVerificationId('');
-      setOtpCode('');
-      setFeedback('Phone number verified successfully.');
-    } catch (err: unknown) {
-      console.error(err);
-      setError('OTP verification failed. Please recheck the code and try again.');
+      setFeedback('Phone verified!');
+    } catch (err) {
+      setError('OTP verification failed.');
     } finally {
       setPhoneLoading(false);
     }
@@ -243,31 +171,17 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
   const handleSelfieUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !profile?.id || !user) return;
-
     setSelfieLoading(true);
-    setError(null);
-    setFeedback(null);
-
     try {
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 0.25,
-        maxWidthOrHeight: 1000,
-        useWebWorker: true,
-      });
-      const selfieRef = ref(storage, `selfies/${user.uid}/${Date.now()}_${compressed.name}`);
+      const compressed = await imageCompression(file, { maxSizeMB: 0.25, maxWidthOrHeight: 1000 });
+      const selfieRef = ref(storage, `selfies/${user.uid}/${Date.now()}_selfie.jpg`);
       const snapshot = await uploadBytes(selfieRef, compressed);
-      const selfieUrl = await getDownloadURL(snapshot.ref);
-
-      await updateDoc(doc(db, 'profiles', profile.id), {
-        selfieUrl,
-        updatedAt: new Date().toISOString(),
-      });
-
+      const url = await getDownloadURL(snapshot.ref);
+      await updateDoc(doc(db, 'profiles', profile.id), { selfieUrl: url, updatedAt: new Date().toISOString() });
       await onProfileRefresh?.();
-      setFeedback('Selfie uploaded successfully.');
+      setFeedback('Selfie uploaded!');
     } catch (err) {
-      console.error(err);
-      setError('Unable to upload selfie right now.');
+      setError('Selfie upload failed.');
     } finally {
       setSelfieLoading(false);
       event.target.value = '';
@@ -275,54 +189,33 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
   };
 
   const handleStepAction = async (stepId: string) => {
-    if (stepId === 'phone') {
-      setPhoneModalOpen(true);
-      setError(null);
-      setFeedback(null);
-      return;
-    }
-
-    if (stepId === 'email') {
-      if (user?.emailVerified) {
-        await handleEmailRefresh();
-      } else {
-        await handleEmailVerification();
-      }
-      return;
-    }
-
-    if (stepId === 'selfie') {
-      selfieInputRef.current?.click();
-      return;
-    }
-
-    if (stepId === 'admin') {
-      if (profile?.adminApproved) {
-        window.location.href = '/dashboard/member?view=chats&chat=super-admin';
-      } else {
-        await handleSubmitToAdmin();
-      }
+    if (stepId === 'phone') { setPhoneModalOpen(true); return; }
+    if (stepId === 'email') { user?.emailVerified ? await handleEmailRefresh() : await handleEmailVerification(); return; }
+    if (stepId === 'selfie') { selfieInputRef.current?.click(); return; }
+    if (stepId === 'admin') { 
+      if (profile?.adminApproved) { window.location.href = '/dashboard/member?view=chats&chat=super-admin'; }
+      else { await handleSubmitToAdmin(); }
     }
   };
 
   return (
     <>
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-rose-100/20 overflow-hidden animate-in fade-in slide-in-from-right-4 duration-1000">
-        <div className="bg-rose-600 p-8 text-white relative overflow-hidden">
-          <ShieldCheck className="absolute -top-4 -right-4 text-white/10" size={120} />
-          <div className="relative z-10 space-y-2">
-            <h3 className="text-xl font-black uppercase tracking-tight">Onboarding Checklist</h3>
-            <p className="text-rose-100 text-sm font-medium">Follow these steps to reach 100% Authenticity Score.</p>
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-rose-100/30 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="bg-gradient-to-br from-rose-600 to-rose-700 p-8 text-white relative">
+          <ShieldCheck className="absolute -top-4 -right-4 text-white/10" size={140} />
+          <div className="relative z-10 space-y-3">
+            <h3 className="text-2xl font-black uppercase tracking-tight">Onboarding Guide</h3>
+            <p className="text-rose-100 font-medium text-sm">Become a 'Highly Authentic' member by completing these steps.</p>
 
-            <div className="pt-4 space-y-2">
-              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-rose-200">
-                <span>Progress</span>
-                <span>{progressPercent}% Complete</span>
+            <div className="pt-6 space-y-2">
+              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.25em] text-rose-200">
+                <span>Verification Progress</span>
+                <span>{totalScore}%</span>
               </div>
-              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden border border-white/5">
                 <div
                   className="h-full bg-white transition-all duration-1000 ease-out"
-                  style={{ width: `${progressPercent}%` }}
+                  style={{ width: `${totalScore}%` }}
                 />
               </div>
             </div>
@@ -330,172 +223,142 @@ export default function AuthenticityChecklist({ profile, onProfileRefresh }: Pro
         </div>
 
         {(feedback || error) && (
-          <div className={`mx-6 mt-6 rounded-2xl border px-4 py-3 text-xs font-semibold ${
+          <div className={`mx-8 mt-8 rounded-2xl border px-5 py-4 text-xs font-bold leading-relaxed ${
             error ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-emerald-50 border-emerald-100 text-emerald-700'
           }`}>
             {error || feedback}
           </div>
         )}
 
-        <div className="p-6 space-y-3">
+        <div className="p-8 space-y-4">
           {steps.map((step) => (
             <div
               key={step.id}
-              className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all ${
+              className={`group flex items-center gap-5 p-5 rounded-3xl border transition-all duration-300 ${
                 step.isCompleted
-                  ? 'bg-emerald-50/50 border-emerald-100'
-                  : 'bg-slate-50 border-slate-50 hover:border-rose-100'
+                  ? 'bg-emerald-50/20 border-emerald-50 shadow-sm'
+                  : 'bg-slate-50 border-slate-50 hover:border-rose-100 hover:bg-white hover:shadow-xl hover:shadow-slate-100'
               }`}
             >
-              <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                step.isCompleted ? 'bg-emerald-500 text-white' : 'bg-white text-slate-400 group-hover:bg-rose-50 group-hover:text-rose-600'
+              <div className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${
+                step.isCompleted ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-100' : 'bg-white text-slate-300 group-hover:bg-rose-50 group-hover:text-rose-500'
               }`}>
-                {step.isCompleted ? <CheckCircle2 size={20} /> : step.icon}
+                {step.isCompleted ? <CheckCircle2 size={24} /> : step.icon}
               </div>
 
               <div className="grow min-w-0">
-                <div className="flex items-center gap-2">
-                  <h4 className={`text-sm font-bold truncate ${step.isCompleted ? 'text-emerald-900' : 'text-slate-800'}`}>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <h4 className={`text-sm font-black uppercase tracking-tight truncate ${step.isCompleted ? 'text-emerald-900' : 'text-slate-800'}`}>
                     {step.title}
                   </h4>
                   {step.isOptional && (
-                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Optional</span>
+                    <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200/50">Bonus</span>
                   )}
                 </div>
-                <p className={`text-xs truncate ${step.isCompleted ? 'text-emerald-700/60' : 'text-slate-500'}`}>
+                <p className={`text-[11px] font-medium leading-normal ${step.isCompleted ? 'text-emerald-700/60' : 'text-slate-400'}`}>
                   {step.desc}
                 </p>
               </div>
 
-              {step.href ? (
-                <Link
-                  href={step.href}
-                  className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                    step.isCompleted
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-white text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white shadow-sm'
-                  }`}
-                >
-                  {step.buttonText} <ArrowRight size={12} />
-                </Link>
-              ) : (
-                <button
-                  onClick={() => handleStepAction(step.id)}
-                  disabled={
-                    sendingEmail || refreshingEmail || phoneLoading || selfieLoading || 
-                    (step.id === 'admin' && !isMandatoryComplete) ||
-                    (step.id === 'admin' && (profile?.screeningStatus === 'pending' || !!profile?.adminApproved))
-                  }
-                  className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                    step.isCompleted
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : (step.id === 'admin' && !isMandatoryComplete)
-                        ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:border-rose-500 hover:text-rose-600'
-                  } disabled:opacity-70`}
-                >
-                  {(step.id === 'email' && (sendingEmail || refreshingEmail)) || (step.id === 'phone' && phoneLoading) || (step.id === 'selfie' && selfieLoading) || (step.id === 'admin' && selfieLoading)
-                    ? <Loader2 size={12} className="animate-spin" />
-                    : null}
-                  {step.id === 'admin' && !isMandatoryComplete && !step.isCompleted ? 'Locked' : step.buttonText}
-                </button>
-              )}
+              <div className="shrink-0">
+                {step.id === 'profile' ? (
+                  <Link
+                    href="/dashboard/member?view=my-profiles"
+                    className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      step.isCompleted
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'bg-slate-900 text-white shadow-xl shadow-slate-200 hover:bg-rose-600'
+                    }`}
+                  >
+                    {step.buttonText} <ArrowRight size={12} />
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => handleStepAction(step.id)}
+                    disabled={
+                      sendingEmail || refreshingEmail || phoneLoading || selfieLoading || 
+                      (step.id === 'admin' && !isMandatoryComplete) ||
+                      (step.id === 'admin' && (profile?.screeningStatus === 'pending' || !!profile?.adminApproved))
+                    }
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      step.isCompleted
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : (step.id === 'admin' && !isMandatoryComplete)
+                          ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:border-rose-400 hover:text-rose-600 shadow-sm'
+                    } disabled:opacity-50`}
+                  >
+                    {((step.id === 'email' && (sendingEmail || refreshingEmail)) || (step.id === 'phone' && phoneLoading) || (step.id === 'selfie' && selfieLoading) || (step.id === 'admin' && selfieLoading))
+                      ? <Loader2 size={12} className="animate-spin" />
+                      : null}
+                    {step.buttonText}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
 
-        <div className="p-6 pt-0">
-          {!user?.emailVerified && (
-            <button
-              onClick={handleEmailRefresh}
-              disabled={refreshingEmail}
-              className="mb-4 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 text-xs font-black uppercase tracking-widest hover:border-rose-200 hover:text-rose-600 transition-all disabled:opacity-70"
-            >
-              {refreshingEmail ? <Loader2 size={14} className="animate-spin" /> : null}
-              Refresh Email Status
-            </button>
-          )}
-
-          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-3">
-            <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-[10px] text-amber-700 font-medium leading-relaxed">
-              <strong>Note:</strong> Admin approval may take 24-48 hours after you complete all steps. High Authenticity profiles get more trust from families.
+        <div className="p-8 pt-0 space-y-4">
+          <div className="p-5 bg-amber-50 rounded-3xl border border-amber-100 flex items-start gap-4">
+            <AlertCircle size={20} className="text-amber-500 shrink-0 mt-0.5 shadow-sm" />
+            <p className="text-[11px] text-amber-700 font-medium leading-relaxed">
+              <strong>Family Trust Notice:</strong> High authenticity scores attract 3x more interests. Your selfie and phone verification are encrypted and only used for internal trust screening.
             </p>
           </div>
         </div>
       </div>
 
-      <input
-        ref={selfieInputRef}
-        type="file"
-        accept="image/*"
-        capture="user"
-        className="hidden"
-        onChange={handleSelfieUpload}
-      />
-
-      <div id="phone-recaptcha" />
+      <input ref={selfieInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleSelfieUpload} />
 
       {phoneModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white rounded-[2rem] border border-slate-100 shadow-2xl overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-              <div>
-                <h4 className="text-lg font-black text-slate-900">Verify Phone Number</h4>
-                <p className="text-sm text-slate-500">Use OTP verification to increase your authenticity score.</p>
-              </div>
-              <button onClick={() => setPhoneModalOpen(false)} className="p-2 rounded-xl hover:bg-slate-50 text-slate-400">
-                <X size={18} />
-              </button>
+        <div className="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div className="w-full max-w-sm bg-white rounded-[3rem] border border-slate-100 shadow-2xl space-y-6 overflow-hidden">
+            <div className="bg-slate-50 p-8 text-center space-y-2 border-b border-slate-100 relative">
+               <button onClick={() => setPhoneModalOpen(false)} className="absolute top-4 right-4 p-2 text-slate-300 hover:text-rose-600 transition-colors">
+                  <X size={20} />
+               </button>
+               <h4 className="text-2xl font-black text-slate-900 tracking-tight leading-none">Phone Sync</h4>
+               <p className="text-xs text-slate-500 font-medium">Verification prevents community spam.</p>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Phone Number</label>
+            <div className="p-8 pt-0 space-y-5">
+              <div className="space-y-4">
                 <input
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="+91XXXXXXXXXX"
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-rose-300"
+                  className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-5 py-4 text-sm font-bold text-slate-800 outline-none focus:bg-white focus:border-rose-400 focus:shadow-lg focus:shadow-rose-100 transition-all"
                 />
-              </div>
 
-              {verificationId && (
-                <div>
-                  <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">OTP Code</label>
+                {verificationId && (
                   <input
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value)}
-                    placeholder="Enter 6 digit OTP"
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-rose-300"
+                    placeholder="6 Digit OTP Code"
+                    className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-5 py-4 text-sm font-bold text-slate-800 outline-none focus:bg-white animate-in zoom-in-95 duration-300"
                   />
-                </div>
-              )}
+                )}
+              </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-2">
                 {!verificationId ? (
                   <button
                     onClick={handleSendOtp}
                     disabled={phoneLoading || !phoneNumber.trim()}
-                    className="flex-1 rounded-2xl bg-rose-600 text-white px-4 py-3 text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all disabled:opacity-70"
+                    className="w-full rounded-2xl bg-rose-600 text-white px-5 py-4 font-black uppercase tracking-widest text-[10px] hover:bg-rose-700 shadow-xl shadow-rose-200 transition-all disabled:opacity-50"
                   >
-                    {phoneLoading ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Send OTP'}
+                    {phoneLoading ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Request OTP Code'}
                   </button>
                 ) : (
                   <button
                     onClick={handleVerifyOtp}
                     disabled={phoneLoading || !otpCode.trim()}
-                    className="flex-1 rounded-2xl bg-emerald-600 text-white px-4 py-3 text-xs font-black uppercase tracking-widest hover:bg-emerald-700 transition-all disabled:opacity-70"
+                    className="w-full rounded-2xl bg-emerald-600 text-white px-5 py-4 font-black uppercase tracking-widest text-[10px] hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition-all"
                   >
-                    {phoneLoading ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Verify OTP'}
+                    {phoneLoading ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Confirm Verification'}
                   </button>
                 )}
-                <button
-                  onClick={() => setPhoneModalOpen(false)}
-                  className="rounded-2xl border border-slate-200 px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all"
-                >
-                  Cancel
-                </button>
               </div>
             </div>
           </div>

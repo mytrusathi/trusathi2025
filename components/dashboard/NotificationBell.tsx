@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Heart, MessageCircle, X } from 'lucide-react';
 import { db } from '@/app/lib/firebase';
-import { collection, query, where, onSnapshot, limit, updateDoc, doc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, limit, updateDoc, doc, orderBy } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 
@@ -42,17 +42,13 @@ export default function NotificationBell() {
     const recentQuery = query(
       collection(db, 'notifications'),
       where('recipientId', '==', user.uid),
+      orderBy('createdAt', 'desc'),
       limit(20)
     );
 
     const unsubRecent = onSnapshot(recentQuery, (snapshot) => {
       const sorted = snapshot.docs
         .map(d => ({ id: d.id, ...d.data() } as Notification))
-        .sort((a, b) => {
-          const timeA = a.createdAt?.toMillis?.() || 0;
-          const timeB = b.createdAt?.toMillis?.() || 0;
-          return timeB - timeA;
-        })
         .slice(0, 4);
       setRecentNotifs(sorted);
     });
@@ -81,11 +77,24 @@ export default function NotificationBell() {
     }
   };
 
+  const formatTimeAgo = (date: any) => {
+    if (!date) return '';
+    const d = date.toDate ? date.toDate() : new Date(date);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - d.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    return d.toLocaleDateString();
+  };
+
   const getIcon = (type: string) => {
     switch (type) {
-      case 'interest': return <Heart size={14} className="text-rose-500" />;
-      case 'message': return <MessageCircle size={14} className="text-indigo-500" />;
-      default: return <Bell size={14} className="text-slate-400" />;
+      case 'interest': return <Heart size={14} className="text-rose-500" strokeWidth={3} />;
+      case 'message': return <MessageCircle size={14} className="text-indigo-500" strokeWidth={3} />;
+      default: return <Bell size={14} className="text-slate-400" strokeWidth={3} />;
     }
   };
 
@@ -137,10 +146,13 @@ export default function NotificationBell() {
                            }`}>
                               {getIcon(notif.type)}
                            </div>
-                           <div className="space-y-1 min-w-0">
-                              <p className="font-black text-slate-900 text-xs tracking-tight truncate">{notif.title}</p>
-                              <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{notif.message}</p>
-                           </div>
+                            <div className="space-y-1 min-w-0 flex-1">
+                               <div className="flex items-center justify-between gap-2">
+                                  <p className="font-black text-slate-900 text-[11px] tracking-tight truncate uppercase">{notif.title}</p>
+                                  <span className="text-[9px] font-bold text-slate-300 whitespace-nowrap">{formatTimeAgo(notif.createdAt)}</span>
+                               </div>
+                               <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{notif.message}</p>
+                            </div>
                         </div>
                      </div>
                    ))}
@@ -156,7 +168,7 @@ export default function NotificationBell() {
            </div>
 
            <Link 
-             href="/dashboard/member?view=notifications"
+             href={user?.role === 'group-admin' ? "/dashboard/group-admin?view=notifications" : "/dashboard/member?view=notifications"}
              onClick={() => setIsOpen(false)}
              className="block py-4 text-center text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 border-t border-slate-50 hover:bg-indigo-50 transition-all"
            >

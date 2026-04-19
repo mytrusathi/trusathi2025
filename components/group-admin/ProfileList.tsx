@@ -4,7 +4,7 @@ import { db } from '../../app/lib/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc, updateDoc, limit } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
 import { Profile } from '../../types/profile';
-import { Loader2, Plus, Search, FilterX, SlidersHorizontal, Users, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Plus, Search, FilterX, SlidersHorizontal, Users, Eye, EyeOff, ShieldAlert } from 'lucide-react';
 import ProfileCard from './ProfileCard'; // Ensure no { } around this import
 import ProfileForm from './ProfileForm';
 
@@ -145,12 +145,34 @@ const ProfileList = () => {
            />
           </div>
         
-          <button 
-            onClick={() => { setEditingProfile(null); setShowForm(true); }}
-            className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors"
-          >
-            <Plus size={20} /> Add Profile
-          </button>
+          <div className="relative group w-full sm:w-auto">
+            <button 
+              onClick={() => { 
+                if (user?.isApproved === false) return;
+                setEditingProfile(null); 
+                setShowForm(true); 
+              }}
+              disabled={user?.isApproved === false}
+              className={`w-full sm:w-auto px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${
+                user?.isApproved === false 
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' 
+                : 'bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-500/20'
+              }`}
+            >
+              {user?.isApproved === false ? <ShieldAlert size={18} /> : <Plus size={20} />}
+              Add Profile
+            </button>
+            
+            {user?.isApproved === false && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 bg-slate-900 text-white text-[10px] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl z-20">
+                <div className="font-black uppercase tracking-widest mb-1 text-rose-400 flex items-center gap-1">
+                  <ShieldAlert size={10} /> Verification Required
+                </div>
+                Your account is currently under review. Profile creation will be enabled once a Super Admin approves your registration.
+                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900" />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">

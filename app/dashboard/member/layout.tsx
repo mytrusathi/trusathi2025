@@ -2,14 +2,14 @@
 import React, { Suspense } from 'react';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { LogOut } from 'lucide-react';
+import { LogOut, Settings, KeyRound, LayoutDashboard, UserCircle } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/app/lib/firebase';
-import NotificationBell from '@/components/dashboard/NotificationBell';
-import { UserCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import NotificationBell from '@/components/dashboard/NotificationBell';
 import Logo from '@/components/Logo';
+import PageLoader from '@/components/PageLoader';
 
 interface Props {
   children: React.ReactNode;
@@ -45,6 +45,36 @@ const MemberLayoutContent = ({ children }: Props) => {
 
             <div className="flex items-center gap-4">
                 <NotificationBell />
+                <div className="relative group/profile">
+                    <div className="w-9 h-9 rounded-full border border-slate-200 p-0.5 group-hover/profile:border-rose-400 transition-all overflow-hidden bg-white shadow-sm flex items-center justify-center cursor-pointer">
+                       <div className="w-full h-full rounded-full flex items-center justify-center bg-rose-50 text-rose-500 text-xs font-black uppercase">
+                          {user?.displayName?.charAt(0) || 'U'}
+                       </div>
+                    </div>
+
+                    {/* Dropdown Menu */}
+                    <div className="absolute right-0 top-full pt-4 w-64 opacity-0 translate-y-3 pointer-events-none group-hover/profile:opacity-100 group-hover/profile:translate-y-0 group-hover/profile:pointer-events-auto transition-all duration-500 z-[100]">
+                      <div className="bg-white rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden py-3">
+                        <div className="px-6 py-4 border-b border-slate-50 mb-2">
+                          <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-1">Identity Profile</p>
+                          <p className="text-sm font-black text-slate-900 truncate">{user?.displayName || user?.email}</p>
+                        </div>
+
+                        <DropdownLink href="/dashboard/member" icon={<LayoutDashboard size={16} />}>
+                          Dashboard Home
+                        </DropdownLink>
+
+                        <DropdownLink href="/dashboard/settings" icon={<Settings size={16} />}>
+                          Account Settings
+                        </DropdownLink>
+
+                        <DropdownLink href="/dashboard/member?view=change-password" icon={<KeyRound size={16} />}>
+                           Change Password
+                        </DropdownLink>
+                      </div>
+                    </div>
+                </div>
+
                 <div className="w-px h-6 bg-slate-100"></div>
                 <button 
                   onClick={handleLogout} 
@@ -68,7 +98,7 @@ const MemberLayoutContent = ({ children }: Props) => {
 const MemberLayout = ({ children }: Props) => {
   return (
     <ProtectedRoute allowedRoles={['member', 'group-admin', 'super-admin']}>
-      <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <Suspense fallback={<PageLoader message="Initializing Dashboard..." />}>
         <MemberLayoutContent>{children}</MemberLayoutContent>
       </Suspense>
     </ProtectedRoute>
@@ -76,3 +106,12 @@ const MemberLayout = ({ children }: Props) => {
 };
 
 export default MemberLayout;
+
+function DropdownLink({ href, icon, children }: { href: string, icon: React.ReactNode, children: React.ReactNode }) {
+  return (
+    <Link href={href} className="flex items-center gap-3 px-6 py-3.5 hover:bg-rose-50 text-sm font-bold text-slate-700 transition-all text-left hover:pl-8 group">
+      <span className="text-slate-400 group-hover:text-rose-500 transition-colors">{icon}</span>
+      {children}
+    </Link>
+  );
+}

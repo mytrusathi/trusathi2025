@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: ['/', '/about', '/search', '/community'],
-      disallow: ['/dashboard', '/pending-approval', '/register/pending'],
+      disallow: ['/dashboard', '/register/pending'],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

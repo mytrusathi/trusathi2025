@@ -169,7 +169,7 @@ function MemberDashboardContent() {
       case 'notifications':
         return <NotificationsView />;
       default:
-        return <OverviewView />;
+        return <OverviewView userProfile={profiles[0] || null} />;
     }
   };
 
