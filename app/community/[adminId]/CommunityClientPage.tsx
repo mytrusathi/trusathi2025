@@ -54,7 +54,7 @@ export default function CommunityClientPage({ initialAdmin, initialProfiles }: P
               placeholder={`Search within ${initialAdmin?.groupName || 'this community'}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-14 pr-6 py-5 rounded-2xl border border-slate-200 shadow-xl shadow-slate-100 focus:ring-2 focus:ring-rose-500/20 outline-none transition-all text-lg"
+              className="w-full pl-14 pr-6 py-5 rounded-2xl border border-slate-200 shadow-xl shadow-slate-100 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-lg"
             />
           </div>
 

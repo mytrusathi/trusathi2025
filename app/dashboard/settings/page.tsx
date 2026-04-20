@@ -119,14 +119,14 @@ export default function SettingsPage() {
                 />
               </div>
 
-              {user?.role !== 'member' && (
+               {user?.role !== 'member' && (
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">Community/Group Name</label>
+                  <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">Community Name</label>
                   <input 
                     type="text" 
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 outline-none transition-all"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                     placeholder="e.g. Agarwal Samaj"
                   />
                 </div>
@@ -134,14 +134,16 @@ export default function SettingsPage() {
            </div>
 
            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
+              <label className="text-sm font-bold text-slate-500 uppercase tracking-wider ml-1">
+                {user?.email ? "Email Address" : "Mobile Number"}
+              </label>
               <input 
-                type="email" 
-                value={user?.email || ''} 
+                type="text" 
+                value={user?.email || user?.phoneNumber || ''} 
                 className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed" 
                 disabled 
               />
-              <p className="text-xs text-slate-400 ml-1 italic">Email cannot be changed directly for security reasons.</p>
+              <p className="text-xs text-slate-400 ml-1 italic">Identity identifiers cannot be changed for security reasons.</p>
            </div>
         </div>
 

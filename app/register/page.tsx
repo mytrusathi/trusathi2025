@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { User, Users, Check, Loader2, TriangleAlert, Building2, Handshake, ArrowRight, ArrowLeft, Sparkles, Mail, Lock, UserCircle, ShieldCheck } from 'lucide-react';
 
 const RegisterPage = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [groupName, setGroupName] = useState('');
@@ -26,10 +26,23 @@ const RegisterPage = () => {
 
     try {
       if (role === 'group-admin' && !groupName.trim()) {
-        throw new Error("Please provide your Community/Group Name.");
+        throw new Error("Please provide your Community Name.");
       }
 
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Normalize identifier
+      let finalIdentifier = identifier.trim();
+      let phoneNumber = null;
+      let emailAccount = null;
+
+      const isPhone = /^\d{10,15}$/.test(finalIdentifier.replace(/[+\-\s()]/g, ''));
+      if (isPhone) {
+        phoneNumber = finalIdentifier.replace(/[+\-\s()]/g, '');
+        emailAccount = `mobile_${phoneNumber}@trusathi.com`;
+      } else {
+        emailAccount = finalIdentifier;
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(auth, emailAccount, password);
       const user = userCredential.user;
 
       await updateProfile(user, { displayName: name });
@@ -42,7 +55,8 @@ const RegisterPage = () => {
 
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
-        email: user.email,
+        email: !isPhone ? emailAccount : null,
+        phoneNumber: phoneNumber,
         displayName: name,
         groupName: role === 'group-admin' ? groupName : null,
         role: role,
@@ -58,7 +72,11 @@ const RegisterPage = () => {
       }
 
     } catch (err: any) {
-      setError(err.message || 'Registration failed.');
+      let errorMessage = err.message || 'Registration failed.';
+      if (err.code === 'auth/email-already-in-use') {
+        errorMessage = "This Email or Mobile Number is already registered.";
+      }
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -130,7 +148,7 @@ const RegisterPage = () => {
                   <InputField
                     icon={<Building2 size={20} />}
                     label="Community Name"
-                    placeholder="e.g. Nabha Community Circle"
+                    placeholder="e.g. Hindu Khatri Community Circle"
                     value={groupName}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGroupName(e.target.value)}
                   />
@@ -147,11 +165,11 @@ const RegisterPage = () => {
                 />
                 <InputField
                   icon={<Mail size={20} />}
-                  label="Email Address"
-                  placeholder="name@email.com"
-                  value={email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                  type="email"
+                  label="Email or Mobile Number"
+                  placeholder="name@email.com or 9876543210"
+                  value={identifier}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdentifier(e.target.value)}
+                  type="text"
                 />
               </div>
 
@@ -244,8 +262,8 @@ function RoleButton({ active, onClick, icon, label, desc }: RoleButtonProps) {
     <button
       type="button" onClick={onClick}
       className={`relative p-8 rounded-[3rem] border-2 flex flex-col items-center text-center gap-3 transition-all duration-500 ${active
-          ? 'border-primary bg-primary/5 text-foreground shadow-xl shadow-primary/5'
-          : 'border-border bg-secondary text-muted-foreground hover:border-primary/30 hover:bg-secondary/80'
+        ? 'border-primary bg-primary/5 text-foreground shadow-xl shadow-primary/5'
+        : 'border-border bg-secondary text-muted-foreground hover:border-primary/30 hover:bg-secondary/80'
         }`}
     >
       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-1 transition-all duration-500 ${active ? 'bg-primary text-white scale-110 rotate-3' : 'bg-muted text-muted-foreground'}`}>

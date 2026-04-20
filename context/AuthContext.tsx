@@ -1,4 +1,6 @@
 'use client'
+// Last Updated: 2026-04-20 20:10:00 - Forcing Context Refresh
+
 
 import {
   createContext,
@@ -28,7 +30,7 @@ interface AuthContextType {
   user: AppUser | null
   role: UserRole
   loading: boolean
-  loginWithEmail: (email: string, password: string) => Promise<void>
+  loginWithIdentifier: (identifier: string, password: string) => Promise<void>
   resetPassword: (email: string) => Promise<void>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
@@ -101,8 +103,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      Auth Functions
   ------------------------------*/
 
-  const loginWithEmail = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password)
+  const loginWithIdentifier = async (identifier: string, password: string) => {
+    // Handling is done in the UI component to normalize identifier to virtual email if needed
+    await signInWithEmailAndPassword(auth, identifier, password)
   }
 
   const resetPassword = async (email: string) => {
@@ -142,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         role,
         loading,
-        loginWithEmail,
+        loginWithIdentifier,
         resetPassword,
         logout,
         refreshUser,

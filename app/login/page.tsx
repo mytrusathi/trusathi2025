@@ -3,16 +3,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '@/context/AuthContext'
 import { ArrowLeft, Mail, Lock, Loader2, ArrowRight, Sparkles, ShieldCheck, Handshake } from 'lucide-react'
 import PageLoader from '@/components/PageLoader'
 import ForgotPasswordModal from '@/components/ForgotPasswordModal'
 
 export default function LoginPage() {
-  const { loginWithEmail, user, role, loading } = useAuth()
+  const { loginWithIdentifier, user, role, loading } = useAuth()
   const router = useRouter()
 
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -35,10 +35,29 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setIsSubmitting(true)
+
+    // Normalize identifier
+    let finalIdentifier = identifier.trim()
+    
+    // Check if it's a phone number (e.g., all digits, common length)
+    const isPhone = /^\d{10,15}$/.test(finalIdentifier.replace(/[+\-\s()]/g, ''))
+    if (isPhone) {
+      const cleanPhone = finalIdentifier.replace(/[+\-\s()]/g, '')
+      finalIdentifier = `mobile_${cleanPhone}@trusathi.com`
+    }
+
+    console.log("Attempting login with identifier:", finalIdentifier)
+
     try {
-      await loginWithEmail(email, password)
-    } catch {
-      setError('Invalid email or password. Please try again.')
+      await loginWithIdentifier(finalIdentifier, password)
+    } catch (err: any) {
+      console.error("Login Error Details:", err)
+      // Map common Firebase errors to user-friendly messages
+      let msg = 'Invalid identifier or password. Please try again.'
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        msg = 'Invalid credentials. Please check your Email/Mobile and Password.'
+      }
+      setError(msg)
       setIsSubmitting(false)
     }
   }
@@ -100,11 +119,11 @@ export default function LoginPage() {
                   <Mail size={20} />
                 </div>
                 <input
-                  type="email"
+                  type="text"
                   className="w-full pl-16 pr-6 py-5 bg-secondary border border-border rounded-[2rem] focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all text-foreground placeholder:text-muted-foreground font-medium"
-                  placeholder="Email Address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email or Mobile Number"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   required
                 />
               </div>

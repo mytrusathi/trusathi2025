@@ -116,7 +116,7 @@ function SearchResults() {
               {profiles.length}+
             </div>
           </div>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-3">Profiles Found</p>
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] pl-3">Authenticated Profiles</p>
         </div>
       </div>
 
@@ -201,19 +201,25 @@ function SearchPageContent() {
   const education = searchParams.get('education') || '';
 
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-accent/20">
+    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/10">
       <Navbar />
 
-      <div className="bg-primary pt-24 pb-40 px-4 relative overflow-hidden border-b border-border/10">
-        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-accent/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-[150px]" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-background/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-[100px]" />
+      <div className="relative bg-background pt-40 pb-52 px-4 overflow-hidden border-b border-border/10">
+        {/* Subtler Animated Background Layers */}
+        <div className="absolute inset-0 animate-mesh opacity-20 pointer-events-none" />
+        <div className="absolute top-0 inset-x-0 h-[800px] bg-[radial-gradient(circle_at_top,var(--primary)/0.03,transparent_70%)] pointer-events-none animate-pulse duration-[8000ms]" />
+        
+        {/* Floating Luxury Accents */}
+        <div className="absolute -top-[10%] -right-[5%] w-[800px] h-[800px] bg-accent/5 rounded-full blur-[160px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-primary/3 rounded-full translate-y-1/2 -translate-x-1/2 blur-[120px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-foreground/5 border border-primary-foreground/10 rounded-full text-accent text-[10px] font-black uppercase tracking-[0.25em] mb-10 backdrop-blur-md">
-            <SlidersHorizontal size={14} /> Custom Match Engine
+          <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-card/80 border border-border/50 rounded-full text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-12 shadow-sm backdrop-blur-md">
+            <Sparkles size={14} className="text-accent animate-pulse" /> Custom Match Engine
           </div>
-          <h2 className="text-primary-foreground text-5xl md:text-8xl font-black tracking-tighter mb-16 leading-none italic">
-            Refine your <br className="hidden md:block" /> search filters.
+
+          <h2 className="text-foreground text-5xl md:text-8xl font-black tracking-tighter mb-20 leading-[0.9] italic">
+            Refine your <br className="hidden md:block" /> <span className="text-luxury">search filters.</span>
           </h2>
 
           <div className="max-w-5xl mx-auto">
