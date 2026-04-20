@@ -14,7 +14,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 import Link from 'next/link';
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [groupName, setGroupName] = useState(user?.groupName || '');
@@ -27,6 +27,7 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteStep, setDeleteStep] = useState(1);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleUpdate = async (e: React.FormEvent) => {
     // ... same logic as before ...
@@ -52,23 +53,30 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
+    if (!confirmPassword) {
+      alert("Please enter your password to confirm.");
+      return;
+    }
     setDeleteLoading(true);
     try {
-      await deleteUserAccount();
+      await deleteUserAccount(confirmPassword);
       // On success, redirect to login or home
       router.push('/login?deleted=true');
     } catch (err: unknown) {
       console.error("Deletion error:", err);
       if (err instanceof Error && err.message === "REAUTH_REQUIRED") {
-        alert("For security reasons, please sign out and sign back in again before deleting your account.");
-        await signOut(auth);
+        alert("For your security, account deletion requires a very recent login. \n\nPlease sign out and sign back in with your mobile/email and password, then try again.");
+        await logout(); // Using AuthContext logout
         window.location.href = '/login';
+      } else if (err instanceof Error && err.message === "INVALID_PASSWORD") {
+        alert("Incorrect password. Please try again.");
       } else {
-        alert("Failed to delete account. Please contact support.");
+        alert("We encountered an issue deleting some parts of your account. Please refresh and try again or contact support if the issue persists.");
       }
     } finally {
       setDeleteLoading(false);
       setShowDeleteConfirm(false);
+      setConfirmPassword('');
     }
   };
 
@@ -259,14 +267,31 @@ export default function SettingsPage() {
                 <div className="text-center space-y-3">
                    <h3 className="text-3xl font-black text-slate-900">Final Confirmation</h3>
                    <p className="text-slate-500 font-medium leading-relaxed">
-                     To confirm, please click the button below. You will be immediately signed out and all your data will be wiped from our systems.
+                     To confirm, please enter your account password below. All your data will be permanently wiped.
                    </p>
                 </div>
+                
+                <div className="space-y-4">
+                  <input 
+                    type="password"
+                    placeholder="Enter your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-rose-500/20 font-bold"
+                    disabled={deleteLoading}
+                  />
+                  <div className="text-right">
+                    <Link href="/login?reset=true" className="text-xs font-black text-rose-600 hover:underline uppercase tracking-widest">
+                      Forgot Password?
+                    </Link>
+                  </div>
+                </div>
+
                 <div className="flex flex-col gap-3">
                    <button 
                      onClick={handleDeleteAccount}
-                     disabled={deleteLoading}
-                     className="w-full bg-rose-600 text-white font-black py-5 rounded-2xl hover:bg-rose-700 transition-all shadow-xl shadow-rose-200 flex items-center justify-center gap-3"
+                     disabled={deleteLoading || !confirmPassword}
+                     className="w-full bg-rose-600 text-white font-black py-5 rounded-2xl hover:bg-rose-700 transition-all shadow-xl shadow-rose-200 flex items-center justify-center gap-3 disabled:opacity-50"
                    >
                      {deleteLoading ? <Loader2 className="animate-spin" /> : "Permanently Delete Everything"}
                    </button>
