@@ -8,7 +8,7 @@ type ParsedProfileResult = {
 const RELIGIONS = ['Hindu', 'Muslim', 'Sikh', 'Christian', 'Jain', 'Buddhist', 'Parsi', 'Jewish'];
 const BULLET_PREFIX = /^[\s\-*]+/;
 
-const FIELD_ALIASES: Record<keyof Partial<Profile>, string[]> = {
+const FIELD_ALIASES: Partial<Record<keyof Profile, string[]>> = {
   id: [],
   name: ['name', 'full name', 'candidate name', 'boy name', 'girl name', 'bride name', 'groom name'],
   gender: ['gender', 'sex'],

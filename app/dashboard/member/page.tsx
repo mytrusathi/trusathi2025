@@ -92,6 +92,8 @@ function MemberDashboardContent() {
     setShowForm(true);
   };
 
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this profile?")) return;
     try {
       await deleteDoc(doc(db, 'profiles', id));
       // 🔥 Privacy Cleanup: Remove private contact document
