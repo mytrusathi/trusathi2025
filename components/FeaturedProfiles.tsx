@@ -5,7 +5,8 @@ import { db } from '../app/lib/firebase'
 import { collection, query, limit, getDocs, orderBy, where } from 'firebase/firestore'
 import { Profile } from '../types/profile'
 import PublicProfileCard from './PublicProfileCard'
-import { ChevronRight, Loader2, Sparkles, ArrowRight } from 'lucide-react'
+import { ChevronRight, Sparkles, ArrowRight } from 'lucide-react'
+import { ProfileGridSkeleton } from './ui/ProfileSkeleton'
 import Link from 'next/link'
 
 export default function FeaturedProfiles() {
@@ -78,9 +79,8 @@ export default function FeaturedProfiles() {
 
         {/* Loading State: Simplified wording */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 space-y-4">
-            <Loader2 className="animate-spin text-primary" size={40} />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Loading Profiles...</p>
+          <div className="py-10">
+            <ProfileGridSkeleton count={3} />
           </div>
         ) : profiles.length === 0 ? (
           <div className="text-center py-20 bg-secondary/50 rounded-[2.5rem] border-2 border-dashed border-border/40">

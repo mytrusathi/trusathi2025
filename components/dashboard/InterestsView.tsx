@@ -6,6 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Loader2, Send, Inbox, Check, X, Clock, ExternalLink, AlertCircle, Ban } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Avatar from '../ui/Avatar';
+import { maskName } from '@/app/lib/privacy-utils';
 
 interface Interest {
   id: string;
@@ -172,7 +174,13 @@ export default function InterestsView({ type }: Props) {
         {interests.map((interest) => {
           const isWeSender = interest.senderId === user?.uid;
           const displayImage = (!isWeSender) ? (interest.senderProfileImage || '') : interest.profileImage;
-          const displayName = (!isWeSender) ? (interest.senderProfileName || interest.senderName) : interest.profileName;
+          const rawName = (!isWeSender) ? (interest.senderProfileName || interest.senderName) : interest.profileName;
+          
+          // Reveal full name only if accepted or user is the one who added/sent it? 
+          // Usually in interests, if you sent it, you saw the profile already.
+          const isRevealed = interest.status === 'accepted' || isWeSender;
+          const displayName = isRevealed ? rawName : maskName(rawName);
+          
           const displayLink = (!isWeSender)
             ? (interest.senderProfileId ? `/profile/${interest.senderProfileId}` : null)
             : `/profile/${interest.profileId}`;
@@ -188,15 +196,13 @@ export default function InterestsView({ type }: Props) {
               }`}
             >
               <div className="p-6 flex flex-col sm:flex-row sm:items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl bg-slate-100 relative overflow-hidden shrink-0 border border-slate-100 shadow-sm transition-transform duration-500 group-hover:scale-105">
-                  {displayImage ? (
-                    <Image src={displayImage} alt={displayName} fill className="object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-300 text-xl font-black bg-slate-50">
-                      {displayName.charAt(0)}
-                    </div>
-                  )}
-                </div>
+                <Avatar 
+                  src={displayImage} 
+                  name={rawName} 
+                  isRevealed={isRevealed} 
+                  size="md" 
+                  className="w-20 h-20 rounded-2xl" 
+                />
 
                 <div className="flex-1 min-w-0 space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">

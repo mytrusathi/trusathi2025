@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Phone, MessageSquare, Clock } from 'lucide-react';
+import { Printer, Heart, ExternalLink, ShieldCheck, Loader2, Phone, MessageSquare, Clock, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { db } from '@/app/lib/firebase';
@@ -24,6 +24,8 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [interestSent, setInterestSent] = useState(false);
+  const [revealedContact, setRevealedContact] = useState<string | null>(null);
+  const [fetchingContact, setFetchingContact] = useState(false);
 
   useEffect(() => {
     const checkInterest = async () => {
@@ -45,6 +47,25 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
     checkInterest();
   }, [user, profile.id]);
 
+  useEffect(() => {
+    const fetchPrivateContact = async () => {
+      if (interestSent && profile.revealContactOnInterest && profile.id) {
+        setFetchingContact(true);
+        try {
+          const privateDoc = await getDoc(doc(db, 'profile_private', profile.id));
+          if (privateDoc.exists()) {
+            setRevealedContact(privateDoc.data().contact);
+          }
+        } catch (err) {
+          console.error("Failed to fetch private contact:", err);
+        } finally {
+          setFetchingContact(false);
+        }
+      }
+    };
+    fetchPrivateContact();
+  }, [interestSent, profile.revealContactOnInterest, profile.id]);
+
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
       window.print();
@@ -63,16 +84,13 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
     try {
       if (!profile.id) throw new Error("Invalid profile ID");
 
-      // Use a fallback for createdBy if missing (legacy profiles)
       const receiverId = profile.createdBy || 'system_admin';
 
-      // Prevent self-connect
       if (user.uid === profile.createdBy) {
         alert("You cannot send an interest to your own profile.");
         return;
       }
 
-      // Fetch Sender's Profile (to show the receiver who sent it)
       const senderProfileQuery = query(collection(db, 'profiles'), where('createdBy', '==', user.uid), limit(1));
       const senderProfileSnap = await getDocs(senderProfileQuery);
       const senderProfile = !senderProfileSnap.empty ? senderProfileSnap.docs[0].data() : null;
@@ -92,7 +110,6 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
         createdAt: new Date().toISOString()
       });
 
-      // Send Notification
       await sendNotification({
         recipientId: receiverId,
         senderId: user.uid,
@@ -117,12 +134,14 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
     }
   };
 
-  // Logic: Reveal contact only if interestSent AND (AutoReveal ON or it's a self-managed profile)
   const canSeeContact = interestSent && profile.revealContactOnInterest;
+
+  // Professional fallback for manager name
+  const effectiveManagerName = (!managerName || managerName.toLowerCase() === 'self') ? 'the curator' : managerName;
 
   return (
     <div className="space-y-8">
-      {/* Branding for PDF/Print - Visible only on Print via globals.css .print-only class */}
+      {/* Branding for PDF/Print */}
       <div className="print-only mb-12 border-b-2 border-slate-900 pb-8">
         <div className="flex justify-between items-center">
             <div>
@@ -136,40 +155,42 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
         </div>
       </div>
 
-      {/* Print Button Wrapper */}
-      <div className="flex justify-end no-print">
+      {/* Capture Portfolio Button - Integrated better */}
+      <div className="no-print">
          <button 
            onClick={handlePrint}
-           className="px-8 py-4 bg-white border border-slate-200 hover:border-indigo-200 hover:bg-indigo-50/30 text-slate-600 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl transition-all flex items-center justify-center gap-3 group shadow-sm"
+           className="w-full px-6 py-3.5 bg-background border border-border hover:border-primary/20 hover:bg-primary/5 text-muted-foreground hover:text-primary font-black text-[10px] uppercase tracking-[0.25em] rounded-2xl transition-all flex items-center justify-center gap-3 group shadow-sm border-dashed"
          >
-            <Printer size={18} className="text-slate-400 group-hover:text-indigo-600 transition-colors" /> 
+            <Printer size={16} className="opacity-50 group-hover:opacity-100 transition-opacity" /> 
             <span>Capture Portfolio / PDF</span>
          </button>
       </div>
 
-      {/* Main Connect Action Card */}
-      <div className={`rounded-[3.5rem] p-10 no-print shadow-2xl transition-all duration-700 relative overflow-hidden group ${
-        interestSent ? (canSeeContact ? 'bg-slate-900' : 'bg-slate-800') : 'bg-indigo-600'
+      {/* Main Connection Card */}
+      <div className={`rounded-[2.5rem] p-7 md:p-10 no-print shadow-2xl transition-all duration-700 relative overflow-hidden group border border-white/5 ${
+        interestSent ? (canSeeContact ? 'bg-slate-900' : 'bg-[#A4161A]/90') : 'bg-[#A4161A]'
       }`}>
-          <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors"></div>
+          {/* Subtle Imperial Pattern Overlay */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+          <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors"></div>
           
-          <div className="relative z-10 space-y-8">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                 <ShieldCheck size={20} className="text-white/40" />
-                 <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/50">Secure Matchmaking</span>
+          <div className="relative z-10 space-y-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-4">
+                 <ShieldCheck size={14} className="text-white/40" />
+                 <span className="text-[9px] uppercase font-black tracking-[0.3em] text-white/50">Safe Introduction</span>
               </div>
-              <h4 className="text-white font-black text-3xl md:text-4xl tracking-tight leading-none">
-                {interestSent ? (canSeeContact ? "Connection Established" : "Requested Access") : "Forge a Connection?"}
+              <h4 className="text-white font-black text-2xl md:text-3xl tracking-tight leading-tight font-serif italic">
+                {interestSent ? (canSeeContact ? "Match Verified" : "Request Sent") : "Connect with this Candidate?"}
               </h4>
-              <p className="text-white/60 text-lg font-medium leading-relaxed max-w-md">
+              <p className="text-white/70 text-sm font-medium leading-relaxed">
                  {interestSent 
                    ? (canSeeContact 
-                      ? "Direct communication is now authorized. You can view private details below." 
-                      : `Access request has been safely dispatched to ${managerName || 'the truSathi Team'} for verification.`) 
+                      ? "Family and contact details are now revealed." 
+                      : `Your interest is with ${effectiveManagerName}.`) 
                    : (profile.revealContactOnInterest 
-                      ? `Accessing this profile will reveal authenticated contact details immediately.` 
-                      : `A formal interest notifies ${managerName || 'the truSathi Team'} to facilitate a secure introduction.`)}
+                      ? `Get instant access to contact details.` 
+                      : `Request a secure introduction via ${effectiveManagerName}.`)}
               </p>
             </div>
 
@@ -177,12 +198,15 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
               <button 
                 onClick={handleConnect}
                 disabled={loading}
-                className="w-full font-black py-6 px-8 bg-white text-indigo-900 rounded-[2.5rem] transition-all shadow-[0_20px_40px_-10px_rgba(255,255,255,0.2)] active:scale-95 flex items-center justify-center gap-4 hover:bg-slate-50 uppercase tracking-[0.2em] text-xs"
+                className="w-full font-black py-4 md:py-6 px-6 bg-accent text-accent-foreground rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 flex flex-col items-center justify-center gap-1 group/btn uppercase tracking-[0.25em] text-[10px]"
               >
-                  {loading ? <Loader2 className="animate-spin text-indigo-600" /> : (
+                  {loading ? <Loader2 className="animate-spin text-white" /> : (
                     <>
-                      {user ? "Dispatch Interest Now" : "Authorize to Connect"} 
-                      <ExternalLink size={20} className="text-indigo-400" />
+                      <span className="text-white/80 font-medium normal-case tracking-normal text-xs mb-1">Secure & Fast Connection</span>
+                      <div className="flex items-center gap-2">
+                        {user ? "Send Interest" : "Sign in to Connect"} 
+                        <ExternalLink size={16} className="text-white/50 group-hover/btn:translate-x-1 transition-transform" />
+                      </div>
                     </>
                   )}
               </button>
@@ -196,20 +220,24 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
                               <Phone size={24} className="text-indigo-400" />
                             </div>
                             <div>
-                              <p className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40 mb-1">Direct Contact Agent</p>
-                              <p className="font-black text-3xl text-white tracking-widest">{profile.contact || 'SECURE_HIDDEN'}</p>
+                               <p className="text-[10px] uppercase font-black tracking-[0.3em] text-white/40 mb-1">Direct Contact Detail</p>
+                               {fetchingContact ? (
+                                 <Loader2 size={24} className="animate-spin text-white/20" />
+                               ) : (
+                                 <p className="font-black text-3xl text-white tracking-widest">{revealedContact || 'SECURE_HIDDEN'}</p>
+                               )}
                             </div>
                         </div>
                         
                         <div className="flex items-center gap-3">
-                           <a 
-                              href={`https://wa.me/${profile.contact?.replace(/\D/g, '')}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="px-6 py-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-2xl flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest transition-all"
-                           >
-                              <MessageSquare size={16} /> WhatsApp
-                           </a>
+                            <a 
+                               href={`https://wa.me/${revealedContact?.replace(/\D/g, '') || ''}`} 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               className={`px-6 py-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-2xl flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest transition-all ${!revealedContact ? 'opacity-50 pointer-events-none' : ''}`}
+                            >
+                               <MessageSquare size={16} /> WhatsApp
+                            </a>
                         </div>
                     </div>
 
@@ -223,7 +251,7 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
                              onClick={() => router.push('/dashboard/member?view=chats')}
                              className="w-full md:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20"
                            >
-                             <MessageSquare size={16} /> Secure Chat Platform
+                             <MessageSquare size={16} /> Secure Chat
                            </button>
                         </div>
                     </div>
@@ -234,9 +262,9 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
                         <Clock size={28} className="text-amber-400 animate-pulse" />
                      </div>
                      <div className="space-y-2">
-                        <h5 className="font-black text-xl uppercase tracking-tight">Verification in Progress</h5>
+                        <h5 className="font-black text-xl uppercase tracking-tight">Review in Progress</h5>
                         <p className="text-sm font-medium leading-relaxed text-white/60 max-w-xs">
-                           Waiting for {managerName || 'the truSathi Team'} to approve your profile access. High-priority connections usually take 1-4 hours.
+                           Waiting for {effectiveManagerName} to approve your connect request. This usually takes 1-4 hours.
                         </p>
                      </div>
                   </div>
@@ -247,7 +275,7 @@ export default function ProfileActions({ profile, managerName }: ProfileActionsP
             <div className="flex items-center justify-center gap-6 pt-4 border-t border-white/5">
                 <div className="flex items-center gap-2">
                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                   <span className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">Secure Authenticated</span>
+                   <span className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">Verified Authenticated</span>
                 </div>
                 <div className="flex items-center gap-2">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
@@ -287,7 +315,6 @@ export function FavoriteButton({ profile }: { profile: Profile }) {
       }
       if (!profileId) return;
 
-      // Prevent self-favorite
       if (user.uid === profile.createdBy) {
         alert("You cannot shortlist your own profile.");
         return;
@@ -311,7 +338,6 @@ export function FavoriteButton({ profile }: { profile: Profile }) {
           await setDoc(favRef, favoriteData);
           setIsFav(true);
 
-          // Notify owner (Background - don't block UI if it fails)
           try {
              if (profile.createdBy && profile.createdBy !== user.uid) {
                 await sendNotification({

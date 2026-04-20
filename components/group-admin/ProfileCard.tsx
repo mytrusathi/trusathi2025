@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Avatar from '../ui/Avatar';
 import { Profile } from '../../types/profile';
 import { Edit, Trash2, MapPin, Briefcase, Eye, EyeOff } from 'lucide-react';
 
@@ -32,15 +33,13 @@ const ProfileCard = ({ profile, onEdit, onDelete, onToggleVisibility }: Props) =
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full">
       {/* Top Section: Image & Basic Info */}
       <div className="p-4 flex gap-4 items-start">
-        <div className="relative w-16 h-16 rounded-full bg-slate-100 shrink-0 overflow-hidden border border-slate-100">
-          {profile.imageUrl ? (
-            <Image src={profile.imageUrl} alt={profile.name} fill sizes="64px" className="object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs">
-              No Pic
-            </div>
-          )}
-        </div>
+        <Avatar 
+          src={profile.imageUrl} 
+          name={profile.name} 
+          isRevealed={true} 
+          size="md" 
+          className="w-16 h-16 rounded-full" 
+        />
         
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start">

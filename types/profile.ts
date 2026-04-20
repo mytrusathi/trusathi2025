@@ -1,8 +1,12 @@
+export type PrivacyLevel = 'public' | 'connection' | 'private';
+
 export interface Profile {
   id?: string;
   // Basic Details
   name: string;
   gender: 'male' | 'female';
+  privacySettings?: Record<string, PrivacyLevel>;
+
   dob: string; // Date of Birth (Important for age calc)
   tob?: string; // Time of Birth
   pob?: string; // Place of Birth
@@ -59,4 +63,8 @@ export interface Profile {
   emailVerified?: boolean; // Email address verified
   adminApproved?: boolean; // Manually screened by Team
   screeningStatus?: 'pending' | 'approved' | 'rejected'; // Track review state
+
+  // Curator / Creator Metadata (Optimized for security & performance)
+  creatorName?: string;
+  creatorGroupName?: string;
 }

@@ -9,14 +9,18 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PublicProfileCard from '@/components/PublicProfileCard';
 import SearchBar from '@/components/SearchBar';
-import { Loader2, FilterX, SlidersHorizontal, Search, MapPin, Sparkles, Handshake } from 'lucide-react';
+import { FilterX, SlidersHorizontal, Search, MapPin, Sparkles } from 'lucide-react';
+import { ProfileGridSkeleton } from './ui/ProfileSkeleton';
+import PageLoader from './PageLoader';
 
 function SearchResults() {
   const searchParams = useSearchParams();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState('');
+  const [debouncedKeyword, setDebouncedKeyword] = useState('');
   const [cityFilter, setCityFilter] = useState('all');
+  const [visibleCount, setVisibleCount] = useState(12);
 
   const role = searchParams.get('role') || 'Bride';
   const minAge = searchParams.get('minAge') ? parseInt(searchParams.get('minAge')!, 10) : 18;
@@ -77,10 +81,17 @@ function SearchResults() {
     fetchProfiles();
   }, [role, minAge, maxAge, community, occupation, education]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [keyword]);
+
   const cities = Array.from(new Set(profiles.map((p) => p.city).filter(Boolean))).sort((a, b) => (a as string).localeCompare(b as string));
 
   const filteredProfiles = profiles.filter((p) => {
-    const q = keyword.toLowerCase();
+    const q = debouncedKeyword.toLowerCase();
     const matchesKeyword =
       (p.name?.toLowerCase() || '').includes(q) ||
       (p.city?.toLowerCase() || '').includes(q) ||
@@ -153,18 +164,12 @@ function SearchResults() {
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-32 space-y-8">
-          <div className="relative">
-            <div className="w-24 h-24 border-4 border-muted border-t-accent rounded-full animate-spin"></div>
-            <div className="absolute inset-0 flex items-center justify-center text-accent">
-              <Handshake size={28} className="animate-bounce" />
-            </div>
-          </div>
-          <p className="text-muted-foreground font-black uppercase tracking-[0.3em] text-[11px]">Updating screened results...</p>
+        <div className="py-20">
+           <ProfileGridSkeleton count={6} />
         </div>
       ) : filteredProfiles.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 animate-in fade-in slide-in-from-bottom-12 duration-1000">
-          {filteredProfiles.map((profile) => (
+          {filteredProfiles.slice(0, visibleCount).map((profile) => (
             <PublicProfileCard profile={profile} key={profile.id} />
           ))}
         </div>
@@ -185,6 +190,17 @@ function SearchResults() {
           >
             Reset All Filters
           </button>
+        </div>
+      )}
+
+      {!loading && filteredProfiles.length > visibleCount && (
+        <div className="mt-20 text-center">
+           <button 
+             onClick={() => setVisibleCount(prev => prev + 12)}
+             className="px-12 py-5 bg-white border border-border rounded-full font-black text-[10px] uppercase tracking-[0.3em] hover:bg-muted transition-all shadow-xl active:scale-95"
+           >
+             Load More Screened Profiles
+           </button>
         </div>
       )}
     </div>

@@ -5,6 +5,9 @@ import { MapPin, Briefcase, User, ShieldCheck, ArrowUpRight, Lock, Sparkles } fr
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { FavoriteButton } from './ProfileActions';
+import { useProfileReveal } from '@/hooks/useProfileReveal';
+import { isFieldVisible, maskName } from '@/app/lib/privacy-utils';
+import Avatar from './ui/Avatar';
 
 interface Props {
   profile: Profile;
@@ -13,10 +16,7 @@ interface Props {
 const PublicProfileCard = ({ profile }: Props) => {
   const { user } = useAuth();
   
-  // Privacy Logic: Mask if not public and user not authorized
-  const isOwner = user?.uid === profile.createdBy;
-  const isMasked = !isOwner && profile.privacyLevel === 'Private';
-  const isMembersOnly = profile.privacyLevel === 'MembersOnly' && !user;
+  const { isRevealed, loading: revealLoading } = useProfileReveal(profile);
 
   // Helper: Calculate Age from DOB
   const getAge = (dob?: string) => {
@@ -32,9 +32,9 @@ const PublicProfileCard = ({ profile }: Props) => {
   };
 
   const age = getAge(profile.dob);
-  const displayName = isMasked ? (profile.name.split(' ')[0] + ' ***') : profile.name;
+  const displayName = isRevealed ? profile.name : maskName(profile.name);
 
-  if (isMembersOnly) {
+  if (profile.privacyLevel === 'MembersOnly' && !user) {
     return (
       <div className="bg-card rounded-[2rem] border border-border p-10 flex flex-col items-center justify-center text-center space-y-8 shadow-premium min-h-[450px]">
          <div className="w-24 h-24 bg-secondary rounded-full flex items-center justify-center text-muted-foreground border border-border shadow-inner">
@@ -69,27 +69,25 @@ const PublicProfileCard = ({ profile }: Props) => {
 
       {/* Image Section */}
       <div className="h-[22rem] bg-secondary relative overflow-hidden">
-        {profile.imageUrl ? (
-          <Image
-            src={profile.imageUrl}
-            alt={displayName}
-            fill
-            sizes="(max-width: 768px) 100vw, 33vw"
-            className={`object-cover group-hover:scale-110 transition-transform duration-[1500ms] ease-out ${isMasked ? 'blur-2xl grayscale' : ''}`}
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/30">
-            <User size={100} strokeWidth={0.5} />
-          </div>
-        )}
+        {/* Divine Identity Badge */}
+        <div className={`absolute top-6 left-6 z-20 px-4 py-1.5 rounded-full backdrop-blur-xl border flex items-center gap-2 shadow-premium transition-transform group-hover:scale-105 ${
+          profile.gender === 'female' 
+          ? 'bg-rose-500/10 border-rose-500/20 text-rose-600' 
+          : 'bg-primary/10 border-primary/20 text-primary'
+        }`}>
+           <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${profile.gender === 'female' ? 'bg-rose-500' : 'bg-primary'}`}></div>
+           <span className="text-[10px] font-black uppercase tracking-widest">
+             {profile.gender === 'female' ? 'Bride Portfolio' : 'Groom Portfolio'}
+           </span>
+        </div>
 
-        {isMasked && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/10 backdrop-blur-sm">
-             <div className="px-6 py-3 bg-white/90 backdrop-blur-md rounded-2xl border border-border text-foreground text-[9px] font-black uppercase tracking-[0.3em] shadow-premium flex items-center gap-2">
-                <Lock size={12} className="text-primary" /> Photo Restricted
-             </div>
-          </div>
-        )}
+        <Avatar 
+          src={profile.imageUrl} 
+          name={profile.name} 
+          isRevealed={isFieldVisible('imageUrl', profile, isRevealed)} 
+          size="xl" 
+          className="w-full h-full rounded-none border-none shadow-none" 
+        />
         
         {/* Elegant Gradient Overlays */}
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/20 to-transparent pointer-events-none"></div>

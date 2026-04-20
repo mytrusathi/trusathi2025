@@ -3,16 +3,16 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import imageCompression from 'browser-image-compression';
 import { db, storage } from '../../app/lib/firebase';
-import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../../context/AuthContext';
-import { Profile } from '../../types/profile';
+import { Profile, PrivacyLevel } from '../../types/profile';
 import { parseWhatsAppBiodataToProfile } from '../../app/utils/profileParser';
 import { 
   Loader2, Upload, X, Save, User, MapPin, Briefcase, 
   Users, Star, Ruler, Heart, Calendar, Wand2, Shield, Camera
 } from 'lucide-react';
-import { Section, Input, Select } from '../ui/FormElements';
+import { Section, Input, Select, PrivacySelector } from '../ui/FormElements';
 
 interface Props {
   initialData?: Profile | null;
@@ -102,6 +102,16 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const updatePrivacy = (field: string, level: PrivacyLevel) => {
+    setFormData(prev => ({
+      ...prev,
+      privacySettings: {
+        ...(prev.privacySettings || {}),
+        [field]: level
+      }
+    }));
+  };
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -171,26 +181,50 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
         imageUrl,
         selfieUrl,
         createdBy: user.uid,
+        creatorName: user.displayName || '',
+        creatorGroupName: user.groupName || '',
         nameLowerCase: formData.name?.toLowerCase(), 
         isPublic: formData.isPublic ?? true,
         heightValue: heightValue,
       };
 
+      // Extract contact for private storage
+      const { contact, ...publicProfileData } = profileData;
+
       if (initialData?.id) {
         await updateDoc(doc(db, 'profiles', initialData.id), {
-          ...profileData,
+          ...publicProfileData,
           updatedAt: new Date().toISOString(),
         });
+
+        // Update private data
+        if (contact) {
+          await updateDoc(doc(db, 'profile_private', initialData.id), {
+            contact,
+            updatedAt: new Date().toISOString()
+          });
+        }
       } else {
         const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
         const profileNo = `TS-${randomStr}`;
 
-        await addDoc(collection(db, 'profiles'), {
-          ...profileData,
+        const docRef = await addDoc(collection(db, 'profiles'), {
+          ...publicProfileData,
           profileNo,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
+
+        // Save private contact info using same ID
+        if (contact) {
+          await setDoc(doc(db, 'profile_private', docRef.id), {
+            contact,
+            profileId: docRef.id,
+            profileNo,
+            createdBy: user.uid,
+            createdAt: new Date().toISOString()
+          });
+        }
       }
       onSuccess();
     } catch (error) {
@@ -234,12 +268,12 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
       
       {/* Header */}
       <div className="bg-white px-8 py-5 border-b border-slate-100 flex justify-between items-center sticky top-0 z-20">
-        <div>
-           <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
-             {initialData ? 'Edit Profile' : 'Create New Profile'}
-           </h2>
-           <p className="text-sm text-slate-500">Fill in the details to create a shareable biodata</p>
-        </div>
+         <div>
+            <h2 className="text-2xl font-bold font-serif text-slate-800 tracking-tight">
+              {initialData ? 'Refine Divine Portfolio' : 'Create Sanctuary Portfolio'}
+            </h2>
+            <p className="text-sm text-slate-500">Curate your identity with granular privacy controls</p>
+         </div>
         <button onClick={onCancel} className="p-2 bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 rounded-full transition-all">
           <X size={24} />
         </button>
@@ -259,7 +293,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                     <User className="text-slate-300" size={80} />
                     )}
                 </div>
-                <div className="absolute bottom-2 right-4 bg-rose-600 text-white p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
+                <div className="absolute bottom-2 right-4 bg-primary text-white p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
                    <Upload size={20} />
                 </div>
                 <input 
@@ -269,8 +303,18 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                   className="absolute inset-0 opacity-0 cursor-pointer w-full h-full rounded-full"
                 />
               </div>
-              <p className="text-sm font-bold text-slate-700">Profile Photo</p>
-              <p className="text-xs text-slate-400 mt-1">Click to upload a clear image</p>
+              <div className="flex items-center gap-3 w-full justify-center">
+                 <div className="text-center">
+                    <p className="text-sm font-bold text-slate-700">Profile Photo</p>
+                    <p className="text-[10px] text-slate-400">Click to upload</p>
+                 </div>
+                 <div className="h-8 w-[1px] bg-slate-100"></div>
+                 <PrivacySelector 
+                   value={formData.privacySettings?.imageUrl || 'connection'} 
+                   onChange={(val) => updatePrivacy('imageUrl', val)} 
+                   label="Visibility"
+                 />
+              </div>
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
@@ -343,7 +387,7 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                 <button
                   type="button"
                   onClick={handleParseBiodata}
-                  className="px-5 py-2.5 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors"
+                  className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors"
                 >
                   Parse & Fill
                 </button>
@@ -369,7 +413,15 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
             {/* 1. Basic Details */}
             <Section title="Basic Details" icon={<User size={18} />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Input label="Full Name" name="name" value={formData.name} onChange={handleChange} required />
+                <Input 
+                   label="Full Name" 
+                   name="name" 
+                   value={formData.name} 
+                   onChange={handleChange} 
+                   required 
+                   privacyValue={formData.privacySettings?.name || 'connection'}
+                   onPrivacyChange={(val) => updatePrivacy('name', val)}
+                />
                 
                 <div className="grid grid-cols-2 gap-4">
                     <Select 
@@ -415,8 +467,24 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                     onChange={handleChange}
                     options={['Hindu', 'Muslim', 'Sikh', 'Christian', 'Jain', 'Buddhist', 'Parsi', 'Jewish', 'Other']}
                   />
-                  <Input label="Caste" name="caste" value={formData.caste} onChange={handleChange} placeholder="e.g. Brahmin" />
-                  <Input label="Gotra" name="gotra" value={formData.gotra} onChange={handleChange} placeholder="e.g. Bharadwaj" />
+                   <Input 
+                     label="Caste" 
+                     name="caste" 
+                     value={formData.caste} 
+                     onChange={handleChange} 
+                     placeholder="e.g. Brahmin" 
+                     privacyValue={formData.privacySettings?.caste || 'public'}
+                     onPrivacyChange={(val) => updatePrivacy('caste', val)}
+                   />
+                   <Input 
+                     label="Gotra" 
+                     name="gotra" 
+                     value={formData.gotra} 
+                     onChange={handleChange} 
+                     placeholder="e.g. Bharadwaj" 
+                     privacyValue={formData.privacySettings?.gotra || 'public'}
+                     onPrivacyChange={(val) => updatePrivacy('gotra', val)}
+                   />
                   
                   <Input label="Time of Birth" name="tob" type="time" value={formData.tob} onChange={handleChange} />
                   <Input label="Place of Birth" name="pob" value={formData.pob} onChange={handleChange} />
@@ -444,17 +512,39 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
                       options={['Govt', 'Private', 'Business', 'Professional', 'Self-Employed', 'Other']}
                     />
                     <Input label="Company Name" name="company" value={formData.company} onChange={handleChange} />
-                    <Input label="Annual Income" name="income" value={formData.income} onChange={handleChange} placeholder="e.g. 12 LPA" />
+                     <Input 
+                        label="Annual Income" 
+                        name="income" 
+                        value={formData.income} 
+                        onChange={handleChange} 
+                        placeholder="e.g. 12 LPA" 
+                        privacyValue={formData.privacySettings?.income || 'public'}
+                        onPrivacyChange={(val) => updatePrivacy('income', val)}
+                     />
                 </div>
             </Section>
 
             {/* 4. Family */}
             <Section title="Family Background" icon={<Users size={18} />}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <Input label="Father's Name" name="fatherName" value={formData.fatherName} onChange={handleChange} />
-                    <Input label="Father's Occupation" name="fatherOccupation" value={formData.fatherOccupation} onChange={handleChange} />
-                    <Input label="Mother's Name" name="motherName" value={formData.motherName} onChange={handleChange} />
-                    <Input label="Mother's Occupation" name="motherOccupation" value={formData.motherOccupation} onChange={handleChange} />
+                     <Input 
+                        label="Father's Name" 
+                        name="fatherName" 
+                        value={formData.fatherName} 
+                        onChange={handleChange} 
+                        privacyValue={formData.privacySettings?.fatherName || 'connection'}
+                        onPrivacyChange={(val) => updatePrivacy('fatherName', val)}
+                     />
+                     <Input label="Father's Occupation" name="fatherOccupation" value={formData.fatherOccupation} onChange={handleChange} />
+                     <Input 
+                        label="Mother's Name" 
+                        name="motherName" 
+                        value={formData.motherName} 
+                        onChange={handleChange} 
+                        privacyValue={formData.privacySettings?.motherName || 'connection'}
+                        onPrivacyChange={(val) => updatePrivacy('motherName', val)}
+                     />
+                     <Input label="Mother's Occupation" name="motherOccupation" value={formData.motherOccupation} onChange={handleChange} />
                     <Input label="Siblings" name="siblings" value={formData.siblings} onChange={handleChange} placeholder="e.g. 1 Brother, 2 Sisters" className="md:col-span-2" />
                 </div>
             </Section>
@@ -530,13 +620,13 @@ const ProfileForm = ({ initialData, onSuccess, onCancel }: Props) => {
           >
             Cancel
           </button>
-          <button 
+           <button 
             type="submit"
             disabled={loading}
-            className="px-8 py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-colors flex items-center gap-2 shadow-lg shadow-rose-200 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-            {initialData ? 'Update Profile' : 'Save Biodata'}
+            {initialData ? 'Update Divine Portfolio' : 'Publish Sanctuary Portfolio'}
           </button>
         </div>
       </form>

@@ -92,10 +92,14 @@ function MemberDashboardContent() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this profile?")) return;
     try {
       await deleteDoc(doc(db, 'profiles', id));
+      // 🔥 Privacy Cleanup: Remove private contact document
+      try {
+        await deleteDoc(doc(db, 'profile_private', id));
+      } catch (e) {
+        console.warn("Private data cleanup failed (might not exist):", e);
+      }
       setProfiles(prev => prev.filter(p => p.id !== id));
     } catch (error) {
       console.error("Delete failed", error);
