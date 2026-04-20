@@ -4,11 +4,13 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import { Metadata } from 'next';
 import { ArrowLeft, Shield, AlertTriangle, Sparkles, HeartHandshake, ShieldCheck, Scale } from 'lucide-react';
 
-export const metadata = {
-  title: 'Community Charter | TruSathi',
-  description: 'Read the TruSathi Community Charter — our commitment to trust, authenticity, and serving mankind through verified matchmaking.',
+export const metadata: Metadata = {
+  title: "The Community Charter | Authentic Connections",
+  description: "Read the TruSathi Community Charter — our commitment to trust, authenticity, and serving mankind through verified matchmaking. Understand our decentralized trust model and safety guidelines.",
+  keywords: ["Community Charter", "Matrimonial Rules", "Trusted Matchmaking", "Platform Integrity", "Safety Guidelines"],
 };
 
 export default function TermsPage() {

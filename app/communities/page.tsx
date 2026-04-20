@@ -5,7 +5,14 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { AppUser } from '@/types/appUser';
+import { Metadata } from 'next';
 import { Users, ShieldCheck, Search, ArrowRight } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: "Verified Communities | Join Your People",
+  description: "Explore trusted matrimony groups managed by verified community leaders. Find matches within your specific community with the highest degree of trust and cultural relevance.",
+  keywords: ["Community Matrimony", "Verified Groups", "Caste Matrimony", "Secure Matchmaking", "Cultural Connections"],
+};
 
 async function getCommunities() {
   const q = query(collection(db, 'users'), where('role', '==', 'group-admin'), where('isApproved', '==', true));

@@ -1,14 +1,18 @@
-import { MetadataRoute } from 'next';
+import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.trusathi.com';
-  
   return {
     rules: {
       userAgent: '*',
-      allow: ['/', '/about', '/search', '/community'],
-      disallow: ['/dashboard', '/register/pending'],
+      allow: '/',
+      disallow: [
+        '/dashboard/', 
+        '/register/success', 
+        '/api/',
+        '/_next/',
+        '/static/'
+      ],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
-  };
+    sitemap: 'https://trusathi.com/sitemap.xml',
+  }
 }

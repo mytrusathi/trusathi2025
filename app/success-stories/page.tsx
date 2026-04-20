@@ -1,8 +1,15 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { Metadata } from 'next';
 import { Sparkles, ShieldCheck, Users, Globe, HandHeart } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: "Success Stories & Our Mission | TruSathi Matrimony",
+  description: "Read about our mission to serve mankind through selfless, community-verified matchmaking. Discover the vision behind TruSathi - a 100% free and honest matrimonial service.",
+  keywords: ["Success Stories", "Matrimonial Mission", "Trusted Matrimony", "Free Matchmaking", "Human Service"],
+};
 
 export default function SuccessStoriesPage() {
   return (
